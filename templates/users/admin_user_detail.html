@@ -1,0 +1,2130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle de {{ usuario.full_name }} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <!-- Encabezado con información del usuario -->
+    <div class="user-detail-header mb-4">
+        <div class="header-gradient">
+            <div class="header-content">
+                <div class="user-main-info">
+                    <div class="user-avatar-large">
+                        {{ usuario.full_name|slice:":1" }}
+                    </div>
+                    <div class="user-details">
+                        <h2 class="user-full-name mb-1">{{ usuario.full_name }}</h2>
+                        <p class="user-email mb-2">
+                            <i class="fas fa-envelope me-2"></i>{{ usuario.email }}
+                        </p>
+                        <div class="user-meta-tags">
+                            {% if usuario.institution %}
+                            <span class="meta-tag">
+                                <i class="fas fa-building me-1"></i>{{ usuario.institution }}
+                            </span>
+                            {% endif %}
+                            <span class="meta-tag">
+                                <i class="fas fa-calendar-plus me-1"></i>Registro: {{ usuario.date_joined|date:"d/m/Y" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'dashboard' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+                </a>
+            </div>
+        </div>
+        
+        <!-- Información adicional del usuario -->
+        <div class="user-info-grid">
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-venus-mars"></i>
+                </div>
+                <div class="info-content">
+                    <label>Género</label>
+                    <p>{{ usuario.get_gender_display }}</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-birthday-cake"></i>
+                </div>
+                <div class="info-content">
+                    <label>Fecha de Nacimiento</label>
+                    <p>{{ usuario.date_of_birth|date:"d/m/Y"|default:"No especificada" }}</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-content">
+                    <label>Último Acceso</label>
+                    <p>{{ usuario.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estadísticas Rápidas -->
+    <div class="row mb-4 g-4 stats-animation-container">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card stat-primary">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ total_pruebas }}</h3>
+                    <p class="stat-label">Total Pruebas</p>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card stat-success">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ total_valores }}</h3>
+                    <p class="stat-label">Tests de Valores</p>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar stat-progress-success" 
+                             style="width: {% if total_pruebas and total_pruebas > 0 %}{% widthratio total_valores total_pruebas 100 %}%{% else %}0%{% endif %}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card stat-info">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ total_domino }}</h3>
+                    <p class="stat-label">Tests de Dominó</p>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar stat-progress-info" 
+                             style="width: {% if total_pruebas and total_pruebas > 0 %}{% widthratio total_domino total_pruebas 100 %}%{% else %}0%{% endif %}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card stat-warning">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">
+                        {% if avg_domino.puntuacion %}
+                            {{ avg_domino.puntuacion|floatformat:1 }}
+                        {% else %}
+                            0.0
+                        {% endif %}
+                    </h3>
+                    <p class="stat-label">Promedio Dominó</p>
+                    <div class="stat-progress">
+                        <div class="stat-progress-bar stat-progress-warning" style="width: 85%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabs Mejorados -->
+    <div class="modern-tabs-container">
+        <ul class="modern-tabs" id="userTabs" role="tablist">
+            <li class="modern-tab-item" role="presentation">
+                <button class="modern-tab-button active" id="valores-tab" data-bs-toggle="tab" 
+                        data-bs-target="#valores" type="button" role="tab">
+                    <span class="tab-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </span>
+                    <span class="tab-content-wrapper">
+                        <span class="tab-title">Tests de Valores</span>
+                        <span class="tab-count">{{ total_valores }}</span>
+                    </span>
+                </button>
+            </li>
+            <li class="modern-tab-item" role="presentation">
+                <button class="modern-tab-button" id="domino-tab" data-bs-toggle="tab" 
+                        data-bs-target="#domino" type="button" role="tab">
+                    <span class="tab-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </span>
+                    <span class="tab-content-wrapper">
+                        <span class="tab-title">Tests de Dominó</span>
+                        <span class="tab-count">{{ total_domino }}</span>
+                    </span>
+                </button>
+            </li>
+            <li class="modern-tab-item" role="presentation">
+                <button class="modern-tab-button" id="estadisticas-tab" data-bs-toggle="tab" 
+                        data-bs-target="#estadisticas" type="button" role="tab">
+                    <span class="tab-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </span>
+                    <span class="tab-content-wrapper">
+                        <span class="tab-title">Estadísticas</span>
+                        <span class="tab-count"><i class="fas fa-analytics"></i></span>
+                    </span>
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content modern-tab-content" id="userTabsContent">
+            <!-- Tab de Tests de Valores -->
+            <div class="tab-pane fade show active" id="valores" role="tabpanel">
+                {% if resultados_valores %}
+                <div class="data-table-card">
+                    <div class="data-table-header">
+                        <h5 class="data-table-title">
+                            <i class="fas fa-heart me-2"></i>Historial de Tests de Valores
+                        </h5>
+                        <button class="btn btn-export-small">
+                            <i class="fas fa-download me-2"></i>Exportar
+                        </button>
+                    </div>
+                    <div class="data-table-body">
+                        <div class="table-responsive">
+                            <table class="table elegant-table">
+                                <thead>
+                                    <tr>
+                                        <th><i class="far fa-calendar me-2"></i>Fecha</th>
+                                        <th><i class="fas fa-trophy me-2"></i>Valor Dominante</th>
+                                        <th>Teórico</th>
+                                        <th>Económico</th>
+                                        <th>Estético</th>
+                                        <th>Social</th>
+                                        <th>Político</th>
+                                        <th>Religioso</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resultado in resultados_valores %}
+                                    <tr class="table-row-animated">
+                                        <td>
+                                            <span class="date-badge">
+                                                {{ resultado.fecha_completado|date:"d/m/Y H:i" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="value-badge value-badge-dominant">
+                                                <i class="fas fa-crown me-1"></i>{{ resultado.valor_dominante }}
+                                            </span>
+                                        </td>
+                                        <td><span class="score-value">{{ resultado.teorico|floatformat:1 }}</span></td>
+                                        <td><span class="score-value">{{ resultado.economico|floatformat:1 }}</span></td>
+                                        <td><span class="score-value">{{ resultado.estetico|floatformat:1 }}</span></td>
+                                        <td><span class="score-value">{{ resultado.social|floatformat:1 }}</span></td>
+                                        <td><span class="score-value">{{ resultado.politico|floatformat:1 }}</span></td>
+                                        <td><span class="score-value">{{ resultado.religioso|floatformat:1 }}</span></td>
+                                        <td class="text-center">
+                                            <a href="{% url 'reporte_valores' resultado.id %}" 
+                                               class="btn-table-action btn-action-success" 
+                                               target="_blank"
+                                               title="Ver reporte completo">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state-card">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5 class="empty-state-title">No hay tests de valores</h5>
+                    <p class="empty-state-text">Este usuario aún no ha completado ningún Test de Valores.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Tab de Tests de Dominó -->
+            <div class="tab-pane fade" id="domino" role="tabpanel">
+                {% if resultados_domino %}
+                <div class="data-table-card">
+                    <div class="data-table-header">
+                        <h5 class="data-table-title">
+                            <i class="fas fa-puzzle-piece me-2"></i>Historial de Tests de Dominó
+                        </h5>
+                        <button class="btn btn-export-small">
+                            <i class="fas fa-download me-2"></i>Exportar
+                        </button>
+                    </div>
+                    <div class="data-table-body">
+                        <div class="table-responsive">
+                            <table class="table elegant-table">
+                                <thead>
+                                    <tr>
+                                        <th><i class="far fa-calendar me-2"></i>Fecha</th>
+                                        <th><i class="fas fa-star me-2"></i>Puntuación</th>
+                                        <th>Percentil</th>
+                                        <th>Diagnóstico</th>
+                                        <th><i class="far fa-clock me-2"></i>Tiempo</th>
+                                        <th>Eficiencia</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resultado in resultados_domino %}
+                                    <tr class="table-row-animated">
+                                        <td>
+                                            <span class="date-badge">
+                                                {{ resultado.fecha|date:"d/m/Y H:i" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="score-badge score-badge-info">
+                                                {{ resultado.puntuacion }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="percentile-display">
+                                                <span class="percentile-value">{{ resultado.percentil|floatformat:1 }}%</span>
+                                                <div class="percentile-bar">
+                                                    <div class="percentile-fill" style="width: {{ resultado.percentil|floatformat:0 }}%"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="diagnostic-badge">{{ resultado.diagnostico }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="time-badge">
+                                                <i class="far fa-clock me-1"></i>{{ resultado.tiempo_utilizado }}s
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="efficiency-badge">{{ resultado.eficiencia|floatformat:1 }}%</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{% url 'resultados_domino' resultado.id %}" 
+                                               class="btn-table-action btn-action-info" 
+                                               target="_blank"
+                                               title="Ver resultados completos">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state-card">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h5 class="empty-state-title">No hay tests de dominó</h5>
+                    <p class="empty-state-text">Este usuario aún no ha completado ningún Test de Dominó.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Tab de Estadísticas -->
+            <div class="tab-pane fade" id="estadisticas" role="tabpanel">
+                <div class="row g-4">
+                    <!-- Estadísticas de Valores -->
+                    <div class="col-lg-6">
+                        <div class="stats-detail-card">
+                            <div class="stats-detail-header">
+                                <div class="stats-detail-icon stats-icon-success">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-detail-title">Promedios de Test de Valores</h5>
+                                    <p class="stats-detail-subtitle">Análisis por dimensión</p>
+                                </div>
+                            </div>
+                            <div class="stats-detail-body">
+                                {% if avg_valores.teorico %}
+                                <div class="value-bars-container">
+                                    <div class="value-bar-item">
+                                        <div class="value-bar-label">
+                                            <span class="label-text">Teórico</span>
+                                            <span class="label-value">{{ avg_valores.teorico|floatformat:1 }}</span>
+                                        </div>
+                                        <div class="value-bar-track">
+                                            <div class="value-bar-fill value-fill-teorico" 
+                                                 style="width: {{ avg_valores.teorico|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="value-bar-item">
+                                        <div class="value-bar-label">
+                                            <span class="label-text">Económico</span>
+                                            <span class="label-value">{{ avg_valores.economico|floatformat:1 }}</span>
+                                        </div>
+                                        <div class="value-bar-track">
+                                            <div class="value-bar-fill value-fill-economico" 
+                                                 style="width: {{ avg_valores.economico|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="value-bar-item">
+                                        <div class="value-bar-label">
+                                            <span class="label-text">Estético</span>
+                                            <span class="label-value">{{ avg_valores.estetico|floatformat:1 }}</span>
+                                        </div>
+                                        <div class="value-bar-track">
+                                            <div class="value-bar-fill value-fill-estetico" 
+                                                 style="width: {{ avg_valores.estetico|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="value-bar-item">
+                                        <div class="value-bar-label">
+                                            <span class="label-text">Social</span>
+                                            <span class="label-value">{{ avg_valores.social|floatformat:1 }}</span>
+                                        </div>
+                                        <div class="value-bar-track">
+                                            <div class="value-bar-fill value-fill-social" 
+                                                 style="width: {{ avg_valores.social|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="value-bar-item">
+                                        <div class="value-bar-label">
+                                            <span class="label-text">Político</span>
+                                            <span class="label-value">{{ avg_valores.politico|floatformat:1 }}</span>
+                                        </div>
+                                        <div class="value-bar-track">
+                                            <div class="value-bar-fill value-fill-politico" 
+                                                 style="width: {{ avg_valores.politico|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="value-bar-item">
+                                        <div class="value-bar-label">
+                                            <span class="label-text">Religioso</span>
+                                            <span class="label-value">{{ avg_valores.religioso|floatformat:1 }}</span>
+                                        </div>
+                                        <div class="value-bar-track">
+                                            <div class="value-bar-fill value-fill-religioso" 
+                                                 style="width: {{ avg_valores.religioso|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="no-data-state">
+                                    <i class="fas fa-chart-bar fa-3x"></i>
+                                    <p>No hay datos de valores disponibles</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Valores Dominantes -->
+                        {% if valores_dominantes %}
+                        <div class="stats-detail-card mt-4">
+                            <div class="stats-detail-header">
+                                <div class="stats-detail-icon stats-icon-success">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-detail-title">Valores Dominantes</h5>
+                                    <p class="stats-detail-subtitle">Frecuencia de aparición</p>
+                                </div>
+                            </div>
+                            <div class="stats-detail-body">
+                                <div class="frequency-list">
+                                    {% for item in valores_dominantes %}
+                                    <div class="frequency-item">
+                                        <span class="frequency-label">
+                                            <i class="fas fa-trophy me-2"></i>{{ item.valor_dominante }}
+                                        </span>
+                                        <span class="frequency-badge">{{ item.count }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Estadísticas de Dominó -->
+                    <div class="col-lg-6">
+                        <div class="stats-detail-card">
+                            <div class="stats-detail-header">
+                                <div class="stats-detail-icon stats-icon-info">
+                                    <i class="fas fa-puzzle-piece"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-detail-title">Promedios de Test de Dominó</h5>
+                                    <p class="stats-detail-subtitle">Rendimiento general</p>
+                                </div>
+                            </div>
+                            <div class="stats-detail-body">
+                                {% if avg_domino.puntuacion %}
+                                <div class="metric-cards-grid">
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="metric-content">
+                                            <span class="metric-label">Puntuación</span>
+                                            <span class="metric-value">{{ avg_domino.puntuacion|floatformat:1 }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="metric-content">
+                                            <span class="metric-label">Percentil</span>
+                                            <span class="metric-value">{{ avg_domino.percentil|floatformat:1 }}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-tachometer-alt"></i>
+                                        </div>
+                                        <div class="metric-content">
+                                            <span class="metric-label">Eficiencia</span>
+                                            <span class="metric-value">{{ avg_domino.eficiencia|floatformat:1 }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="no-data-state">
+                                    <i class="fas fa-puzzle-piece fa-3x"></i>
+                                    <p>No hay datos de dominó disponibles</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Diagnósticos Frecuentes -->
+                        {% if diagnosticos %}
+                        <div class="stats-detail-card mt-4">
+                            <div class="stats-detail-header">
+                                <div class="stats-detail-icon stats-icon-info">
+                                    <i class="fas fa-stethoscope"></i>
+                                </div>
+                                <div>
+                                    <h5 class="stats-detail-title">Diagnósticos Frecuentes</h5>
+                                    <p class="stats-detail-subtitle">Clasificaciones obtenidas</p>
+                                </div>
+                            </div>
+                            <div class="stats-detail-body">
+                                <div class="frequency-list">
+                                    {% for item in diagnosticos %}
+                                    <div class="frequency-item">
+                                        <span class="frequency-label">
+                                            <i class="fas fa-file-medical me-2"></i>{{ item.diagnostico|default:"Sin diagnóstico" }}
+                                        </span>
+                                        <span class="frequency-badge frequency-badge-info">{{ item.count }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botones de Acción Finales -->
+    <div class="action-buttons-footer">
+        <div class="action-group">
+            <button class="btn-action-footer btn-print" onclick="window.print()">
+                <i class="fas fa-print"></i>
+                <span>Imprimir Reporte</span>
+            </button>
+            <button class="btn-action-footer btn-excel" id="exportBtn">
+                <i class="fas fa-file-excel"></i>
+                <span>Exportar a Excel</span>
+            </button>
+        </div>
+        <div class="action-group">
+            <a href="mailto:{{ usuario.email }}" class="btn-action-footer btn-email">
+                <i class="fas fa-envelope"></i>
+                <span>Contactar Usuario</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --color-primary: #2A4D6E;
+    --color-secondary: #3A7D7D;
+    --color-accent: #FDB833;
+    --color-success: #06D6A0;
+    --color-info: #3A7D7D;
+    --color-warning: #FDB833;
+    --color-danger: #EF476F;
+    --color-text: #2c3e50;
+    --color-text-muted: #6c757d;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 5px 20px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   HEADER DEL USUARIO
+======================================== */
+.user-detail-header {
+    animation: fadeInDown 0.6s ease;
+}
+
+.header-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.header-gradient::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.header-content {
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.user-main-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.user-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: white;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border: 5px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-details {
+    color: white;
+}
+
+.user-full-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    color: #c0c5ff;
+}
+
+.user-email {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.user-meta-tags {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.meta-tag {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.btn-back {
+    background: white;
+    color: var(--color-primary);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    color: var(--color-secondary);
+}
+
+/* Grid de información adicional */
+.user-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(42, 77, 110, 0.1) 0%, rgba(42, 77, 110, 0.05) 100%);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.info-content label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.info-content p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* ========================================
+   TARJETAS DE ESTADÍSTICAS
+======================================== */
+.stats-animation-container {
+    animation: fadeInUp 0.6s ease;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    animation: slideInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--card-color) 0%, transparent 100%);
+}
+
+.stat-primary { --card-color: var(--color-primary); }
+.stat-success { --card-color: var(--color-success); }
+.stat-info { --card-color: var(--color-info); }
+.stat-warning { --card-color: var(--color-warning); }
+
+.stat-icon-wrapper {
+    margin-bottom: 1rem;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, rgba(42, 77, 110, 0.1) 0%, rgba(42, 77, 110, 0.05) 100%);
+    color: var(--card-color);
+}
+
+.stat-success .stat-icon {
+    background: linear-gradient(135deg, rgba(6, 214, 160, 0.15) 0%, rgba(6, 214, 160, 0.05) 100%);
+}
+
+.stat-info .stat-icon {
+    background: linear-gradient(135deg, rgba(58, 125, 125, 0.15) 0%, rgba(58, 125, 125, 0.05) 100%);
+}
+
+.stat-warning .stat-icon {
+    background: linear-gradient(135deg, rgba(253, 184, 51, 0.15) 0%, rgba(253, 184, 51, 0.05) 100%);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0.5rem 0;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+.stat-progress {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.stat-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    border-radius: 10px;
+    transition: width 1s ease;
+}
+
+.stat-progress-success {
+    background: linear-gradient(90deg, #06D6A0 0%, #04a67a 100%);
+}
+
+.stat-progress-info {
+    background: linear-gradient(90deg, #3A7D7D 0%, #2d6161 100%);
+}
+
+.stat-progress-warning {
+    background: linear-gradient(90deg, #FDB833 0%, #e5a31f 100%);
+}
+
+/* ========================================
+   TABS MODERNOS
+======================================== */
+.modern-tabs-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    animation: fadeIn 0.6s ease 0.4s both;
+}
+
+.modern-tabs {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 3px solid #dee2e6;
+}
+
+.modern-tab-item {
+    flex: 1;
+}
+
+.modern-tab-button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    color: var(--color-text-muted);
+}
+
+.modern-tab-button::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.modern-tab-button:hover {
+    background: rgba(42, 77, 110, 0.05);
+    color: var(--color-primary);
+}
+
+.modern-tab-button.active {
+    background: white;
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.modern-tab-button.active::after {
+    transform: scaleX(1);
+}
+
+.tab-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(42, 77, 110, 0.1);
+    transition: var(--transition);
+}
+
+.modern-tab-button.active .tab-icon {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(42, 77, 110, 0.3);
+}
+
+.tab-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.tab-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tab-count {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.modern-tab-content {
+    padding: 2rem;
+}
+
+/* ========================================
+   TABLAS DE DATOS
+======================================== */
+.data-table-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.data-table-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.data-table-title {
+    color: white;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.btn-export-small {
+    background: white;
+    color: var(--color-primary);
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.btn-export-small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.data-table-body {
+    padding: 0;
+}
+
+.elegant-table {
+    margin: 0;
+    width: 100%;
+}
+
+.elegant-table thead {
+    background: #f8f9fa;
+}
+
+.elegant-table thead th {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.elegant-table tbody tr {
+    border-bottom: 1px solid #f1f3f5;
+    transition: var(--transition);
+}
+
+.table-row-animated:hover {
+    background: linear-gradient(90deg, rgba(42, 77, 110, 0.03) 0%, transparent 100%);
+    transform: scale(1.005);
+}
+
+.elegant-table tbody td {
+    padding: 1.25rem 1.5rem;
+    vertical-align: middle;
+}
+
+/* Badges y elementos de tabla */
+.date-badge {
+    background: rgba(42, 77, 110, 0.1);
+    color: var(--color-primary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.value-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.value-badge-dominant {
+    background: linear-gradient(135deg, #06D6A0 0%, #04a67a 100%);
+    color: white;
+    box-shadow: 0 3px 10px rgba(6, 214, 160, 0.3);
+}
+
+.score-value {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.score-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: inline-block;
+    min-width: 50px;
+    text-align: center;
+}
+
+.score-badge-info {
+    background: linear-gradient(135deg, #3A7D7D 0%, #2d6161 100%);
+    color: white;
+    box-shadow: 0 3px 10px rgba(58, 125, 125, 0.3);
+}
+
+.percentile-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.percentile-value {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.percentile-bar {
+    width: 100px;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.percentile-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3A7D7D 0%, #2d6161 100%);
+    border-radius: 10px;
+    transition: width 1s ease;
+}
+
+.diagnostic-badge {
+    background: rgba(58, 125, 125, 0.1);
+    color: var(--color-info);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.time-badge,
+.efficiency-badge {
+    background: rgba(253, 184, 51, 0.1);
+    color: var(--color-warning);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-table-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.btn-action-success {
+    background: rgba(6, 214, 160, 0.1);
+    color: #06D6A0;
+}
+
+.btn-action-success:hover {
+    background: #06D6A0;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(6, 214, 160, 0.3);
+}
+
+.btn-action-info {
+    background: rgba(58, 125, 125, 0.1);
+    color: #3A7D7D;
+}
+
+.btn-action-info:hover {
+    background: #3A7D7D;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(58, 125, 125, 0.3);
+}
+
+/* ========================================
+   ESTADO VACÍO
+======================================== */
+.empty-state-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow-sm);
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-state-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(42, 77, 110, 0.1) 0%, rgba(42, 77, 110, 0.05) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--color-primary);
+}
+
+.empty-state-title {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-text {
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* ========================================
+   TARJETAS DE ESTADÍSTICAS DETALLADAS
+======================================== */
+.stats-detail-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.stats-detail-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.stats-detail-header {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.stats-detail-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stats-icon-success {
+    background: linear-gradient(135deg, #06D6A0 0%, #04a67a 100%);
+}
+
+.stats-icon-info {
+    background: linear-gradient(135deg, #3A7D7D 0%, #2d6161 100%);
+}
+
+.stats-detail-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.stats-detail-subtitle {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.stats-detail-body {
+    padding: 1.5rem;
+}
+
+/* Barras de valores */
+.value-bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.value-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.value-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label-text {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.label-value {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 1rem;
+}
+
+.value-bar-track {
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.value-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+}
+
+.value-fill-teorico {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.value-fill-economico {
+    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+}
+
+.value-fill-estetico {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.value-fill-social {
+    background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.value-fill-politico {
+    background: linear-gradient(90deg, #fa709a 0%, #fee140 100%);
+}
+
+.value-fill-religioso {
+    background: linear-gradient(90deg, #30cfd0 0%, #330867 100%);
+}
+
+/* Lista de frecuencias */
+.frequency-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.frequency-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: var(--transition);
+}
+
+.frequency-item:hover {
+    background: rgba(42, 77, 110, 0.05);
+    transform: translateX(5px);
+}
+
+.frequency-label {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.frequency-badge {
+    background: linear-gradient(135deg, #06D6A0 0%, #04a67a 100%);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: center;
+}
+
+.frequency-badge-info {
+    background: linear-gradient(135deg, #3A7D7D 0%, #2d6161 100%);
+}
+
+/* Tarjetas de métricas */
+.metric-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.metric-card {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-info) 0%, var(--color-secondary) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.metric-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.metric-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.no-data-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+}
+
+.no-data-state i {
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   BOTONES DE ACCIÓN FINALES
+======================================== */
+.action-buttons-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-action-footer {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid;
+    background: white;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.btn-print {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-print:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(42, 77, 110, 0.3);
+}
+
+.btn-excel {
+    border-color: #06D6A0;
+    color: #06D6A0;
+}
+
+.btn-excel:hover {
+    background: #06D6A0;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(6, 214, 160, 0.3);
+}
+
+.btn-email {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.btn-email:hover {
+    background: var(--color-accent);
+    color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(253, 184, 51, 0.3);
+}
+
+/* ========================================
+   ANIMACIONES
+======================================== */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-width: 992px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-main-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-full-name {
+        font-size: 1.5rem;
+    }
+    
+    .modern-tabs {
+        flex-direction: column;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-avatar-large {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .modern-tab-content {
+        padding: 1rem;
+    }
+    
+    .elegant-table thead th,
+    .elegant-table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .action-buttons-footer {
+        flex-direction: column;
+    }
+    
+    .action-group {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .btn-action-footer {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .data-table-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .btn-export-small {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   UTILIDADES
+======================================== */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: var(--color-secondary);
+}
+
+/* Estilos de impresión */
+@media print {
+    .btn-back,
+    .btn-export-small,
+    .action-buttons-footer,
+    .modern-tabs {
+        display: none !important;
+    }
+    
+    .modern-tab-content {
+        display: block !important;
+    }
+    
+    .tab-pane {
+        display: block !important;
+        opacity: 1 !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activar tooltips de Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Animación de las barras de progreso al hacer scroll
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.width = entry.target.getAttribute('data-width') || entry.target.style.width;
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.stat-progress-bar, .value-bar-fill, .percentile-fill').forEach(bar => {
+        observer.observe(bar);
+    });
+    
+    // Manejar exportación a Excel
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        // Mostrar notificación elegante
+        showNotification('Funcionalidad de exportación en desarrollo. ¡Próximamente!', 'info');
+    });
+    
+    // Guardar la pestaña activa en localStorage
+    const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (event) {
+            localStorage.setItem('lastActiveTab', event.target.id);
+        });
+    });
+    
+    // Restaurar la última pestaña activa
+    const lastTab = localStorage.getItem('lastActiveTab');
+    if (lastTab) {
+        const triggerEl = document.querySelector('#' + lastTab);
+        if (triggerEl) {
+            const tab = new bootstrap.Tab(triggerEl);
+            tab.show();
+        }
+    }
+    
+    // Animación de conteo para los números
+    animateNumbers();
+});
+
+// Función para animar números
+function animateNumbers() {
+    const numbers = document.querySelectorAll('.stat-number, .metric-value');
+    
+    numbers.forEach(numberElement => {
+        const finalNumber = parseFloat(numberElement.textContent);
+        if (isNaN(finalNumber)) return;
+        
+        const duration = 1500;
+        const steps = 60;
+        const increment = finalNumber / steps;
+        let currentNumber = 0;
+        let currentStep = 0;
+        
+        const timer = setInterval(() => {
+            currentNumber += increment;
+            currentStep++;
+            
+            if (currentStep >= steps) {
+                clearInterval(timer);
+                numberElement.textContent = finalNumber.toFixed(1);
+            } else {
+                numberElement.textContent = currentNumber.toFixed(1);
+            }
+        }, duration / steps);
+    });
+}
+
+// Función para mostrar notificaciones elegantes
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `custom-notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${getNotificationIcon(type)} notification-icon"></i>
+            <span class="notification-message">${message}</span>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Auto-eliminar después de 4 segundos
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+function getNotificationIcon(type) {
+    const icons = {
+        'info': 'info-circle',
+        'success': 'check-circle',
+        'warning': 'exclamation-triangle',
+        'error': 'times-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+</script>
+
+<style>
+/* Estilos para notificaciones personalizadas */
+.custom-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 300px;
+    max-width: 500px;
+    z-index: 9999;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-left: 5px solid;
+}
+
+.custom-notification.show {
+    transform: translateX(0);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.notification-icon {
+    font-size: 1.5rem;
+}
+
+.notification-message {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+.notification-close:hover {
+    color: var(--color-danger);
+}
+
+.notification-info {
+    border-left-color: var(--color-info);
+}
+
+.notification-info .notification-icon {
+    color: var(--color-info);
+}
+
+.notification-success {
+    border-left-color: var(--color-success);
+}
+
+.notification-success .notification-icon {
+    color: var(--color-success);
+}
+
+.notification-warning {
+    border-left-color: var(--color-warning);
+}
+
+.notification-warning .notification-icon {
+    color: var(--color-warning);
+}
+
+.notification-error {
+    border-left-color: var(--color-danger);
+}
+
+.notification-error .notification-icon {
+    color: var(--color-danger);
+}
+
+/* Animación de pulso para iconos importantes */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.value-badge-dominant {
+    animation: pulse 2s infinite;
+}
+
+/* Efecto de brillo en hover para tarjetas */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+}
+
+.stat-card:hover::after {
+    left: 100%;
+}
+
+/* Mejora visual para modo oscuro (opcional) */
+@media (prefers-color-scheme: dark) {
+    .user-info-grid .info-card,
+    .stat-card,
+    .data-table-card,
+    .empty-state-card,
+    .stats-detail-card,
+    .action-buttons-footer {
+        background: #c0c5ff;
+        color: #e0e0e0;
+    }
+    
+    .elegant-table thead {
+        background: #2a2a2a;
+    }
+    
+    .elegant-table tbody tr {
+        border-bottom-color: #333;
+    }
+    
+    .table-row-animated:hover {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+    }
+}
+
+/* Estilos adicionales para mejorar la accesibilidad */
+.btn-table-action:focus,
+.btn-action-footer:focus,
+.modern-tab-button:focus {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Indicador de carga para exportaciones */
+.btn-export-small.loading,
+.btn-action-footer.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-export-small.loading::after,
+.btn-action-footer.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@keyframes spin {
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
+
+/* Mejoras para scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Efecto de enfoque suave en elementos interactivos */
+.modern-tab-button,
+.btn-table-action,
+.btn-action-footer,
+.frequency-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-tab-button::before,
+.btn-table-action::before,
+.btn-action-footer::before,
+.frequency-item::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.modern-tab-button:active::before,
+.btn-table-action:active::before,
+.btn-action-footer:active::before,
+.frequency-item:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Estilos para tooltips personalizados */
+.custom-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-tooltip .tooltip-text {
+    visibility: hidden;
+    background-color: var(--color-primary);
+    color: white;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-tooltip .tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-primary) transparent transparent transparent;
+}
+
+.custom-tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Estilos para skeleton loading (opcional para futuras mejoras) */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Estilos para badges de estado adicionales */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.status-badge-active {
+    background: rgba(6, 214, 160, 0.15);
+    color: #06D6A0;
+}
+
+.status-badge-pending {
+    background: rgba(253, 184, 51, 0.15);
+    color: #FDB833;
+}
+
+.status-badge-inactive {
+    background: rgba(108, 117, 125, 0.15);
+    color: #6c757d;
+}
+
+/* Mejoras para la experiencia táctil en dispositivos móviles */
+@media (hover: none) and (pointer: coarse) {
+    .btn-table-action,
+    .btn-action-footer,
+    .modern-tab-button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .stat-card:hover,
+    .info-card:hover,
+    .stats-detail-card:hover {
+        transform: none;
+    }
+}
+
+/* Estilos para modo de contraste alto */
+@media (prefers-contrast: high) {
+    .modern-tab-button.active {
+        border: 3px solid var(--color-primary);
+    }
+    
+    .btn-table-action,
+    .btn-action-footer {
+        border-width: 3px;
+    }
+}
+
+/* Estilos para reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+{% endblock %}

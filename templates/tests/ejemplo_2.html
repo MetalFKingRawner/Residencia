@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Dominó - Disposición Radial (Corregido)</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        .domino-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .domino-tile {
+            --tile-width: 65px;
+            --tile-height: 130px;
+            width: var(--tile-width);
+            height: var(--tile-height);
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            transform-origin: center;
+        }
+
+        .domino-tile.respuesta {
+            border: 2px dashed #999;
+            background-color: #f9f9f9;
+        }
+
+        .domino-half {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .domino-half:first-child {
+            border-bottom: 2px solid #333;
+        }
+
+        .domino-tile.respuesta .domino-half:first-child {
+            border-bottom: 2px dashed #999;
+        }
+
+        .dot {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+
+        /* Patrones de puntos (igual que antes) */
+        .dots-1 .dot-1 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dots-2 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-2 .dot-2 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-3 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-3 .dot-2 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dots-3 .dot-3 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-2 { top: 25%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-3 { top: 75%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-4 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-2 { top: 25%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-4 { top: 75%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-5 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-2 { top: 25%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-3 { top: 50%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-4 { top: 50%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-5 { top: 75%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-6 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+
+        /* --- POSICIONES PARA 5 FICHAS (Ref: image_1496e9.png) --- */
+        .count-5 .tile-1 { transform: translate(-80px, -90px) rotate(-40deg); }
+        .count-5 .tile-2 { transform: translate(80px, -90px) rotate(40deg); }
+        .count-5 .tile-3 { transform: translate(125px, 50px) rotate(105deg); }
+        .count-5 .tile-4 { transform: translate(-125px, 50px) rotate(-105deg); }
+        .count-5 .respuesta { transform: translateY(140px); }
+        /* Oculta fichas no usadas */
+        .count-5 .tile-5, .count-5 .tile-6, .count-5 .tile-7 { display: none; }
+
+
+        /* --- POSICIONES PARA 6 FICHAS (Ref: image_149999.png) --- */
+        .count-6 .tile-1 { transform: translateY(-135px) rotate(0deg); }
+        .count-6 .tile-2 { transform: translate(105px, -65px) rotate(55deg); }
+        .count-6 .tile-3 { transform: translate(105px, 70px) rotate(125deg); }
+        .count-6 .tile-4 { transform: translate(-105px, 70px) rotate(-125deg); }
+        .count-6 .tile-5 { transform: translate(-105px, -65px) rotate(-55deg); }
+        .count-6 .respuesta { transform: translateY(140px); }
+        /* Oculta fichas no usadas */
+        .count-6 .tile-6, .count-6 .tile-7 { display: none; }
+
+
+        /* --- POSICIONES PARA 7 FICHAS (Ref: image_1499f6.png) --- */
+        .count-7 .tile-1 { transform: translate(-70px, -145px) rotate(-25deg); }
+        .count-7 .tile-2 { transform: translate(70px, -145px) rotate(25deg); }
+        .count-7 .tile-3 { transform: translate(155px, -25px) rotate(90deg); }
+        .count-7 .tile-4 { transform: translate(100px, 95px) rotate(145deg); }
+        .count-7 .tile-5 { transform: translate(-100px, 95px) rotate(-145deg); }
+        .count-7 .tile-6 { transform: translate(-155px, -25px) rotate(-90deg); }
+        .count-7 .respuesta { transform: translateY(140px); }
+        /* Oculta fichas no usadas */
+        .count-7 .tile-7 { display: none; }
+
+    </style>
+</head>
+<body>
+
+<div class="domino-container count-7"> <div class="domino-tile tile-1">
+        <div class="domino-half dots-0">
+            <!--<div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+            <div class="dot dot-4"></div><div class="dot dot-5"></div><div class="dot dot-6"></div> -->
+        </div>
+        <div class="domino-half dots-6">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+            <div class="dot dot-4"></div><div class="dot dot-5"></div><div class="dot dot-6"></div>
+        </div>
+    </div>
+
+    <div class="domino-tile tile-2">
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+            <div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+        <div class="domino-half dots-5">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+            <div class="dot dot-4"></div><div class="dot dot-5"></div>
+        </div>
+    </div>
+
+    <div class="domino-tile tile-3">
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+            <div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+        <div class="domino-half dots-5">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+            <div class="dot dot-4"></div><div class="dot dot-5"></div>
+        </div>
+    </div>
+
+    <div class="domino-tile tile-4">
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+            <div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+        <div class="domino-half dots-1">
+            <div class="dot dot-1"></div>
+        </div>
+    </div>
+
+    <div class="domino-tile tile-5">
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+            <div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+        <div class="domino-half dots-1">
+            <div class="dot dot-1"></div>
+        </div>
+    </div>
+    
+    <div class="domino-tile tile-6">
+        <div class="domino-half dots-0"></div>
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+            <div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+    </div>
+    
+    <div class="domino-tile tile-7">
+        </div>
+
+
+    <div class="domino-tile respuesta">
+         <div class="domino-half"></div>
+         <div class="domino-half"></div>
+    </div>
+</div>
+
+</body>
+</html>

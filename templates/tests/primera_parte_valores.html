@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Primera Parte - {{ test.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!--
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex flex-column align-items-center justify-content-center py-4">
+            <h3 class="mb-3 text-center">Primera Parte: Distribución de puntos</h3>
+            <p class="mb-1 text-center">Distribuye 3 puntos entre cada par de opciones usando solo combinaciones válidas: (3,0), (0,3), (2,1) o (1,2)</p>
+            <p class="mb-0 text-center">Si no puedes decidirte por una distribución de puntos, deja ambos valores en 0</p>
+        </div>
+    </div>-->
+
+    <form id="form-test" method="post" action="{% url 'tests:primera_parte_valores' %}">
+        {% csrf_token %}
+        
+        <div class="alert alert-info mb-4 text-center">
+            <div class="d-flex align-items-center justify-content-center">
+                <i class="fas fa-info-circle fa-2x me-3"></i>
+                <div>
+                    <strong>Instrucción:</strong> Para cada pregunta, asigna puntos a las opciones A y B usando los cuadros. 
+                    <span class="d-block mt-1">La suma debe ser siempre 3 puntos, o 0 si no puedes decidirte.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for pregunta in preguntas %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 pregunta-card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Pregunta {{ forloop.counter }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text fw-semibold">{{ pregunta.texto }}</p>
+                        
+                        <div class="opciones-container mb-3">
+                            {% for opcion in pregunta.opcionvalores_set.all %}
+                            <div class="opcion mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="letra-opcion me-2">
+                                        <span class="badge bg-primary rounded-circle">{{ opcion.letra }}</span>
+                                    </div>
+                                    <div class="texto-opcion flex-grow-1">
+                                        {{ opcion.texto }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="puntuacion-container">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <div class="puntuacion-input text-center me-4">
+                                    <label class="d-block mb-2 fw-bold">A</label>
+                                    <input type="text" class="form-control puntos-input" 
+                                        name="puntos_p{{ pregunta.id }}_a" 
+                                        maxlength="1"
+                                        value="0" required
+                                        data-pregunta="{{ pregunta.id }}"
+                                        data-opcion="a">
+                                </div>
+                                
+                                <div class="puntuacion-input text-center ms-4">
+                                    <label class="d-block mb-2 fw-bold">B</label>
+                                    <input type="text" class="form-control puntos-input" 
+                                        name="puntos_p{{ pregunta.id }}_b" 
+                                        maxlength="1"
+                                        value="0" required
+                                        data-pregunta="{{ pregunta.id }}"
+                                        data-opcion="b">
+                                </div>
+                            </div>
+                            
+                            <div class="error-msg mt-2 text-center text-danger" id="error_{{ pregunta.id }}" style="display: none;">
+                                <span>Combinación inválida. Usa solo: (3,0), (0,3), (2,1), (1,2) o (0,0)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if forloop.counter|divisibleby:2 %}
+        </div><div class="row"> 
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Botón centrado sin barra fija ni progreso -->
+        <div class="d-flex justify-content-center my-4">
+            <button type="submit" class="btn btn-success btn-lg px-5">
+                <i class="fas fa-check-circle me-2"></i>Terminar Primera Parte
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .pregunta-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #e0e0e0;
+    }
+    .pregunta-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .puntuacion-container {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+    }
+    .puntuacion-input {
+        position: relative;
+        width: 100px;
+    }
+    .puntuacion-input label {
+        position: absolute;
+        top: -25px;
+        left: 35px;
+        font-weight: bold;
+    }
+    .puntos-input {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        border: 3px solid #2A4D6E;
+        border-radius: 12px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        margin: 0;
+    }
+    .puntos-input:focus {
+        border-color: #3A7D7D;
+        box-shadow: 0 0 0 0.25rem rgba(42, 77, 110, 0.25);
+    }
+    .puntos-input.is-invalid {
+        border-color: #dc3545;
+        color: #dc3545;
+        background-image: none !important;
+        padding-right: 12px;
+    }
+    .opcion {
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f0f4f8;
+    }
+    .letra-opcion .badge {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const puntosInputs = document.querySelectorAll('.puntos-input');
+    
+    const handleInput = function(e) {
+        // Permitir sólo dígitos 0-3 y un solo carácter
+        this.value = this.value.replace(/[^0-3]/g, '');
+        if (this.value.length > 1) {
+            this.value = this.value.slice(0, 1);
+        }
+        // Si el campo no está vacío, forzamos máximo 3
+        const num = parseInt(this.value);
+        if (!isNaN(num) && num > 3) {
+            this.value = '3';
+        }
+        validateCombination.call(this);
+    };
+    
+    const validateCombination = function() {
+        const preguntaId = this.dataset.pregunta;
+        const inputA = document.querySelector(`input[data-pregunta="${preguntaId}"][data-opcion="a"]`);
+        const inputB = document.querySelector(`input[data-pregunta="${preguntaId}"][data-opcion="b"]`);
+        const errorDiv = document.getElementById(`error_${preguntaId}`);
+        
+        const valA = parseInt(inputA.value) || 0;
+        const valB = parseInt(inputB.value) || 0;
+        const total = valA + valB;
+        
+        const validCombinations = [
+            [3,0], [0,3], [2,1], [1,2], [0,0]
+        ];
+        
+        let isValid = validCombinations.some(c => c[0] === valA && c[1] === valB);
+        
+        if (!isValid) {
+            errorDiv.style.display = 'block';
+            inputA.classList.add('is-invalid');
+            inputB.classList.add('is-invalid');
+        } else {
+            errorDiv.style.display = 'none';
+            inputA.classList.remove('is-invalid');
+            inputB.classList.remove('is-invalid');
+        }
+    };
+    
+    puntosInputs.forEach(input => {
+        input.addEventListener('input', handleInput);
+        input.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = '0';
+                validateCombination.call(this);
+            }
+        });
+        // validación inicial
+        validateCombination.call(input);
+    });
+    
+    document.getElementById('form-test').addEventListener('submit', function(e) {
+        let hasErrors = false;
+        puntosInputs.forEach(input => {
+            validateCombination.call(input);
+            if (input.classList.contains('is-invalid')) {
+                hasErrors = true;
+            }
+        });
+        if (hasErrors) {
+            e.preventDefault();
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-3';
+            alertDiv.style.zIndex = '2000';
+            alertDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div>
+                        <h5>Combinaciones inválidas</h5>
+                        <p class="mb-0">Por favor corrige las respuestas marcadas en rojo antes de continuar</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+    });
+});
+</script>
+{% endblock %}

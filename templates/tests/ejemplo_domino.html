@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Test de Dominó – Ejercicio 1</title>
+    <style>
+        /* --------------------
+           1. Reset y tipografía
+           -------------------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e2e2e2;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* --------------------
+           2. Contenedor principal
+           -------------------- */
+        .domino-exercise-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            padding: 24px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.05),
+                inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+        }
+
+        /* --------------------
+           3. Ficha de dominó (base)
+           -------------------- */
+        .domino-tile {
+            width: 80px;
+            height: 160px;
+            background: linear-gradient(145deg, #e3fcec, #f1eafc); /* Verde menta → lavanda pálido */
+            border: 2px solid #d1c1e0; /* Lila grisáceo */
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.08),
+                inset 0 1px 2px rgba(255, 255, 255, 0.4);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        /* --------------------
+           4. Hover y selección (para TODAS las fichas)
+           -------------------- */
+        .domino-tile:hover {
+            background: linear-gradient(145deg, #f0fff2, #faf4ff);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.10),
+                inset 0 1px 2px rgba(255, 255, 255, 0.45);
+        }
+        .domino-tile:active {
+            background: linear-gradient(145deg, #d5f8d8, #efe4f8);
+            transform: translateY(0) scale(0.99);
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.06),
+                inset 0 2px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* --------------------
+           5. Ficha de respuesta (vacía)
+           -------------------- */
+        .domino-tile.respuesta {
+            border: 2px dashed #d1c1e0;
+            background-color: #f7f7f9; /* Blanco con apenas un tinte pastel */
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.05);
+            cursor: text; /* Muestra cursor “texto” al pasar sobre ella */
+        }
+
+        /* Anular hover/active para LA SOLA ficha vacía */
+        .domino-tile.respuesta:hover {
+            transform: none !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        }
+        .domino-tile.respuesta:active {
+            transform: none !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* --------------------
+           6. Mitades de la ficha
+           -------------------- */
+        .domino-half {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .domino-half:first-child {
+            border-bottom: 2px solid #bababa;
+        }
+        .domino-tile.respuesta .domino-half:first-child {
+            border-bottom: 2px dashed #ccc;
+        }
+
+        /* --------------------
+           7. Estilo de los puntos (“pips”)
+           -------------------- */
+        .dot {
+            width: 14px;
+            height: 14px;
+            background-color: #6f6f6f; /* Gris medio */
+            border-radius: 50%;
+            position: absolute;
+            transition: background-color 0.2s ease;
+            box-shadow: none;
+        }
+        .domino-tile:hover .dot {
+            background-color: #5a5a5a;
+        }
+
+        /* --------------------
+           8. Patrones de posición (1 a 6 puntos)
+           -------------------- */
+        .dots-1 .dot-1 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-2 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-2 .dot-2 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-2 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-3 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-3 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-4 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-3 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-4 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-5 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-3 {
+            top: 50%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-4 {
+            top: 50%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-5 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-6 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* --------------------
+           9. Inputs dentro de ficha vacía
+           -------------------- */
+        .domino-input {
+            width: 60%;
+            max-width: 40px;
+            font-size: 2rem;       /* Aquí aumentamos el tamaño de los números */
+            font-weight: 600;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: #4f4f4f;
+            caret-color: #6f6f6f;
+            outline: none;
+            padding: 0;
+            line-height: 1;
+        }
+        .domino-input:focus {
+            border-bottom: 2px solid #b3a9d9; /* Lila muy suave */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="domino-exercise-container">
+        <!-- Primera fila: 3 fichas con puntos -->
+        <div class="domino-tile" id="tile-0-0">
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+        </div>
+
+        <div class="domino-tile" id="tile-0-1">
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+        </div>
+
+        <div class="domino-tile" id="tile-0-2">
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+        </div>
+
+        <!-- Segunda fila: 2 fichas con puntos y 1 vacía (editable) -->
+        <div class="domino-tile" id="tile-1-0">
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+        </div>
+
+        <div class="domino-tile" id="tile-1-1">
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+            <div class="domino-half dots-4">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="dot dot-4"></div>
+            </div>
+        </div>
+
+        <!-- Ficha editable (posición 1,2) sin efecto hover/click -->
+        <div class="domino-tile respuesta" id="tile-1-2-respuesta">
+            <div class="domino-half">
+                <input class="domino-input" maxlength="1" placeholder="" />
+            </div>
+            <div class="domino-half">
+                <input class="domino-input" maxlength="1" placeholder="" />
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para pintar puntos si la usas dinámicamente (igual que antes)
+        function drawDots(halfElement, count) {
+            halfElement.innerHTML = '';
+            halfElement.className = 'domino-half';
+            if (count > 0 && count <= 6) {
+                halfElement.classList.add(`dots-${count}`);
+                for (let i = 1; i <= count; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot', `dot-${i}`);
+                    halfElement.appendChild(dot);
+                }
+            }
+        }
+
+        // Validar que solo se ingrese un dígito entre 0 y 6 en cada input de la ficha vacía
+        const inputsRespuesta = document.querySelectorAll('.domino-input');
+        inputsRespuesta.forEach(input => {
+            input.addEventListener('input', () => {
+                const val = input.value;
+                if (!/^[0-6]$/.test(val)) {
+                    input.value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

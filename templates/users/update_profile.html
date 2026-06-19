@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Perfil - PsyMetrics{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0" style="color: white;">Editar Perfil</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_full_name" class="form-label">Nombre completo</label>
+                                {{ form.full_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_email" class="form-label">Correo electrónico</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_date_of_birth" class="form-label">Fecha de nacimiento</label>
+                                {{ form.date_of_birth }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_gender" class="form-label">Género</label>
+                                {{ form.gender }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_institution" class="form-label">Institución/Empresa</label>
+                                {{ form.institution }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="id_education_level" class="form-label">Nivel de estudios</label>
+                                {{ form.education_level }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_occupation" class="form-label">Ocupación</label>
+                            {{ form.occupation }}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

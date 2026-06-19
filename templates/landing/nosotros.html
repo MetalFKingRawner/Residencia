@@ -1,0 +1,851 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nosotros — Centro DHAE</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --cream:   #faf7f0;
+      --warm:    #f0e8d4;
+      --sand:    #d8c898;
+      --primary: #a08848;
+      --dark:    #685820;
+      --ink:     #201808;
+      --accent:  #709888;
+      --accent2: #b8d0c8;
+      --white:   #ffffff;
+      --ff-display: 'Cormorant Garamond', Georgia, serif;
+      --ff-body:    'DM Sans', sans-serif;
+    }
+
+    body {
+      --nav-h: 68px;
+      font-family: var(--ff-body);
+      font-weight: 300;
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    /* ── NAV (idéntico al home) ── */
+    .lnav {
+      position: sticky; top: 0; z-index: 50;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4%;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sand);
+      box-shadow: 0 2px 16px rgba(0,0,0,.06);
+    }
+    .lnav-brand { display: flex; align-items: center; gap: 11px; }
+    .lnav-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--primary);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .lnav-icon svg { width: 22px; height: 22px; fill: #fff; }
+    .lnav-name { display: flex; flex-direction: column; line-height: 1.15; }
+    .lnav-name strong { font-family: var(--ff-display); font-size: 1rem; font-weight: 600; color: var(--dark); letter-spacing: .01em; }
+    .lnav-name span  { font-size: .7rem; color: var(--primary); font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+    .lnav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+    .lnav-links a {
+      text-decoration: none; padding: 6px 14px; border-radius: 999px;
+      font-size: .82rem; font-weight: 400; color: var(--dark);
+      transition: background .2s, color .2s;
+    }
+    .lnav-links a:hover { background: var(--warm); color: var(--primary); }
+    .lnav-links a.active { background: var(--warm); color: var(--primary); font-weight: 500; }
+    .lnav-links .pill-cursos { background: var(--primary); color: #fff !important; font-weight: 500; margin-left: 4px; }
+    .lnav-links .pill-cursos:hover { background: var(--dark); }
+    .lnav-cta {
+      padding: 8px 20px; border-radius: 999px;
+      background: var(--accent); color: #fff !important;
+      font-size: .82rem; font-weight: 500; transition: background .2s;
+    }
+    .lnav-cta:hover { background: var(--dark); }
+
+    /* ── HERO NOSOTROS ── */
+    .nos-hero {
+      position: relative; overflow: hidden;
+      background: linear-gradient(150deg, var(--ink) 0%, #3a2408 55%, #5c3a10 100%);
+      padding: 80px 5% 88px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    .nos-hero::before {
+      content: ''; position: absolute; top: -140px; right: -120px;
+      width: 560px; height: 560px; border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent2) 30%, transparent) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .nos-hero::after {
+      content: ''; position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .nos-hero-text { position: relative; z-index: 2; }
+    .hero-breadcrumb {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: 22px;
+      font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--sand);
+    }
+    .hero-breadcrumb a { color: var(--accent2); text-decoration: none; transition: color .2s; }
+    .hero-breadcrumb a:hover { color: var(--sand); }
+    .hero-breadcrumb span { opacity: .5; }
+    .nos-hero h1 {
+      font-family: var(--ff-display);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 300; color: var(--cream);
+      line-height: 1.12; margin-bottom: 20px;
+    }
+    .nos-hero h1 em { font-style: italic; color: var(--accent2); }
+    .nos-hero-desc {
+      font-size: .95rem; line-height: 1.9;
+      color: rgba(250,247,240,.75); max-width: 460px;
+      margin-bottom: 36px;
+    }
+    .nos-hero-stats {
+      display: flex; gap: 28px; flex-wrap: wrap;
+    }
+    .hero-stat {
+      display: flex; flex-direction: column;
+      border-left: 2px solid var(--primary);
+      padding-left: 14px;
+    }
+    .hero-stat strong {
+      font-family: var(--ff-display); font-size: 2rem;
+      font-weight: 600; color: var(--sand);
+      line-height: 1;
+    }
+    .hero-stat span {
+      font-size: .72rem; text-transform: uppercase;
+      letter-spacing: .09em; color: rgba(250,247,240,.6);
+      margin-top: 4px;
+    }
+
+    /* Imagen hero derecha */
+    .nos-hero-img-wrap {
+      position: relative; z-index: 2;
+    }
+    .nos-hero-img {
+      width: 100%; aspect-ratio: 4/3;
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,.45);
+      position: relative;
+    }
+    .nos-hero-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    /* Placeholder si no hay imagen */
+    .nos-hero-img-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, var(--accent2), var(--sand), var(--primary));
+      display: grid; place-items: center;
+    }
+    .nos-hero-img-placeholder svg { width: 90px; height: 90px; fill: rgba(255,255,255,.3); }
+    .nos-hero-badge {
+      position: absolute; bottom: -18px; left: -18px;
+      background: var(--white); border-radius: 18px; padding: 14px 18px;
+      box-shadow: 0 12px 36px rgba(0,0,0,.14);
+      display: flex; align-items: center; gap: 12px; min-width: 200px;
+    }
+    .badge-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--primary); display: grid; place-items: center; flex-shrink: 0; }
+    .badge-ico svg { width: 22px; height: 22px; fill: #fff; }
+    .badge-txt strong { display: block; font-size: .85rem; font-weight: 500; color: var(--dark); }
+    .badge-txt span   { font-size: .74rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+
+    /* ── MARQUEE ── */
+    .marquee-bar { overflow: hidden; background: var(--dark); padding: 12px 0; }
+    .marquee-inner { display: flex; white-space: nowrap; animation: mq 26s linear infinite; }
+    .marquee-inner span {
+      display: inline-flex; align-items: center; gap: 14px;
+      color: var(--cream); font-size: .78rem;
+      letter-spacing: .1em; text-transform: uppercase; padding: 0 30px;
+    }
+    .marquee-inner span::before { content: '◆'; color: var(--sand); font-size: .5rem; }
+    @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── SECCIÓN QUIÉNES SOMOS ── */
+    .sec-quienes {
+      padding: 96px 5%; background: var(--white);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+    .sec-quienes-img {
+      border-radius: 24px; overflow: hidden;
+      aspect-ratio: 3/4; max-height: 520px;
+      position: relative;
+    }
+    .sec-quienes-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(150deg, var(--accent2), var(--warm), var(--sand));
+      display: grid; place-items: center;
+    }
+    .img-placeholder svg { width: 80px; height: 80px; fill: rgba(255,255,255,.35); }
+    .img-overlay-card {
+      position: absolute; top: 20px; right: -20px;
+      background: var(--white); border-radius: 16px; padding: 14px 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.12);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ov-dot { width: 38px; height: 38px; border-radius: 10px; background: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+    .ov-dot svg { width: 18px; height: 18px; fill: #fff; }
+    .ov-txt strong { display: block; font-size: .82rem; font-weight: 500; color: var(--dark); }
+    .ov-txt span   { font-size: .72rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+
+    .stag { font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+    .section-h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 300; color: var(--dark);
+      line-height: 1.2; margin-bottom: 16px;
+    }
+    .section-h2 em { font-style: italic; color: var(--primary); }
+    .section-p {
+      font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      line-height: 1.9; margin-bottom: 14px;
+    }
+    .values-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .chip {
+      padding: 6px 18px; border-radius: 999px;
+      background: var(--warm); border: 1px solid var(--sand);
+      font-size: .78rem; font-weight: 500; color: var(--dark);
+      transition: background .2s, border-color .2s;
+    }
+    .chip:hover { background: var(--sand); }
+
+    /* ── MISIÓN Y VISIÓN ── */
+    .sec-mv {
+      padding: 96px 5%;
+      background: var(--cream);
+      position: relative; overflow: hidden;
+    }
+    .sec-mv::before {
+      content: ''; position: absolute; top: -100px; right: -80px;
+      width: 480px; height: 480px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 68%);
+      opacity: .3; pointer-events: none;
+    }
+    .sec-mv::after {
+      content: ''; position: absolute; bottom: -80px; left: -60px;
+      width: 360px; height: 360px; border-radius: 50%;
+      background: radial-gradient(circle, var(--sand) 0%, transparent 70%);
+      opacity: .45; pointer-events: none;
+    }
+    .mv-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; position: relative; z-index: 1;
+    }
+    .mv-card {
+      background: var(--white); border-radius: 24px;
+      padding: 40px 36px;
+      border: 1px solid var(--warm);
+      box-shadow: 0 8px 32px color-mix(in srgb, var(--dark) 6%, transparent);
+      position: relative; overflow: hidden;
+      transition: transform .35s, box-shadow .35s;
+    }
+    .mv-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 56px color-mix(in srgb, var(--dark) 11%, transparent);
+    }
+    .mv-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transform: scaleX(0); transform-origin: left; transition: transform .4s;
+    }
+    .mv-card:hover::after { transform: scaleX(1); }
+    .mv-card-ico {
+      width: 60px; height: 60px; border-radius: 16px;
+      display: grid; place-items: center;
+      margin-bottom: 22px; flex-shrink: 0;
+    }
+    .mv-card-ico.ico-mision { background: linear-gradient(135deg, var(--primary), var(--dark)); }
+    .mv-card-ico.ico-vision { background: linear-gradient(135deg, var(--accent), #4e7060); }
+    .mv-card-ico svg { width: 28px; height: 28px; fill: #fff; }
+    .mv-card-label {
+      font-size: .7rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--primary); margin-bottom: 10px;
+    }
+    .mv-card h3 {
+      font-family: var(--ff-display); font-size: 1.6rem;
+      font-weight: 300; color: var(--dark); margin-bottom: 14px;
+    }
+    .mv-card h3 em { font-style: italic; color: var(--primary); }
+    .mv-card p {
+      font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      line-height: 1.9;
+    }
+    .mv-card-quote {
+      font-family: var(--ff-display); font-size: 4rem;
+      color: var(--warm); line-height: 1;
+      position: absolute; top: 20px; right: 28px;
+      user-select: none;
+    }
+
+    /* ── NUESTRO EQUIPO ── */
+    .sec-equipo {
+      padding: 96px 5%;
+      background: var(--dark);
+      position: relative; overflow: hidden;
+    }
+    .sec-equipo::before {
+      content: ''; position: absolute; top: -80px; left: -60px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent2) 20%, transparent) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .sec-equipo .stag { color: var(--accent2); margin-bottom: 10px; }
+    .sec-equipo .section-h2 { color: var(--cream); margin-bottom: 12px; }
+    .sec-equipo .section-h2 em { color: var(--accent2); }
+    .equipo-intro {
+      font-size: .9rem; color: var(--sand); max-width: 540px;
+      line-height: 1.85; margin-bottom: 60px; position: relative; z-index: 1;
+    }
+
+    .equipo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px; position: relative; z-index: 1;
+    }
+    .equipo-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px; padding: 32px 24px;
+      text-align: center;
+      transition: background .3s, transform .3s;
+    }
+    .equipo-card:hover {
+      background: rgba(255,255,255,.11);
+      transform: translateY(-5px);
+    }
+    .equipo-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,.15);
+      position: relative;
+    }
+    .equipo-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Placeholder avatar */
+    .equipo-avatar-ph {
+      width: 100%; height: 100%;
+      display: grid; place-items: center;
+    }
+    .equipo-avatar-ph svg { width: 40px; height: 40px; fill: rgba(255,255,255,.45); }
+    .equipo-role {
+      font-size: .68rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 6px;
+    }
+    .equipo-card h4 {
+      font-family: var(--ff-display); font-size: 1.15rem;
+      font-weight: 600; color: var(--cream); margin-bottom: 8px;
+    }
+    .equipo-card p {
+      font-size: .8rem; color: var(--sand); line-height: 1.7;
+    }
+
+    /* ── ENFOQUE / PILARES ── */
+    .sec-pilares {
+      padding: 96px 5%;
+      background: var(--warm);
+      position: relative; overflow: hidden;
+    }
+    .sec-pilares::before {
+      content: ''; position: absolute; bottom: -80px; right: -80px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 68%);
+      opacity: .3; pointer-events: none;
+    }
+    .pilares-head { text-align: center; margin-bottom: 60px; position: relative; z-index: 1; }
+    .pilares-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 28px; position: relative; z-index: 1;
+    }
+    .pilar-card {
+      background: var(--white); border-radius: 20px; padding: 32px 26px;
+      border: 1px solid var(--sand);
+      box-shadow: 0 6px 24px color-mix(in srgb, var(--dark) 6%, transparent);
+      transition: transform .3s, box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .pilar-card:hover { transform: translateY(-6px); box-shadow: 0 18px 48px color-mix(in srgb, var(--dark) 10%, transparent); }
+    .pilar-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transform: scaleX(0); transform-origin: left; transition: transform .4s;
+    }
+    .pilar-card:hover::after { transform: scaleX(1); }
+    .pilar-num {
+      font-family: var(--ff-display); font-size: 3.2rem;
+      font-weight: 300; color: var(--warm);
+      line-height: 1; position: absolute; top: 16px; right: 22px;
+    }
+    .pilar-ico {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--warm); border: 1px solid var(--sand);
+      display: grid; place-items: center; margin-bottom: 18px;
+    }
+    .pilar-ico svg { width: 24px; height: 24px; fill: var(--primary); }
+    .pilar-card h3 {
+      font-family: var(--ff-display); font-size: 1.25rem;
+      font-weight: 600; color: var(--dark); margin-bottom: 8px;
+    }
+    .pilar-card p {
+      font-size: .85rem; color: color-mix(in srgb, var(--primary) 50%, var(--ink));
+      line-height: 1.8;
+    }
+
+    /* ── CTA ── */
+    .lcta {
+      padding: 72px 5%; text-align: center;
+      background: linear-gradient(135deg, #181004 0%, #403010 50%, #604818 100%);
+      position: relative; overflow: hidden;
+    }
+    .lcta::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .lcta h2 { font-family: var(--ff-display); font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 300; color: #fff; margin-bottom: 12px; position: relative; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+    .lcta p { font-size: .9rem; color: rgba(255,243,230,.88); max-width: 440px; margin: 0 auto 32px; line-height: 1.8; position: relative; }
+    .btn-wh { padding: 13px 34px; border-radius: 999px; background: #fff; color: var(--primary); font-family: var(--ff-body); font-size: .9rem; font-weight: 500; border: none; cursor: pointer; box-shadow: 0 6px 22px rgba(0,0,0,.22); transition: transform .2s, box-shadow .2s; position: relative; }
+    .btn-wh:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.26); }
+
+    /* ── FOOTER (idéntico al home) ── */
+    .lfooter { background: var(--ink); padding: 60px 5% 0; }
+    .ft { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .fb-brand p { font-size: .82rem; color: rgba(220,200,164,.6); line-height: 1.75; margin-top: 14px; max-width: 240px; }
+    .fc h4 { font-family: var(--ff-display); font-size: .95rem; font-weight: 600; color: var(--sand); margin-bottom: 14px; }
+    .fc { display: flex; flex-direction: column; gap: 8px; }
+    .fc a { color: rgba(220,200,164,.6); text-decoration: none; font-size: .82rem; transition: color .2s; }
+    .fc a:hover { color: var(--primary); }
+    .fb { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; font-size: .78rem; color: rgba(220,200,164,.5); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .nos-hero { grid-template-columns: 1fr; padding: 56px 5% 64px; }
+      .nos-hero-img-wrap { display: none; }
+      .sec-quienes { grid-template-columns: 1fr; }
+      .sec-quienes-img { aspect-ratio: 16/9; max-height: 340px; }
+      .img-overlay-card { right: 0; }
+      .mv-grid { grid-template-columns: 1fr; }
+      .pilares-grid { grid-template-columns: 1fr 1fr; }
+      .ft { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+    @media (max-width: 600px) {
+      .pilares-grid { grid-template-columns: 1fr; }
+      .equipo-grid { grid-template-columns: repeat(2, 1fr); }
+      .ft { grid-template-columns: 1fr; }
+      .nos-hero-stats { gap: 18px; }
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .fade-up {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up-delay-1 { transition-delay: .1s; }
+    .fade-up-delay-2 { transition-delay: .2s; }
+    .fade-up-delay-3 { transition-delay: .3s; }
+    .fade-up-delay-4 { transition-delay: .4s; }
+    .fade-up-delay-5 { transition-delay: .5s; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+  </style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════ NAVEGACIÓN ═══════════════════════ -->
+<nav class="lnav">
+  <div class="lnav-brand">
+    <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE" 
+     style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+    <div class="lnav-name">
+      <strong>Centro DHAE</strong>
+      <span>Desarrollo Humano Integral</span>
+    </div>
+  </div>
+  <ul class="lnav-links">
+    <li><a href="{% url 'home' %}">Inicio</a></li>
+    <li><a href="#" class="active">Nosotros</a></li>
+    <li><a href="{% url 'servicios' %}">Servicios</a></li>
+    <li><a href="#">Productos</a></li>
+    <li><a href="#">Contacto</a></li>
+    <li><a href="{% url 'tests:index' %}">Pruebas</a></li>
+    <li><a href="#" class="pill-cursos">📚 Cursos</a></li>
+  </ul>
+</nav>
+
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section class="nos-hero">
+  <div class="nos-hero-text">
+    <div class="hero-breadcrumb">
+      <a href="{% url 'home' %}">Inicio</a>
+      <span>›</span>
+      Nosotros
+    </div>
+    <h1>20 años construyendo<br><em>vidas más plenas</em></h1>
+    <p class="nos-hero-desc">
+      Somos un centro especializado en Desarrollo Humano Integral, comprometido con el crecimiento
+      personal, grupal y organizacional de quienes confían en nosotros. Ciencia, humanismo y
+      experiencia al servicio de tu bienestar.
+    </p>
+    <div class="nos-hero-stats">
+      <div class="hero-stat">
+        <strong>20+</strong>
+        <span>Años de experiencia</span>
+      </div>
+      <div class="hero-stat">
+        <strong>5+</strong>
+        <span>Especialidades</span>
+      </div>
+      <div class="hero-stat">
+        <strong>100%</strong>
+        <span>Enfoque humanista</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nos-hero-img-wrap">
+    <div class="nos-hero-img">
+      <!-- Reemplaza la ruta por tu imagen real -->
+      <img src="{% static 'img/nosotros-hero.jpg' %}" alt="Equipo Centro DHAE"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/>
+      <div class="nos-hero-img-placeholder" style="display:none;">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      </div>
+    </div>
+    <div class="nos-hero-badge">
+      <div class="badge-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </div>
+      <div class="badge-txt">
+        <strong>Calidad certificada</strong>
+        <span>Neurociencias · Humanismo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ MARQUEE ═══════════════════════ -->
+<div class="marquee-bar" aria-hidden="true">
+  <div class="marquee-inner">
+    <span>Desarrollo Humano</span>
+    <span>Neurociencias</span>
+    <span>Psicología</span>
+    <span>Pedagogía</span>
+    <span>Salud Integral</span>
+    <span>Sonoterapia</span>
+    <span>Crecimiento Personal</span>
+    <span>Consultoría Organizacional</span>
+    <span>Bienestar</span>
+    <span>Desarrollo Humano</span>
+    <span>Neurociencias</span>
+    <span>Psicología</span>
+    <span>Pedagogía</span>
+    <span>Salud Integral</span>
+    <span>Sonoterapia</span>
+    <span>Crecimiento Personal</span>
+    <span>Consultoría Organizacional</span>
+    <span>Bienestar</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ QUIÉNES SOMOS ═══════════════════════ -->
+<section class="sec-quienes">
+  <div class="sec-quienes-img fade-up">
+    <div class="img-placeholder">
+      <!-- Reemplaza la ruta por tu imagen real -->
+      <img src="{% static 'img/quienes-somos.jpg' %}" alt="Centro DHAE"
+           onerror="this.style.display='none'; this.parentElement.querySelector('.img-placeholder').style.display='grid'"/>
+      <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+    </div>
+    <div class="img-overlay-card">
+      <div class="ov-dot">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"/></svg>
+      </div>
+      <div class="ov-txt">
+        <strong>Centro de formación</strong>
+        <span>Desarrollo Humano Integral</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="fade-up fade-up-delay-2">
+    <div class="stag">Quiénes somos</div>
+    <h2 class="section-h2">Un centro con <em>propósito</em><br>y vocación humana</h2>
+    <p class="section-p">
+      Somos un centro de formación en el área de Desarrollo Humano en sus diversas áreas. Contamos
+      con más de <strong>20 años de experiencia</strong> que avalan nuestra calidad y trayectoria.
+    </p>
+    <p class="section-p">
+      Nuestro objetivo es promover el crecimiento y el bienestar de la comunidad que solicita nuestros
+      servicios a través del diseño e implementación de programas especializados, orientados a la
+      optimización del potencial personal, grupal y organizacional.
+    </p>
+    <p class="section-p">
+      Tenemos como fin último <strong>elevar la calidad de vida</strong> de las personas,
+      optimizando los recursos disponibles y ofreciendo servicios de alto impacto.
+    </p>
+    <div class="values-chips">
+      <span class="chip">Potencial personal</span>
+      <span class="chip">Desarrollo grupal</span>
+      <span class="chip">Consultoría organizacional</span>
+      <span class="chip">Calidad de vida</span>
+      <span class="chip">Programas especializados</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ MISIÓN Y VISIÓN ═══════════════════════ -->
+<section class="sec-mv">
+  <div style="text-align:center; margin-bottom:52px; position:relative; z-index:1;" class="fade-up">
+    <div class="stag">Nuestro propósito</div>
+    <h2 class="section-h2">Misión &amp; <em>Visión</em></h2>
+    <p class="section-p" style="max-width:500px; margin:0 auto;">
+      Los valores que guían cada acción y cada servicio que ofrecemos a nuestra comunidad.
+    </p>
+  </div>
+
+  <div class="mv-grid">
+    <div class="mv-card fade-up fade-up-delay-1">
+      <div class="mv-card-quote">&ldquo;</div>
+      <div class="mv-card-ico ico-mision">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      </div>
+      <div class="mv-card-label">Nuestra Misión</div>
+      <h3>Servicio integral de <em>alta calidad</em></h3>
+      <p>
+        Prestar servicios integrales para el desarrollo humano personal, grupal y organizacional,
+        caracterizados por una alta calidad técnico-científica, impactando positivamente en la
+        calidad de vida de la comunidad y en la construcción de una mejor sociedad.
+      </p>
+    </div>
+
+    <div class="mv-card fade-up fade-up-delay-2">
+      <div class="mv-card-quote">&ldquo;</div>
+      <div class="mv-card-ico ico-vision">
+        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </div>
+      <div class="mv-card-label">Nuestra Visión</div>
+      <h3>Centro de <em>referencia</em> y excelencia</h3>
+      <p>
+        Ser un centro de referencia para la prestación de servicios integrales reconocidos por la
+        excelencia de sus procedimientos, así como por los altos estándares de calidad y humanización
+        que fundamentan nuestras acciones, impactando en el desarrollo social.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ NUESTRO EQUIPO ═══════════════════════ -->
+<section class="sec-equipo">
+  <div style="position:relative; z-index:1; margin-bottom:52px;" class="fade-up">
+    <div class="stag">Nuestros colaboradores</div>
+    <h2 class="section-h2">El equipo <em>humano</em> detrás<br>de cada proceso</h2>
+    <p class="equipo-intro">
+      Contamos con un gran equipo multidisciplinario formado por profesionales comprometidos con
+      brindar asesoramiento y consultoría personalizada en el área de Desarrollo Humano al más alto
+      nivel de calidad.
+    </p>
+  </div>
+
+  <div class="equipo-grid">
+
+    <div class="equipo-card fade-up fade-up-delay-1">
+      <div class="equipo-avatar">
+        <!-- Reemplaza la ruta por tu imagen real -->
+        <img src="{% static 'img/equipo/psicologo.jpg' %}" alt="Psicólogo"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/>
+        <div class="equipo-avatar-ph" style="background: linear-gradient(135deg, var(--primary), var(--dark)); display:none;">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+      </div>
+      <div class="equipo-role">Psicología</div>
+      <h4>Psicólog@s</h4>
+      <p>Orientación y atención psicológica basada en evidencia y enfoque humanista.</p>
+    </div>
+
+    <div class="equipo-card fade-up fade-up-delay-2">
+      <div class="equipo-avatar">
+        <img src="{% static 'img/equipo/pedagogo.jpg' %}" alt="Pedagogo"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/>
+        <div class="equipo-avatar-ph" style="background: linear-gradient(135deg, var(--accent), #4e7060); display:none;">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+      </div>
+      <div class="equipo-role">Pedagogía</div>
+      <h4>Pedagog@s</h4>
+      <p>Acompañamiento pedagógico personalizado para el aprendizaje y desarrollo integral.</p>
+    </div>
+
+    <div class="equipo-card fade-up fade-up-delay-3">
+      <div class="equipo-avatar">
+        <img src="{% static 'img/equipo/salud.jpg' %}" alt="Salud Integral"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/>
+        <div class="equipo-avatar-ph" style="background: linear-gradient(135deg, #8aab7e, #4e7060); display:none;">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+      </div>
+      <div class="equipo-role">Salud Integral</div>
+      <h4>Especialistas en Salud</h4>
+      <p>Atención holística que integra el bienestar físico, mental y emocional.</p>
+    </div>
+
+    <div class="equipo-card fade-up fade-up-delay-4">
+      <div class="equipo-avatar">
+        <img src="{% static 'img/equipo/sonorapeuta.jpg' %}" alt="Sonoterapeuta"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"/>
+        <div class="equipo-avatar-ph" style="background: linear-gradient(135deg, var(--sand), var(--primary)); display:none;">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+      </div>
+      <div class="equipo-role">Sonoterapia</div>
+      <h4>Sonoterapeuta</h4>
+      <p>Terapias con sonido para armonizar estados internos y promover el equilibrio.</p>
+    </div>
+
+    <div class="equipo-card fade-up fade-up-delay-5">
+      <div class="equipo-avatar">
+        <div class="equipo-avatar-ph" style="background: linear-gradient(135deg, var(--dark), #b07050); display:grid;">
+          <svg viewBox="0 0 24 24" style="width:40px;height:40px;fill:rgba(255,255,255,.45);"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+      </div>
+      <div class="equipo-role">Neurociencias</div>
+      <h4>Consultores</h4>
+      <p>Metodologías basadas en neurociencias aplicadas al desarrollo humano.</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ PILARES / ENFOQUE ═══════════════════════ -->
+<section class="sec-pilares">
+  <div class="pilares-head fade-up">
+    <div class="stag">Nuestro enfoque</div>
+    <h2 class="section-h2">Pilares que nos <em>distinguen</em></h2>
+    <p class="section-p" style="max-width:480px; margin:0 auto;">
+      Cada servicio está fundamentado en tres ejes que garantizan resultados reales y sostenibles.
+    </p>
+  </div>
+
+  <div class="pilares-grid">
+    <div class="pilar-card fade-up fade-up-delay-1">
+      <div class="pilar-num">01</div>
+      <div class="pilar-ico">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      </div>
+      <h3>Rigor Técnico-Científico</h3>
+      <p>Apoyados en métodos, técnicas y herramientas basados en el conocimiento que aportan las neurociencias, con un enfoque humanista.</p>
+    </div>
+
+    <div class="pilar-card fade-up fade-up-delay-2">
+      <div class="pilar-num">02</div>
+      <div class="pilar-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      </div>
+      <h3>Atención Personalizada</h3>
+      <p>Consultoría individual, grupal y organizacional adaptada a cada contexto, optimizando los recursos disponibles de cada persona o institución.</p>
+    </div>
+
+    <div class="pilar-card fade-up fade-up-delay-3">
+      <div class="pilar-num">03</div>
+      <div class="pilar-ico">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      </div>
+      <h3>Impacto Comunitario</h3>
+      <p>Nuestras acciones buscan elevar la calidad de vida individual y colectiva, contribuyendo a la construcción de una sociedad más sana y consciente.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ CTA ═══════════════════════ -->
+<div class="lcta" id="contacto">
+  <h2>¿Quieres conocer más sobre <em style="font-style:italic;color:var(--accent2);">nosotros</em>?</h2>
+  <p>Agenda una consulta sin costo y descubre cómo podemos acompañarte en tu proceso de crecimiento.</p>
+  <button class="btn-wh" onclick="window.location.href='{% url 'home' %}#contacto'">Agenda tu consulta gratis</button>
+</div>
+
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="lfooter">
+  <div class="ft">
+    <div class="fb-brand">
+      <div class="lnav-brand" style="filter:brightness(1.5)">
+        <div class="lnav-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"/></svg>
+        </div>
+        <div class="lnav-name">
+          <strong style="color:#f9f4ed">Centro DHAE</strong>
+          <span>Desarrollo Humano Integral</span>
+        </div>
+      </div>
+      <p>Centro de Desarrollo Humano Integral y Atención Especializada S.C.</p>
+    </div>
+
+    <div class="fc">
+      <h4>Servicios</h4>
+      <a href="#">Atención Psicológica</a>
+      <a href="#">Orientación Vocacional</a>
+      <a href="#">Pruebas Psicométricas</a>
+      <a href="#">Cursos de Capacitación</a>
+    </div>
+
+    <div class="fc">
+      <h4>Centro DHAE</h4>
+      <a href="#">Nosotros</a>
+      <a href="#">Aviso de privacidad</a>
+    </div>
+
+    <div class="fc">
+      <h4>Contacto</h4>
+      <a href="#">+52 (55) 4015-9751</a>
+      <a href="#">centrodhae@gmail.com</a>
+      <a href="#">WhatsApp</a>
+    </div>
+  </div>
+  <div class="fb">
+    <span>© 2025 Centro DHAE S.C. — Todos los derechos reservados.</span>
+    <span>Hecho con ❤ en México</span>
+  </div>
+</footer>
+
+
+<script>
+  // Scroll fade-in
+  (function () {
+    const els = document.querySelectorAll('.fade-up');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(el => io.observe(el));
+  })();
+</script>
+
+</body>
+</html>

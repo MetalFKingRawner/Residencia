@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Resultados - Test de Valores{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="text-center" style="color: white;">Resultados del Test de Valores</h2>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <h3>Tu Perfil de Valores</h3>
+                <p class="lead">Basado en tus respuestas al Test de Valores de Allport</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h4 style="color: white; text-align: center;">Puntuaciones por Valor</h4>
+                        </div>
+                        <div class="card-body">
+                            <div style="position: relative; height: 400px;">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+
+                            <!-- Leyenda de clasificación -->
+                            <div class="mt-4">
+                                <h5>Leyenda de Clasificación:</h5>
+                                <div class="d-flex flex-wrap">
+                                    <span class="badge bg-danger me-2 mb-2">MUY BAJO</span>
+                                    <span class="badge bg-warning me-2 mb-2">BAJO</span>
+                                    <span class="badge bg-primary me-2 mb-2">NORMAL</span>
+                                    <span class="badge bg-success me-2 mb-2">ALTO</span>
+                                    <span class="badge bg-info me-2 mb-2">MUY ALTO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h4 style="color: white; text-align: center;">Interpretación Profesional</h4>
+                        </div>
+                        <div class="card-body">
+                            <h5>Valor Dominante: <span class="text-success">{{ dominante }}</span></h5>
+                            <p>{{ descripcion }}</p>
+                            
+                            <h5>Meta Principal: {{ meta }}</h5>
+                            <h5 class="mt-4">Clasificación de Valores</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Valor</th>
+                                            <th>Puntuación</th>
+                                            <th>Clasificación</th>
+                                            <th>Rango Normal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for valor, puntuacion in valores.items %}
+                                        <tr style="background-color: '{{ clasificaciones|get_item:valor|get_item:'color' }}20';">
+                                            <td>{{ valor }}</td>
+                                            <td>{{ puntuacion|floatformat:1 }}</td>
+                                            <td>
+                                                <span class="badge" style="background-color: {{ clasificaciones|get_item:valor|get_item:'color' }};">
+                                                    {{ clasificaciones|get_item:valor|get_item:'clasificacion' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                            {{ rangos_valores|get_item:valor|get_item:'bajo' }} -
+                                            {{ rangos_valores|get_item:valor|get_item:'alto' }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+                    Volver al Dashboard
+                </a>
+                <a href="{% url 'tests:reporte_valores' resultado_id=resultado_id %}" class="btn btn-outline-primary btn-lg ms-2">
+                    <i class="fas fa-download me-2"></i>Descargar Reporte PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<!-- Asegúrate de tener cargado Chart.js antes de este bloque -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ valores_grafica|json_script:"valores-grafica-data" }}
+{{ puntuaciones_grafica|json_script:"puntuaciones-grafica-data" }}
+{{ rangos_valores|json_script:"rangos-data" }}
+{{ clasificaciones|json_script:"clasificaciones-data" }}
+{{ colores_grafica_json|json_script:"colores-data" }}
+
+<!-- Asegúrate de haber incluido Chart.js antes de este bloque: -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
+<!-- <canvas id="radarChart" style="max-height: 500px;"></canvas> -->
+
+<script>
+  // ——— 1. SOLO AQUI DECLARAMOS UNA VEZ cada const ———
+  const valoresGrafica     = JSON.parse(document.getElementById('valores-grafica-data').textContent);
+  const puntuacionesGrafica = JSON.parse(document.getElementById('puntuaciones-grafica-data').textContent);
+  const rangosData          = JSON.parse(document.getElementById('rangos-data').textContent);
+  const clasificacionesData = JSON.parse(document.getElementById('clasificaciones-data').textContent);
+  const coloresGrafica      = JSON.parse(document.getElementById('colores-data').textContent);
+
+  // ——— 2. Creamos los arrays necesarios ———
+  const coloresPuntos = valoresGrafica.map(valor => {
+    return (clasificacionesData[valor] && clasificacionesData[valor].color)
+      ? clasificacionesData[valor].color
+      : '#888888';
+  });
+
+  const maxPuntuacion = Math.max(...puntuacionesGrafica);
+  const minPuntuacion = Math.min(...puntuacionesGrafica);
+
+  const rangosNormales = valoresGrafica.map(valor => {
+    if (rangosData[valor]) {
+      return (parseFloat(rangosData[valor].bajo) + parseFloat(rangosData[valor].alto)) / 2;
+    }
+    return 0;
+  });
+
+  // ——— 3. Definimos config SOLO AQUÍ ———
+  const config = {
+    type: 'radar',
+    data: {
+      labels: valoresGrafica,
+      datasets: [
+        {
+          label: 'Tu Perfil',
+          data: puntuacionesGrafica,
+          backgroundColor: 'rgba(58, 125, 125, 0.4)',
+          borderColor: 'rgba(58, 125, 125, 1)',
+          pointBackgroundColor: coloresPuntos,
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgba(58, 125, 125, 1)',
+          pointRadius: 5,
+          pointHoverRadius: 8
+        },
+        {
+          label: 'Rango Normal',
+          data: rangosNormales,
+          fill: true,
+          backgroundColor: 'rgba(200, 200, 200, 0.2)',
+          borderColor: 'rgb(150, 150, 150)',
+          pointBackgroundColor: 'rgb(150, 150, 150)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(150, 150, 150)',
+          pointRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          angleLines: {
+            display: true,
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          pointLabels: {
+            font: {
+              size: 14,
+              family: "'Montserrat', sans-serif"
+            },
+            color: '#333'
+          },
+          min: Math.max(0, minPuntuacion - 10),
+          max: maxPuntuacion + 10,
+          ticks: {
+            stepSize: Math.ceil(maxPuntuacion / 10) * 2,
+            backdropColor: 'transparent',
+            showLabelBackdrop: false
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              size: 16,
+              weight: 'bold'
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          titleFont: { size: 14 },
+          bodyFont: { size: 14 },
+          padding: 12,
+          callbacks: {
+            label: function(context) {
+              return `${context.dataset.label}: ${context.formattedValue}`;
+            },
+            afterLabel: function(context) {
+              const valor = context.label;
+              if (clasificacionesData[valor] && clasificacionesData[valor].significado) {
+                return clasificacionesData[valor].significado;
+              }
+              return '';
+            }
+          }
+        }
+      },
+      animation: {
+        duration: 2000,
+        easing: 'easeOutQuart'
+      }
+    }
+  };
+
+  // ——— 4. Renderizamos el gráfico cuando el DOM haya cargado ———
+  window.addEventListener('load', function() {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx, config);
+  });
+</script>
+
+
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load embed_video_tags %}
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'courses:curso_list' %}">Cursos</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:curso_detail' slug=curso.slug %}">{{ curso.titulo }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ leccion.titulo }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h2 mb-3">{{ leccion.titulo }}</h1>
+                    
+                    {% for recurso in recursos %}
+
+                        {% if recurso.tipo == 'texto' %}
+                            <div class="leccion-contenido mb-4">
+                                {{ recurso.contenido_texto|safe }}
+                            </div>
+
+                        {% elif recurso.tipo == 'video' %}
+                            <div class="mb-4">
+                                {% video recurso.video_url '100% x 400' %}
+                            </div>
+
+                        {% elif recurso.tipo == 'archivo' %}
+                            <div class="mb-4">
+                                <a href="{{ recurso.archivo.url }}" class="btn btn-outline-secondary" target="_blank" download>
+                                    <i class="fas fa-file-alt me-2"></i>Descargar documento
+                                </a>
+                            </div>
+
+                        {% elif recurso.tipo == 'audio' %}
+                            <div class="mb-4">
+                                <audio controls class="w-100">
+                                    <source src="{{ recurso.archivo.url }}">
+                                    Tu navegador no soporta audio HTML5.
+                                </audio>
+                            </div>
+
+                        {% endif %}
+
+                    {% empty %}
+                        <p class="text-muted">Esta lección no tiene contenido aún.</p>
+                    {% endfor %}
+                    
+                    {% if user_inscrito and not leccion_completada %}
+                        <form method="post" 
+                            action="{% url 'courses:completar_leccion' slug=curso.slug orden=leccion.orden %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">✓ Marcar como completada</button>
+                        </form>
+                    {% elif leccion_completada %}
+                        <div class="alert alert-success mt-4">
+                            ✓ Lección completada
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.leccion-contenido img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 16px auto;
+}
+</style>
+{% endblock %}

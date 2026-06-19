@@ -1,0 +1,91 @@
+<!-- templates/tests/reporte_valores.html -->
+ {% load custom_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Valores - Test de Allport</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h1 { color: #2A4D6E; text-align: center; font-size: 18px; }
+        h2 { color: #3A7D7D; border-bottom: 1px solid #3A7D7D; font-size: 14px; }
+        .section { margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .valor-dominante { background-color: #e9f7ef; padding: 8px; border-radius: 4px; }
+        .clasificacion-badge { padding: 2px 5px; border-radius: 3px; color: white; font-size: 10px; }
+        .logo { text-align: center; margin-bottom: 15px; }
+        .footer { margin-top: 20px; text-align: center; font-size: 10px; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <!-- Asegúrate de tener un logo en static/img/logo.png -->
+        <img src="{{ static_path }}/img/test-mechanical.jpg" alt="Logo" width="120">
+    </div>
+    
+    <h1>Reporte de Valores - Test de Allport</h1>
+    
+    <div class="section">
+        <h2>Perfil de Valores</h2>
+        <div class="valor-dominante">
+            <p><strong>Valor Dominante:</strong> {{ dominante }}</p>
+            <p>{{ descripcion }}</p>
+            <p><strong>Meta Principal:</strong> {{ meta }}</p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Resultados Detallados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Valor</th>
+                    <th>Puntuación</th>
+                    <th>Clasificación</th>
+                    <th>Rango Normal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for valor, puntuacion in valores.items %}
+                <tr>
+                    <td>{{ valor }}</td>
+                    <td>{{ puntuacion|floatformat:1 }}</td>
+                    <td>
+                        <span class="clasificacion-badge" style="background-color: '{{ clasificaciones|get_item:valor|get_item:'color' }}';">
+                            {{ clasificaciones|get_item:valor|get_item:'clasificacion' }}
+                        </span>
+                    </td>
+                    <td>{{ rangos_valores|get_item:valor|get_item:'bajo' }}-{{ rangos_valores|get_item:valor|get_item:'alto' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="section">
+        <h2>Gráfico de Perfil</h2>
+        <div style="text-align: center; margin: 20px 0;">
+            <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de valores" width="500">
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Interpretación</h2>
+        <p><strong>Clasificaciones:</strong></p>
+        <ul>
+            <li><strong>MUY BAJO:</strong> Significativamente por debajo de la norma poblacional</li>
+            <li><strong>BAJO:</strong> Por debajo del promedio poblacional</li>
+            <li><strong>NORMAL:</strong> Dentro del rango esperado para la población</li>
+            <li><strong>ALTO:</strong> Por encima del promedio poblacional</li>
+            <li><strong>MUY ALTO:</strong> Significativamente por encima de la norma poblacional</li>
+        </ul>
+    </div>
+    
+    <div class="footer">
+        <p>Reporte generado el {% now "j F Y H:i" %}</p>
+        <p>© {% now "Y" %} Plataforma Psicológica - Todos los derechos reservados</p>
+    </div>
+</body>
+</html>

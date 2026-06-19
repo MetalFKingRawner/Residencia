@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Test de Valores - {{ test.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="text-center" style="color: white;">{{ test.nombre }}</h2>
+            <p class="text-center mb-0">Por: {{ test.autor }}</p>
+        </div>
+        
+        <div class="card-body">
+            <!-- Sección de introducción -->
+            <div class="text-center mb-4">
+                <img src="{% static 'img/test_valores.jpg' %}" alt="Icono Test de Valores" width="100" class="mb-3">
+                <h3 class="text-primary">Instrucciones para la Primera Parte</h3>
+                <p class="lead">Distribuye tus puntos según tu grado de acuerdo con cada afirmación</p>
+            </div>
+            
+            <div class="row">
+                <!-- Columna 1: Sistema de puntuación -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header card-header-accent">
+                            <h4><i class="fas fa-calculator me-2"></i>Sistema de Puntuación</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>Para cada pregunta, deberás distribuir <strong>3 puntos</strong> entre las dos opciones (A y B) usando solo estas combinaciones:</p>
+                            
+                            <div class="ejemplo-puntuacion mt-4">
+                                <!-- Caso 1: 3-0 -->
+                                <div class="caso mb-4">
+                                    <div class="d-flex justify-content-center mb-2">
+                                        <div class="cuadro bg-success text-white">3</div>
+                                        <div class="cuadro">0</div>
+                                    </div>
+                                    <p class="text-center fw-bold">Acuerdo total con la Opción A</p>
+                                    <p class="text-center text-muted">Desacuerdo total con la Opción B</p>
+                                </div>
+                                
+                                <!-- Caso 2: 0-3 -->
+                                <div class="caso mb-4">
+                                    <div class="d-flex justify-content-center mb-2">
+                                        <div class="cuadro">0</div>
+                                        <div class="cuadro bg-success text-white">3</div>
+                                    </div>
+                                    <p class="text-center fw-bold">Acuerdo total con la Opción B</p>
+                                    <p class="text-center text-muted">Desacuerdo total con la Opción A</p>
+                                </div>
+                                
+                                <!-- Caso 3: 2-1 -->
+                                <div class="caso mb-4">
+                                    <div class="d-flex justify-content-center mb-2">
+                                        <div class="cuadro bg-warning">2</div>
+                                        <div class="cuadro">1</div>
+                                    </div>
+                                    <p class="text-center fw-bold">Preferencia por la Opción A</p>
+                                    <p class="text-center text-muted">Pero con cierto acuerdo con la Opción B</p>
+                                </div>
+                                
+                                <!-- Caso 4: 1-2 -->
+                                <div class="caso">
+                                    <div class="d-flex justify-content-center mb-2">
+                                        <div class="cuadro">1</div>
+                                        <div class="cuadro bg-warning">2</div>
+                                    </div>
+                                    <p class="text-center fw-bold">Preferencia por la Opción B</p>
+                                    <p class="text-center text-muted">Pero con cierto acuerdo con la Opción A</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Columna 2: Normas y ejemplo -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header card-header-accent">
+                            <h4><i class="fas fa-list-check me-2"></i>Normas Importantes</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>¡Atención!</strong> Debes seguir estas reglas al responder
+                            </div>
+                            
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Siempre debes elegir una opción</strong> aunque la diferencia sea mínima
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-ban text-danger me-2"></i>
+                                    <strong>Prohibido usar combinaciones diferentes</strong> a las 4 especificadas
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-clock me-2"></i>
+                                    No hay límite de tiempo pero se recomienda no demorarse
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-pen me-2"></i>
+                                    Si te es imposible decidir, puedes <strong>omitir la pregunta</strong> (dejar ambos en 0)
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    Responde con sinceridad, no hay respuestas correctas o incorrectas
+                                </li>
+                            </ul>
+                            
+                            <div class="mt-4">
+                                <h5><i class="fas fa-lightbulb me-2"></i>Ejemplo Práctico</h5>
+                                <div class="border p-3 rounded bg-light">
+                                    <p class="mb-2"><strong>Pregunta:</strong> ¿Prefieres leer un libro o ver una película?</p>
+                                    <div class="d-flex mb-1">
+                                        <div class="me-3">
+                                            <span class="badge bg-primary">A</span> Leer un libro
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-primary">B</span> Ver una película
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="form-check me-4">
+                                            <input class="form-check-input" type="radio" name="ejemplo" checked>
+                                            <label class="form-check-label">
+                                                <strong>2 puntos</strong> para A<br>
+                                                <strong>1 punto</strong> para B
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted">(Prefiero leer, pero a veces veo películas)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botón de inicio con instrucción final -->
+            <div class="text-center mt-4">
+                <div class="alert alert-primary">
+                    <h5><i class="fas fa-play-circle me-2"></i>¿Listo para comenzar?</h5>
+                    <p class="mb-0">La prueba consta de <strong>2 partes</strong> con diferentes sistemas de respuesta</p>
+                </div>
+                
+                <a href="{% url 'tests:primera_parte_valores' %}" class="btn btn-primary btn-lg px-5 py-3">
+                    <i class="fas fa-play me-2"></i>Comenzar Primera Parte
+                </a>
+                
+                <!--<div class="mt-3">
+                    <small class="text-muted">Tiempo estimado: 20-30 minutos</small>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Headers de tarjetas informativas */
+    .card-header-accent {
+        background: linear-gradient(135deg, var(--accent) 0%, #4e7060 100%);
+        color: white;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 20px;
+    }
+    
+    .card-header-accent h4 {
+      color: white;
+      margin: 0;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+    .cuadro {
+        width: 50px;
+        height: 50px;
+        border: 2px solid #2A4D6E;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin: 0 5px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    
+    .caso {
+        padding: 15px;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+        transition: transform 0.3s;
+    }
+    
+    .caso:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .bg-success {
+        background-color: #3A7D7D !important;
+    }
+    
+    .bg-warning {
+        background-color: #FFD700 !important;
+        color: #333 !important;
+    }
+</style>
+{% endblock %}

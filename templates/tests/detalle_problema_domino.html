@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load domino_tags %}
+
+{% block title %}Problema {{ problema.numero }} - Dominó D-48{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Problema {{ problema.numero }}</h1>
+        <div class="timer bg-primary text-white p-2 rounded">
+            <i class="fas fa-clock me-2"></i>
+            <span id="tiempo-restante">25:00</span>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="domino-matrix" 
+                 style="display: grid; 
+                        grid-template-columns: repeat('{{ problema.matriz_columnas }}', 1fr);
+                        gap: 20px;
+                        justify-items: center;">
+                {% for fila in matriz %}
+                    {% for ficha in fila %}
+                        {% if ficha %}
+                        <div class="domino-tile {% if ficha.superior is None or ficha.inferior is None %}respuesta{% endif %}"
+                             style="width: 100px; height: 200px;">
+                            <div class="domino-half">
+                                {% if ficha.superior is not None %}
+                                    <div class="dots-{{ ficha.superior }}">
+                                        {% for i in ficha.superior|times %}
+                                        <div class="dot dot-{{ forloop.counter }}"></div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <input type="number" 
+                                           class="domino-input" 
+                                           min="0" 
+                                           max="6" 
+                                           required
+                                           style="width: 50px; height: 50px; font-size: 1.8rem;">
+                                {% endif %}
+                            </div>
+                            <div class="domino-half">
+                                {% if ficha.inferior is not None %}
+                                    <div class="dots-{{ ficha.inferior }}">
+                                        {% for i in ficha.inferior|times %}
+                                        <div class="dot dot-{{ forloop.counter }}"></div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <input type="number" 
+                                           class="domino-input" 
+                                           min="0" 
+                                           max="6" 
+                                           required
+                                           style="width: 50px; height: 50px; font-size: 1.8rem;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between">
+        {% if problema.numero > 1 %}
+            <a href="{% url 'detalle_problema_domino' problema.id|add:'-1' %}" 
+               class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Anterior
+            </a>
+        {% else %}
+            <span></span>
+        {% endif %}
+        
+        <button class="btn btn-primary" id="btn-verificar">
+            <i class="fas fa-check me-2"></i>Verificar Respuesta
+        </button>
+        
+        {% if problema.numero < 48 %}
+            <a href="{% url 'detalle_problema_domino' problema.id|add:'1' %}" 
+               class="btn btn-secondary">
+                Siguiente<i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'test_domino' %}" class="btn btn-success">
+                Finalizar Test<i class="fas fa-flag-checkered ms-2"></i>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .domino-tile {
+        background: linear-gradient(145deg, #e3fcec, #f1eafc);
+        border: 2px solid #d1c1e0;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 
+                    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        transition: all 0.15s ease;
+    }
+    
+    .domino-tile.respuesta {
+        background: #f7f7f9;
+        border: 2px dashed #d1c1e0;
+    }
+    
+    .domino-half {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+    
+    .domino-half:first-child {
+        border-bottom: 2px solid #bababa;
+    }
+    
+    .domino-tile.respuesta .domino-half:first-child {
+        border-bottom: 2px dashed #ccc;
+    }
+    
+    .domino-input {
+        width: 50px;
+        height: 50px;
+        font-size: 2rem;
+        text-align: center;
+        border: 2px solid #d1c1e0;
+        border-radius: 8px;
+        outline: none;
+    }
+    
+    .domino-input:focus {
+        border-color: #3A7D7D;
+        box-shadow: 0 0 0 3px rgba(58, 125, 125, 0.25);
+    }
+    
+    .dot {
+        width: 16px;
+        height: 16px;
+        background-color: #333;
+        border-radius: 50%;
+        position: absolute;
+    }
+    
+    /* Patrones de puntos (igual que en tu ejemplo) */
+    .dots-1 .dot-1 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .dots-2 .dot-1 { top: 25%; left: 25%; }
+    .dots-2 .dot-2 { top: 75%; left: 75%; }
+    /* ... completar con todos los patrones ... */
+    .dots-6 .dot-6 { top: 75%; left: 75%; }
+</style>
+
+<script>
+    // Validación de inputs
+    document.querySelectorAll('.domino-input').forEach(input => {
+        input.addEventListener('input', function() {
+            // Limitar a un solo dígito
+            if (this.value.length > 1) {
+                this.value = this.value.slice(0, 1);
+            }
+            
+            // Permitir solo números 0-6
+            if (!/^[0-6]$/.test(this.value)) {
+                this.value = '';
+            }
+        });
+    });
+    
+    // Botón de verificación
+    document.getElementById('btn-verificar').addEventListener('click', function() {
+        const inputs = document.querySelectorAll('.domino-input');
+        let allFilled = true;
+        
+        inputs.forEach(input => {
+            if (!input.value) {
+                allFilled = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!allFilled) {
+            alert('Por favor completa ambos campos de la ficha');
+            return;
+        }
+        
+        // Aquí iría la lógica para verificar la respuesta
+        alert('Respuesta verificada (la funcionalidad completa se implementará después)');
+    });
+</script>
+{% endblock %}

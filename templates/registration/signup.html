@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registro - PsyMetrics{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <form class="auth-form" method="POST">
+                {% csrf_token %}
+                
+                <p class="auth-heading">Crear Nueva Cuenta</p>
+
+                <!-- Mostrar Errores Generales -->
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <p class="mb-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Username -->
+                <div class="auth-field">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" name="username" 
+                           class="auth-input {% if form.username.errors %}is-invalid{% endif %}"
+                           placeholder="Nombre de usuario"
+                           value="{{ form.username.value|default:'' }}"
+                           required>
+                </div>
+
+                <!-- Email -->
+                <div class="auth-field">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" name="email" 
+                           class="auth-input {% if form.email.errors %}is-invalid{% endif %}"
+                           placeholder="Correo electrónico"
+                           value="{{ form.email.value|default:'' }}"
+                           required>
+                </div>
+
+                <!-- Nombre Completo -->
+                <div class="auth-field">
+                    <i class="fas fa-id-card input-icon"></i>
+                    <input type="text" name="full_name" 
+                           class="auth-input {% if form.full_name.errors %}is-invalid{% endif %}"
+                           placeholder="Nombre completo"
+                           value="{{ form.full_name.value|default:'' }}"
+                           required>
+                </div>
+
+                <!-- Contraseña 1 -->
+                <div class="auth-field">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password1" 
+                           class="auth-input {% if form.password1.errors %}is-invalid{% endif %}"
+                           placeholder="Contraseña"
+                           required>
+                </div>
+
+                <!-- Contraseña 2 -->
+                <div class="auth-field">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password2" 
+                           class="auth-input {% if form.password2.errors %}is-invalid{% endif %}"
+                           placeholder="Confirmar contraseña"
+                           required>
+                </div>
+
+                <!-- Fecha de Nacimiento -->
+                <div class="auth-field">
+                    <i class="fas fa-calendar-alt input-icon"></i>
+                    <input type="date" name="date_of_birth" 
+                           class="auth-input {% if form.date_of_birth.errors %}is-invalid{% endif %}"
+                           value="{{ form.date_of_birth.value|default:'' }}">
+                </div>
+
+                <!-- Género -->
+                <div class="auth-field">
+                    <i class="fas fa-venus-mars input-icon"></i>
+                    <select name="gender" 
+                            class="auth-input {% if form.gender.errors %}is-invalid{% endif %}"
+                            required
+                            aria-label="Selecciona tu género">
+                        <option value="" disabled selected>Selecciona tu género</option>
+                        <option value="N">Prefiero no decir</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                        <option value="O">Otro</option>
+                    </select>
+                </div>
+
+                <!-- Institución -->
+                <div class="auth-field">
+                    <i class="fas fa-university input-icon"></i>
+                    <input type="text" name="institution" 
+                           class="auth-input {% if form.institution.errors %}is-invalid{% endif %}"
+                           placeholder="Institución/Empresa"
+                           value="{{ form.institution.value|default:'' }}">
+                </div>
+
+                <!-- Nivel de Estudios -->
+                <div class="auth-field">
+                    <i class="fas fa-graduation-cap input-icon"></i>
+                    <input type="text" name="education_level" 
+                           class="auth-input {% if form.education_level.errors %}is-invalid{% endif %}"
+                           placeholder="Nivel de estudios"
+                           value="{{ form.education_level.value|default:'' }}">
+                </div>
+
+                <!-- Ocupación -->
+                <div class="auth-field">
+                    <i class="fas fa-briefcase input-icon"></i>
+                    <input type="text" name="occupation" 
+                           class="auth-input {% if form.occupation.errors %}is-invalid{% endif %}"
+                           placeholder="Ocupación"
+                           value="{{ form.occupation.value|default:'' }}">
+                </div>
+
+                <div class="auth-buttons mt-4">
+                    <button type="submit" class="btn-auth-primary">
+                        <i class="fas fa-user-plus me-2"></i>Registrarse
+                    </button>
+                    <a href="{% url 'core_login' %}" class="btn-auth-secondary">
+                        <i class="fas fa-sign-in-alt me-2"></i>¿Ya tienes cuenta?
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

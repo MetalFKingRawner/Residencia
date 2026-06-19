@@ -1,0 +1,715 @@
+{% extends 'base.html' %}
+{% load static domino_tags %}
+
+{% block title %}Test de Dominó D-48{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'tests:calcular_resultados_domino' %}" id="test-domino-form">
+  {% csrf_token %}
+  <div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>Test de Dominó D-48</h1>
+      <div class="timer bg-primary text-white p-2 rounded">
+        <i class="fas fa-clock me-2"></i>
+        <span id="tiempo-restante">25:00</span>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      Resuelve los problemas a continuación. Completa los valores de las fichas vacías.
+    </div>
+
+    <div class="row row-cols-1 row-cols-lg-2 g-4">
+      {% for problema in problemas_preparados %}
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Problema {{ problema.obj.numero }}</h5>
+          </div>
+          <div class="card-body">
+            <!-- CASO MATRIZ -->
+            {% if problema.tipo == 'MATRIZ' %}
+            <div class="domino-matrix mb-3" 
+                 style="display: grid; 
+                        grid-template-columns: repeat({{ problema.obj.matriz_columnas }}, 1fr);
+                        gap: 10px;
+                        justify-items: center;">
+              {% for fila in problema.matriz %}
+                {% for ficha in fila %}
+                  {% if ficha %}
+                  <div class="domino-tile {% if ficha.superior is None or ficha.inferior is None %}respuesta{% endif %}"
+                       style="width: 60px; height: 120px;">
+                    <div class="domino-half">
+                      {% if ficha.superior is not None %}
+                        <div class="dots-{{ ficha.superior }}">
+                          {% for i in ficha.superior|times %}
+                          <div class="dot dot-{{ forloop.counter }}"></div>
+                          {% endfor %}
+                        </div>
+                      {% else %}
+                        <input class="domino-input" 
+                               name="problema_{{ problema.obj.id }}_superior"
+                               maxlength="1"
+                               placeholder=""
+                               required
+                               style="width: 30px; height: 40px; font-size: 1.5rem;">
+                      {% endif %}
+                    </div>
+                    <div class="domino-half">
+                      {% if ficha.inferior is not None %}
+                        <div class="dots-{{ ficha.inferior }}">
+                          {% for i in ficha.inferior|times %}
+                          <div class="dot dot-{{ forloop.counter }}"></div>
+                          {% endfor %}
+                        </div>
+                      {% else %}
+                        <input class="domino-input" 
+                               name="problema_{{ problema.obj.id }}_inferior"
+                               maxlength="1"
+                               placeholder=""
+                               required
+                               style="width: 30px; height: 40px; font-size: 1.5rem;">
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </div>
+            <!-- FIN CASO MATRIZ -->
+            <!-- Caso flor-->
+            {% elif problema.tipo == 'FLOR' %}
+            <div class="domino-flor-container" 
+                data-count="{{ problema.config.num_fichas_perimetro }}"
+                style="position: relative;  margin: 0 auto;">
+              {% for ficha in problema.fichas %}
+              <div class="domino-tile {% if ficha.posicion == 'respuesta' %}respuestano-hover{% endif %}"
+                  style="transform: translate({{ ficha.coordenadas.x }}px, {{ ficha.coordenadas.y }}px) rotate({{ ficha.rotacion }}deg);">
+                <!-- Mitad superior -->
+                <div class="domino-half">
+                  {% if ficha.superior is not None %}
+                    <div class="dots-{{ ficha.superior }}">
+                      {% for i in ficha.superior|times %}
+                      <div class="dot dot-{{ forloop.counter }}"></div>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <input class="domino-input" name="problema_{{ problema.obj.id }}_superior">
+                  {% endif %}
+                </div>
+                
+                <!-- Mitad inferior -->
+                <div class="domino-half">
+                  {% if ficha.inferior is not None %}
+                    <div class="dots-{{ ficha.inferior }}">
+                      {% for i in ficha.inferior|times %}
+                      <div class="dot dot-{{ forloop.counter }}"></div>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <input class="domino-input" name="problema_{{ problema.obj.id }}_inferior">
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <!-- FIN CASO FLOR -->
+            <!-- CASO ESPIRAL -->
+            {% elif problema.tipo == 'ESPIRAL' %}
+            <div class="domino-espiral-container"
+                style="position: relative; margin: 0 auto;">
+              {% for ficha in problema.fichas %}
+              <div class="domino-tile {% if ficha.posicion == 'respuesta' %}respuestano-hover{% endif %}"
+                  style="transform: translate({{ ficha.coordenadas.x }}px, {{ ficha.coordenadas.y }}px) rotate({{ ficha.rotacion }}deg);">
+                <!-- Mitad superior -->
+                <div class="domino-half">
+                  {% if ficha.superior is not None %}
+                    <div class="dots-{{ ficha.superior }}">
+                      {% for i in ficha.superior|times %}
+                      <div class="dot dot-{{ forloop.counter }}"></div>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <input class="domino-input" name="problema_{{ problema.obj.id }}_superior">
+                  {% endif %}
+                </div>
+                
+                <!-- Mitad inferior -->
+                <div class="domino-half">
+                  {% if ficha.inferior is not None %}
+                    <div class="dots-{{ ficha.inferior }}">
+                      {% for i in ficha.inferior|times %}
+                      <div class="dot dot-{{ forloop.counter }}"></div>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <input class="domino-input" name="problema_{{ problema.obj.id }}_inferior">
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <!-- FIN CASO ESPIRAL -->
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary btn-lg">Finalizar Test</button>
+    </div>
+  </div>
+</form>
+
+<style>
+
+  .domino-tile.respuestano-hover:hover,
+  .domino-tile.no-hover:active {
+      background: inherit;
+      transform: none;  /* O simplemente elimina esta línea y dejará el inline intacto */
+      box-shadow: none;
+  }
+  .domino-tile {
+    background: linear-gradient(145deg, #e3fcec, #f1eafc);
+    border: 2px solid #d1c1e0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .domino-tile.respuesta {
+    background: #f7f7f9;
+    border: 2px dashed #d1c1e0;
+  }
+
+  /* Anular hover/active para LA SOLA ficha vacía */
+        .domino-tile.respuesta:hover {
+            transform: none !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        }
+        .domino-tile.respuesta:active {
+            transform: none !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        }
+
+  .domino-tile:hover {
+            background: linear-gradient(145deg, #f0fff2, #faf4ff);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.10),
+                inset 0 1px 2px rgba(255, 255, 255, 0.45);
+        }
+        .domino-tile:active {
+            background: linear-gradient(145deg, #d5f8d8, #efe4f8);
+            transform: translateY(0) scale(0.99);
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.06),
+                inset 0 2px 3px rgba(0, 0, 0, 0.05);
+        }
+  
+  .domino-half {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .domino-half:first-child {
+    border-bottom: 1px solid #bababa;
+  }
+  
+  .domino-tile.respuesta .domino-half:first-child {
+    border-bottom: 1px dashed #ccc;
+  }
+  
+  .domino-input {
+    width: 30px;
+    height: 40px;
+    font-size: 1.5rem;
+    text-align: center;
+    border: 1px solid #d1c1e0;
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  .domino-input:focus {
+    background-color: rgba(58, 125, 125, 0.1);
+    outline: none;
+    border-radius: 4px;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #333;
+    border-radius: 50%;
+    position: absolute;
+  }
+  
+  /* --------------------
+           8. Patrones de posición (1 a 6 puntos)
+           -------------------- */
+        .dots-1 .dot-1 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-2 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-2 .dot-2 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-2 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-3 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-3 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-4 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-3 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-4 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-5 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-3 {
+            top: 50%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-4 {
+            top: 50%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-5 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-6 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+  /* Efecto hover solo para tarjetas */
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  /* Animación para inputs vacíos */
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(58, 125, 125, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(58, 125, 125, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(58, 125, 125, 0); }
+  }
+
+  .domino-tile.respuesta {
+    animation: pulse 2s infinite;
+  }
+        /* Mobile first approach */
+  .domino-tile {
+    width: 50px;
+    height: 100px;
+  }
+
+  @media (min-width: 768px) {
+    .domino-tile {
+      width: 60px;
+      height: 120px;
+    }
+  }
+
+  /* Agregar al estilo existente */
+  .domino-input.error {
+    border: 2px solid #dc3545 !important;
+  }
+
+  .text-danger {
+    color: #dc3545;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /*Estilos para dominó en flor */
+  .domino-flor-container{
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            aspect-ratio: 1 / 1;    /* mantiene un contenedor cuadrado */
+            margin: 0 auto;  
+        }
+  .domino-flor-container .domino-tile {
+    --tile-width: 65px;
+    --tile-height: 130px;
+    background: linear-gradient(145deg, #e3fcec, #f1eafc);
+    border: 2px solid #d1c1e0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: absolute;
+            transform-origin: center;
+  }
+  
+  /* --- POSICIONES PARA 5 FICHAS (Ref: image_1496e9.png) --- */
+        .count-5 .tile-1 { transform: translate(-80px, -90px) rotate(-40deg); }
+        .count-5 .tile-2 { transform: translate(80px, -90px) rotate(40deg); }
+        .count-5 .tile-3 { transform: translate(125px, 50px) rotate(105deg); }
+        .count-5 .tile-4 { transform: translate(-125px, 50px) rotate(-105deg); }
+        .count-5 .respuesta { transform: translateY(140px); }
+        /* Oculta fichas no usadas */
+        .count-5 .tile-5, .count-5 .tile-6, .count-5 .tile-7 { display: none; }
+
+
+        /* --- POSICIONES PARA 6 FICHAS (Ref: image_149999.png) --- */
+        .count-6 .tile-1 { transform: translateY(-135px) rotate(0deg); }
+        .count-6 .tile-2 { transform: translate(105px, -65px) rotate(55deg); }
+        .count-6 .tile-3 { transform: translate(105px, 70px) rotate(125deg); }
+        .count-6 .tile-4 { transform: translate(-105px, 70px) rotate(-125deg); }
+        .count-6 .tile-5 { transform: translate(-105px, -65px) rotate(-55deg); }
+        .count-6 .respuesta { transform: translateY(140px); }
+        /* Oculta fichas no usadas */
+        .count-6 .tile-6, .count-6 .tile-7 { display: none; }
+
+
+        /* --- POSICIONES PARA 7 FICHAS (Ref: image_1499f6.png) --- */
+        .count-7 .tile-1 { transform: translate(-70px, -145px) rotate(-25deg); }
+        .count-7 .tile-2 { transform: translate(70px, -145px) rotate(25deg); }
+        .count-7 .tile-3 { transform: translate(155px, -25px) rotate(90deg); }
+        .count-7 .tile-4 { transform: translate(100px, 95px) rotate(145deg); }
+        .count-7 .tile-5 { transform: translate(-100px, 95px) rotate(-145deg); }
+        .count-7 .tile-6 { transform: translate(-155px, -25px) rotate(-90deg); }
+        .count-7 .respuesta { transform: translateY(140px); }
+        /* Oculta fichas no usadas */
+        .count-7 .tile-7 { display: none; }
+
+    /* Anular hover/active para LA SOLA ficha vacía */
+        .domino-flor-container .domino-tile.respuesta:hover {
+            transform: none !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        }
+        .domino-flor-container .domino-tile.respuesta:active {
+            transform: none !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        }
+    .domino-flor-container .domino-tile.respuestano-hover {
+    animation: pulse 2s infinite;
+  }
+
+  /* Estilos para contenedor espiral */
+  .domino-espiral-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      aspect-ratio: 6 / 5;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+  }
+
+  /* Estilos base para fichas */
+  .domino-espiral-container .domino-tile {
+      background: linear-gradient(145deg, #e3fcec, #f1eafc);
+      border: 2px solid #d1c1e0;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: absolute;
+      transform-origin: center;
+  }
+
+  /* Mitades de la ficha */
+  .domino-espiral-container .domino-half {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+  }
+
+  .domino-espiral-container .domino-half:first-child {
+      border-bottom: 1px solid #bababa;
+  }
+  .domino-espiral-container .dot {
+    position: absolute;
+    background-color: #333;
+    border-radius: 50%;
+  }
+
+  /* Tamaños y posiciones de las fichas en espiral */
+  .domino-espiral-container .domino-tile:nth-child(1) { 
+        width: 32px; 
+        height: 65px;
+        transform: translate(10px, -20px);
+    }
+    .domino-espiral-container .domino-tile:nth-child(1) .dot { width: 4px; height: 4px; }
+    
+    .domino-espiral-container .domino-tile:nth-child(2) { 
+        width: 37px; 
+        height: 72px;
+        transform: translate(-40px, 40px) rotate(80deg);
+    }
+    .domino-espiral-container .domino-tile:nth-child(2) .dot { width: 4.5px; height: 4.5px; }
+    
+    .domino-espiral-container .domino-tile:nth-child(3) { 
+        width: 32px; 
+        height: 65px;
+        transform: translate(-115px, 5px) rotate(155deg);
+    }
+    .domino-espiral-container .domino-tile:nth-child(3) .dot { width: 5px; height: 5px; }
+    
+    .domino-espiral-container .domino-tile:nth-child(4) { 
+        width: 37px; 
+        height: 72px;
+        transform: translate(-110px, -85px) rotate(220deg);
+    }
+    .domino-espiral-container .domino-tile:nth-child(4) .dot { width: 5.5px; height: 5.5px; }
+    
+    .domino-espiral-container .domino-tile:nth-child(5) { 
+        width: 45px; 
+        height: 90px;
+        transform: translate(-10px, -135px) rotate(-90deg);
+    }
+    .domino-espiral-container .domino-tile:nth-child(5) .dot { width: 6px; height: 6px; }
+    
+    .domino-espiral-container .domino-tile:nth-child(6) { 
+        width: 52px; 
+        height: 104px;
+        transform: translate(110px, -70px) rotate(-30deg);
+    }
+    .domino-espiral-container .domino-tile:nth-child(6) .dot { width: 6.5px; height: 6.5px; }
+    
+    /* Para la ficha de respuesta, si es la última */
+    .domino-espiral-container .domino-tile.respuestano-hover { 
+        width: 56px; 
+        height: 112px;
+        transform: translate(120px, 75px) rotate(0deg);
+    }
+
+  /* Estilos para puntos */
+  .domino-espiral-container .dots-1 .dot-1 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-2 .dot-1 { top: 30%; left: 30%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-2 .dot-2 { top: 70%; left: 70%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-3 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-3 .dot-2 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-3 .dot-3 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-4 .dot-1 { top: 30%; left: 30%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-4 .dot-2 { top: 30%; left: 70%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-4 .dot-3 { top: 70%; left: 30%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-4 .dot-4 { top: 70%; left: 70%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-5 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-5 .dot-2 { top: 25%; left: 75%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-5 .dot-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-5 .dot-4 { top: 75%; left: 25%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-5 .dot-5 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-6 .dot-1 { top: 25%; left: 30%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-6 .dot-2 { top: 25%; left: 70%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-6 .dot-3 { top: 50%; left: 30%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-6 .dot-4 { top: 50%; left: 70%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-6 .dot-5 { top: 75%; left: 30%; transform: translate(-50%, -50%); }
+  .domino-espiral-container .dots-6 .dot-6 { top: 75%; left: 70%; transform: translate(-50%, -50%); }
+</style>
+
+<script>
+  // Validación de inputs
+  //document.querySelectorAll('.domino-input').forEach(input => {
+  //  input.addEventListener('input', function() {
+      // Limitar a un solo dígito
+  //    if (this.value.length > 1) {
+  //      this.value = this.value.slice(0, 1);
+  //    }
+      
+      // Permitir solo números 0-6
+  //    if (!/^[0-6]$/.test(this.value)) {
+  //      this.value = '';
+  //    }
+  //  });
+  //});
+
+  // Validar que solo se ingrese un dígito entre 0 y 6 en cada input de la ficha vacía
+        const inputsRespuesta = document.querySelectorAll('.domino-input');
+        inputsRespuesta.forEach(input => {
+            input.addEventListener('input', () => {
+                const val = input.value;
+                if (!/^[0-6]$/.test(val)) {
+                    input.value = '';
+                }
+            });
+        });
+  
+  // Temporizador (ejemplo básico)
+  let tiempoRestante = 25 * 60; // 25 minutos en segundos
+  const timerElement = document.getElementById('tiempo-restante');
+  
+  function actualizarTemporizador() {
+    const minutos = Math.floor(tiempoRestante / 60);
+    const segundos = tiempoRestante % 60;
+    timerElement.textContent = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+    
+    if (tiempoRestante <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('test-domino-form').submit();
+    } else {
+      tiempoRestante--;
+    }
+  }
+
+  // Agregar en el script existente
+  //inputsRespuesta.forEach(input => {
+  //  input.addEventListener('input', function() {
+  //    if(this.value.length > 0) {
+  //      this.parentElement.parentElement.classList.remove('respuesta');
+  //      this.parentElement.parentElement.style.border = '2px solid #28a745';
+  //    }
+  //  });
+  //});
+
+  // Función para validar una ficha completa
+  function validarFicha(ficha) {
+    const inputs = ficha.querySelectorAll('.domino-input');
+    let valido = true;
+    
+    inputs.forEach(input => {
+      if (input.value === '') {
+        input.style.border = '2px solid #dc3545';
+        valido = false;
+      } else {
+        input.style.border = ''; // Restablecer si estaba marcado
+      }
+    });
+    
+    return valido;
+  }
+
+  // Mensajes de error debajo de cada problema
+  function mostrarError(problemaId, mensaje) {
+    const errorId = `error-${problemaId}`;
+    let errorElement = document.getElementById(errorId);
+    
+    if (!errorElement) {
+      errorElement = document.createElement('div');
+      errorElement.id = errorId;
+      errorElement.className = 'text-danger mt-2';
+      document.querySelector(`[name="problema_${problemaId}_inferior"]`)
+        .closest('.card-body')
+        .appendChild(errorElement);
+    }
+    
+    errorElement.textContent = mensaje;
+    return errorElement;
+  }
+
+  // Ocultar error cuando se corrige
+  function ocultarError(problemaId) {
+    const errorElement = document.getElementById(`error-${problemaId}`);
+    if (errorElement) errorElement.remove();
+  }
+
+  // Validación en tiempo real
+  document.querySelectorAll('.domino-input').forEach(input => {
+    input.addEventListener('input', function() {
+      // Validar solo dígitos 0-6
+      if (!/^[0-6]$/.test(this.value)) {
+        this.value = '';
+        return;
+      }
+      
+      // Obtener elementos relacionados
+      const ficha = this.closest('.domino-tile');
+      const problemaId = this.name.split('_')[1];
+      
+      // Validar ambos campos
+      if (validarFicha(ficha)) {
+        ocultarError(problemaId);
+      }
+    });
+  });
+
+  // Validación al enviar el formulario
+  document.getElementById('test-domino-form').addEventListener('submit', function(e) {
+    let formularioValido = true;
+    
+    document.querySelectorAll('.domino-tile.respuesta').forEach(ficha => {
+      const problemaId = ficha.querySelector('.domino-input').name.split('_')[1];
+      
+      if (!validarFicha(ficha)) {
+        mostrarError(problemaId, 'Por favor complete ambos valores de la ficha');
+        formularioValido = false;
+        
+        // Animación para llamar la atención
+        ficha.animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-10px)' },
+          { transform: 'translateX(10px)' },
+          { transform: 'translateX(0)' }
+        ], {
+          duration: 500,
+          iterations: 2
+        });
+      }
+    });
+    
+    if (!formularioValido) {
+      e.preventDefault();
+      // Desplazarse al primer error
+      const primerError = document.querySelector('.domino-input[style*="border: 2px solid rgb(220, 53, 69)"]');
+      if (primerError) primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+  
+  const timerInterval = setInterval(actualizarTemporizador, 1000);
+</script>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - PsyMetrics{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Dashboard</h1>
+    
+    <div class="row">
+        <!-- Estadísticas Rápidas -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body text-center">
+                    <h2 class="display-1">{{ total_tests }}</h2>
+                    <p class="card-text">Pruebas completadas</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body text-center">
+                    <h2 class="display-1">{{ total_valores }}</h2>
+                    <p class="card-text">Test de Valores</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-info">
+                <div class="card-body text-center">
+                    <h2 class="display-1">{{ total_domino }}</h2>
+                    <p class="card-text">Test de Dominó</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Últimas Pruebas -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Últimas Pruebas</h3>
+                </div>
+                <div class="card-body">
+                    {% if ultimas_pruebas %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Prueba</th>
+                                    <th>Fecha</th>
+                                    <th>Resultado</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prueba in ultimas_pruebas %}
+                                <tr>
+                                    <td>
+                                        {% if prueba.test.nombre %}
+                                            {{ prueba.test.nombre }}
+                                        {% else %}
+                                            Test de Dominó D-48
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prueba.fecha_completado %}
+                                            {{ prueba.fecha_completado|date:"d M Y" }}
+                                        {% else %}
+                                            {{ prueba.fecha|date:"d M Y" }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prueba.valor_dominante %}
+                                            {{ prueba.valor_dominante }}
+                                        {% else %}
+                                            {{ prueba.puntuacion }} pts
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prueba.valor_dominante %}
+                                        <a href="{% url 'tests:reporte_valores' prueba.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            Ver <i class="fas fa-chevron-right ms-1"></i>
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'tests:resultados_domino' prueba.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            Ver <i class="fas fa-chevron-right ms-1"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">No has realizado pruebas aún</p>
+                        <a href="{% url 'inicio_test_valores' %}" class="btn btn-outline-success mt-3">
+                            Realizar Test
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estadísticas de Valores -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title mb-0">Promedio Test de Valores</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Teórico</span>
+                            <span class="fw-bold">{{ avg_valores.teorico|floatformat:1 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Económico</span>
+                            <span class="fw-bold">{{ avg_valores.economico|floatformat:1 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Estético</span>
+                            <span class="fw-bold">{{ avg_valores.estetico|floatformat:1 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Social</span>
+                            <span class="fw-bold">{{ avg_valores.social|floatformat:1 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Político</span>
+                            <span class="fw-bold">{{ avg_valores.politico|floatformat:1 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Religioso</span>
+                            <span class="fw-bold">{{ avg_valores.religioso|floatformat:1 }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

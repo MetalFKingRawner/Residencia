@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Segunda Parte - {{ test.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <!--<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white d-flex flex-column align-items-center py-4">
+      <h3 class="mb-0 text-center">Segunda Parte: Asignación de rangos</h3>
+      <p class="mb-0 text-center">{{ parte.instrucciones }}</p>
+    </div>
+  </div>-->
+
+  <form id="form-segunda" method="post" action="{% url 'tests:segunda_parte_valores' %}">
+    {% csrf_token %}
+    <div class="alert alert-info mb-4 text-center">
+        <div class="d-flex align-items-center justify-content-center">
+            <i class="fas fa-info-circle fa-2x me-3"></i>
+            <div>
+                <strong>Instrucción:</strong> Para cada pregunta, asigna puntos a las opciones A, B, C y D usando los cuadros. 
+                <span class="d-block mt-1">Ponga 4 a la afirmación que prefiera en primer lugar, 3 a la que prefiera en segundo lugar, etc.</span>
+                <span class="d-block mt-1">En caso de no poder tomar una decisión, ponga 0 en las cuatro opciones</span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+      {% for pregunta in preguntas %}
+      <div class="col-12 mb-4">
+        <div class="card pregunta-card">
+          <!-- Título de la pregunta -->
+          <div class="card-header bg-light text-center">
+            <h5 class="mb-0">Pregunta {{ forloop.counter }}</h5>
+          </div>
+          <div class="card-body">
+            <!-- Descripción -->
+            <p class="mb-4 fw-semibold">{{ pregunta.texto }}</p>
+            <!-- Opciones e inputs -->
+            {% for opcion in pregunta.opcionvalores_set.all %}
+            <div class="d-flex align-items-center justify-content-between mb-3 opcion-row">
+              <div class="texto-opcion">
+                <span class="badge bg-primary rounded-circle">{{ opcion.letra }}</span> {{ opcion.texto }}
+              </div>
+              <input type="text" class="form-control puntos-input ms-3" 
+                     style="width: 80px;" 
+                     name="puntos_p{{ pregunta.id }}_{{ opcion.letra }}" maxlength="1" value="0" required
+                     data-pregunta="{{ pregunta.id }}" data-opcion="{{ opcion.letra }}">
+            </div>
+            {% endfor %}
+            <div class="error-msg text-center text-danger" id="error_{{ pregunta.id }}" style="display: none;">
+              Valores inválidos. Debes usar 4,3,2,1 sin repetir o todos 0.
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-success btn-lg px-5">
+        <i class="fas fa-check-circle me-2"></i>Finalizar Test y Ver Resultados
+      </button>
+    </div>
+  </form>
+</div>
+
+<style>
+  .pregunta-card {
+    border-radius: 12px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #e0e0e0;
+  }
+  .pregunta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .opcion-row .texto-opcion {
+    flex: 1;
+  }
+  .puntos-input {
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    border: 3px solid #2A4D6E;
+    border-radius: 12px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .puntos-input:focus {
+    border-color: #3A7D7D;
+    box-shadow: 0 0 0 0.25rem rgba(42, 77, 110, 0.25);
+  }
+  .puntos-input.is-invalid {
+    border-color: #dc3545;
+    color: #dc3545;
+  }
+  .texto-opcion {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f0f4f8;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('.puntos-input');
+
+  function validateGroup(preguntaId) {
+    const group = Array.from(document.querySelectorAll(`input[data-pregunta="${preguntaId}"]`));
+    const values = group.map(i => parseInt(i.value) || 0);
+    const errorDiv = document.getElementById(`error_${preguntaId}`);
+    const uniqueVals = new Set(values.filter(v => v > 0));
+    const allZero = values.every(v => v === 0);
+    const validSet = new Set([4,3,2,1]);
+
+    let isValid = false;
+    if (allZero) {
+      isValid = true;
+    } else if (uniqueVals.size === 4 && values.every(v => validSet.has(v))) {
+      isValid = true;
+    }
+
+    group.forEach(i => i.classList.toggle('is-invalid', !isValid));
+    errorDiv.style.display = isValid ? 'none' : 'block';
+    return isValid;
+  }
+
+  inputs.forEach(input => {
+    input.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-4]/g, '');
+      if (this.value.length > 1) this.value = this.value.slice(0,1);
+      validateGroup(this.dataset.pregunta);
+    });
+    input.addEventListener('blur', function() {
+      if (this.value === '') this.value = '0';
+      validateGroup(this.dataset.pregunta);
+    });
+    validateGroup(input.dataset.pregunta);
+  });
+
+  document.getElementById('form-segunda').addEventListener('submit', function(e) {
+    let ok = true;
+    [...new Set(Array.from(inputs).map(i => i.dataset.pregunta))].forEach(id => {
+      if (!validateGroup(id)) ok = false;
+    });
+    if (!ok) {
+      e.preventDefault();
+      alert('Corrige las prioridades antes de continuar.');
+    }
+  });
+});
+</script>
+{% endblock %}

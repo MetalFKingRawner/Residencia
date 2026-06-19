@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - PsyMetrics{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <form class="auth-form" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <p class="auth-heading">Acceso Profesional</p>
+                
+                <div class="auth-field">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" name="username" autocomplete="off" 
+                           class="auth-input" placeholder="Usuario" required>
+                </div>
+                
+                <div class="auth-field">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" name="password" 
+                           class="auth-input" placeholder="Contraseña" required>
+                </div>
+                
+                <div class="auth-buttons">
+                    <button type="submit" class="btn-auth-primary">
+                        Iniciar Sesión
+                    </button>
+                    <a href="{% url 'signup' %}" class="btn-auth-secondary">
+                        Registrarse
+                    </a>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'password_reset' %}" class="auth-link">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

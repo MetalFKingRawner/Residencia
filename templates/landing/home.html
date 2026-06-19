@@ -1,0 +1,1106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Centro DHAE — Desarrollo Humano Integral</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --cream:   #faf7f0;
+      --warm:    #f0e8d4;
+      --sand:    #d8c898;
+      --primary: #a08848;
+      --dark:    #685820;
+      --ink:     #201808;
+      --accent:  #709888;
+      --accent2: #b8d0c8;
+      --white:   #ffffff;
+    }
+
+    body {
+      --nav-h: 68px;
+      --ff-display: 'Cormorant Garamond', Georgia, serif;
+      --ff-body: 'DM Sans', sans-serif;
+      font-family: var(--ff-body);
+      font-weight: 300;
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    .lnav {
+      position: sticky; top: 0; z-index: 50;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4%;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sand);
+      box-shadow: 0 2px 16px rgba(0,0,0,.06);
+    }
+    .lnav-brand {
+      display: flex; align-items: center; gap: 11px;
+    }
+    .lnav-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--primary);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .lnav-icon svg { width: 22px; height: 22px; fill: #fff; }
+    .lnav-name {
+      display: flex; flex-direction: column; line-height: 1.15;
+    }
+    .lnav-name strong {
+      font-family: var(--ff-display);
+      font-size: 1rem; font-weight: 600;
+      color: var(--dark); letter-spacing: .01em;
+    }
+    .lnav-name span {
+      font-size: .7rem; color: var(--primary);
+      font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .lnav-links {
+      display: flex; align-items: center; gap: 2px; list-style: none;
+    }
+    .lnav-links a {
+      text-decoration: none;
+      padding: 6px 14px; border-radius: 999px;
+      font-size: .82rem; font-weight: 400; color: var(--dark);
+      transition: background .2s, color .2s;
+    }
+    .lnav-links a:hover { background: var(--warm); color: var(--primary); }
+    .lnav-links .pill-cursos {
+      background: var(--primary); color: #fff !important;
+      font-weight: 500; margin-left: 4px;
+    }
+    .lnav-links .pill-cursos:hover { background: var(--dark); }
+    .lnav-links a.active { background: var(--warm); color: var(--primary); font-weight: 500; }
+    .lnav-cta {
+      padding: 8px 20px; border-radius: 999px;
+      background: var(--accent); color: #fff !important;
+      font-size: .82rem; font-weight: 500;
+      transition: background .2s;
+    }
+    .lnav-cta:hover { background: var(--dark); }
+
+    .banner-slider {
+      position: relative; width: 100%; height: 480px;
+      overflow: hidden; background: var(--ink);
+    }
+    .banner-slide {
+      position: absolute; inset: 0;
+      opacity: 0; transition: opacity 1.2s ease-in-out;
+      background-size: cover; background-position: center;
+    }
+    .banner-slide.active { opacity: 1; }
+    .banner-slide::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(35,13,5,.62) 0%,
+        rgba(35,13,5,.28) 55%,
+        rgba(35,13,5,.10) 100%
+      );
+    }
+    .banner-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0 6%; z-index: 2; max-width: 620px;
+    }
+    .banner-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 4px 14px; border-radius: 999px;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(6px);
+      font-size: .72rem; font-weight: 500;
+      color: rgba(255,255,255,.9); letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 18px; width: fit-content;
+    }
+    .banner-h {
+      font-family: var(--ff-display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 300; color: #fff;
+      line-height: 1.18; margin-bottom: 14px;
+      text-shadow: 0 2px 16px rgba(0,0,0,.3);
+    }
+    .banner-h em { font-style: italic; color: var(--accent2); }
+    .banner-p {
+      font-size: .92rem; color: rgba(255,255,255,.82);
+      line-height: 1.85; max-width: 420px; margin-bottom: 28px;
+    }
+    .banner-btn {
+      padding: 11px 26px; border-radius: 999px;
+      background: var(--primary); color: #fff;
+      font-family: var(--ff-body); font-size: .85rem; font-weight: 500;
+      border: none; cursor: pointer; width: fit-content;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25);
+      transition: background .2s, transform .2s;
+    }
+    .banner-btn:hover { background: var(--dark); transform: translateY(-2px); }
+    .banner-dots {
+      position: absolute; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 5;
+    }
+    .banner-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.4);
+      border: none; cursor: pointer; padding: 0;
+      transition: background .3s, transform .3s;
+    }
+    .banner-dot.active { background: #fff; transform: scale(1.3); }
+    .banner-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 5; background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(6px);
+      color: #fff; width: 44px; height: 44px;
+      border-radius: 50%; font-size: 1.1rem;
+      cursor: pointer; display: grid; place-items: center;
+      transition: background .2s;
+    }
+    .banner-arrow:hover { background: rgba(255,255,255,.28); }
+    .banner-arrow.prev { left: 20px; }
+    .banner-arrow.next { right: 20px; }
+
+    .lhero {
+      min-height: 92vh; padding: 72px 5% 80px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 56px;
+      background: var(--cream);
+      position: relative; overflow: hidden;
+    }
+    .lhero::before {
+      content: ''; position: absolute; top: -120px; right: -100px;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 68%);
+      opacity: .4; pointer-events: none;
+    }
+    .lhero::after {
+      content: ''; position: absolute; bottom: -80px; left: 5%;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, var(--sand) 0%, transparent 70%);
+      opacity: .55; pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 4px 14px; border-radius: 999px;
+      background: var(--warm); border: 1px solid var(--sand);
+      font-size: .72rem; font-weight: 500;
+      color: var(--primary); letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-badge i { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+    .hero-h1 {
+      font-family: var(--ff-display);
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      font-weight: 300; color: var(--dark);
+      line-height: 1.15; margin-bottom: 18px; letter-spacing: -.01em;
+    }
+    .hero-h1 em { font-style: italic; color: var(--primary); }
+    .hero-p {
+      font-size: .95rem; line-height: 1.9;
+      color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      max-width: 430px; margin-bottom: 36px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-prim {
+      padding: 13px 28px; border-radius: 999px;
+      background: var(--primary); color: #fff;
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 500;
+      border: none; cursor: pointer;
+      box-shadow: 0 6px 22px color-mix(in srgb, var(--primary) 35%, transparent);
+      transition: background .2s, transform .2s;
+    }
+    .btn-prim:hover { background: var(--dark); transform: translateY(-2px); }
+    .btn-sec {
+      padding: 13px 28px; border-radius: 999px;
+      background: transparent; color: var(--dark);
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 400;
+      border: 1.5px solid var(--sand); cursor: pointer;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .btn-sec:hover { border-color: var(--primary); background: var(--warm); transform: translateY(-2px); }
+    .hero-card {
+      background: var(--white); border-radius: 24px; overflow: hidden;
+      box-shadow: 0 20px 56px color-mix(in srgb, var(--dark) 14%, transparent);
+      position: relative; z-index: 1;
+    }
+    .hero-card-top {
+      height: 220px;
+      background: linear-gradient(135deg, var(--accent2), var(--sand), var(--primary));
+      display: grid; place-items: center;
+    }
+    .hero-card-top svg { width: 80px; height: 80px; fill: rgba(255,255,255,.45); }
+    .hero-card-body { padding: 24px 28px; }
+    .hero-card-body h3 {
+      font-family: var(--ff-display); font-size: 1.4rem;
+      font-weight: 600; color: var(--dark); margin-bottom: 6px;
+    }
+    .hero-card-body p { font-size: .83rem; color: color-mix(in srgb, var(--primary) 60%, var(--ink)); }
+    .hero-stats { display: flex; gap: 14px; margin-top: 16px; }
+    .hstat {
+      flex: 1; text-align: center; padding: 10px 6px;
+      background: var(--cream); border-radius: 10px;
+    }
+    .hstat-n { font-family: var(--ff-display); font-size: 1.5rem; font-weight: 600; color: var(--primary); }
+    .hstat-l { font-size: .67rem; text-transform: uppercase; letter-spacing: .06em; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+    .hero-card-tag {
+      position: absolute; top: -16px; right: 20px;
+      background: var(--dark); color: #fff;
+      border-radius: 999px; padding: 6px 16px;
+      font-size: .72rem; font-weight: 500;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+    }
+
+
+    .marquee-bar { overflow: hidden; background: var(--dark); padding: 12px 0; }
+    .marquee-inner {
+      display: flex; white-space: nowrap;
+      animation: mq 26s linear infinite;
+    }
+    .marquee-inner span {
+      display: inline-flex; align-items: center; gap: 14px;
+      color: var(--cream); font-size: .78rem;
+      letter-spacing: .1em; text-transform: uppercase; padding: 0 30px;
+    }
+    .marquee-inner span::before { content: '◆'; color: var(--sand); font-size: .5rem; }
+    @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+
+    .lnosotros {
+      padding: 96px 5%; background: var(--white);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+    .nos-visual {
+      border-radius: 24px;
+      background: linear-gradient(150deg, var(--accent2), var(--warm), var(--sand));
+      height: 400px; display: grid; place-items: center; position: relative;
+    }
+    .nos-visual svg { width: 100px; height: 100px; fill: rgba(255,255,255,.35); }
+    .nos-float {
+      position: absolute; bottom: -20px; right: -20px;
+      background: var(--white); border-radius: 18px; padding: 16px 20px;
+      box-shadow: 0 10px 32px rgba(0,0,0,.10);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .nf-dot { width: 42px; height: 42px; border-radius: 12px; background: var(--primary); display: grid; place-items: center; flex-shrink: 0; }
+    .nf-dot svg { width: 20px; height: 20px; fill: #fff; }
+    .nf-txt strong { display: block; font-size: .85rem; font-weight: 500; color: var(--dark); }
+    .nf-txt span   { font-size: .75rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+    .nos-content .stag { font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+    .nos-content h2 {
+      font-family: var(--ff-display); font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 300; color: var(--dark); line-height: 1.2; margin-bottom: 16px;
+    }
+    .nos-content h2 em { font-style: italic; color: var(--primary); }
+    .nos-content p { font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink)); line-height: 1.85; margin-bottom: 14px; }
+    .nos-values { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .nval {
+      padding: 6px 18px; border-radius: 999px;
+      background: var(--warm); border: 1px solid var(--sand);
+      font-size: .78rem; font-weight: 500; color: var(--dark);
+    }
+
+    .lservicios { padding: 96px 5%; background: var(--cream); }
+    .sec-head { text-align: center; margin-bottom: 56px; }
+    .sec-head .stag { font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+    .sec-head h2 {
+      font-family: var(--ff-display); font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 300; color: var(--dark); margin-bottom: 12px;
+    }
+    .sec-head h2 em { font-style: italic; color: var(--primary); }
+    .sec-head p { font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink)); max-width: 500px; margin: 0 auto; line-height: 1.8; }
+    .srv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+    .srv-card {
+      background: var(--white); border-radius: 20px; padding: 32px 28px;
+      border: 1px solid var(--warm); transition: transform .3s, box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .srv-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transform: scaleX(0); transform-origin: left; transition: transform .4s;
+    }
+    .srv-card:hover { transform: translateY(-6px); box-shadow: 0 16px 44px color-mix(in srgb, var(--dark) 10%, transparent); }
+    .srv-card:hover::after { transform: scaleX(1); }
+    .srv-ico { width: 50px; height: 50px; border-radius: 14px; background: var(--warm); display: grid; place-items: center; margin-bottom: 18px; }
+    .srv-ico svg { width: 24px; height: 24px; fill: var(--primary); }
+    .srv-card h3 { font-family: var(--ff-display); font-size: 1.3rem; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
+    .srv-card p { font-size: .85rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink)); line-height: 1.75; }
+    .srv-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: .8rem; font-weight: 500; color: var(--primary); transition: gap .2s; cursor: pointer; }
+    .srv-link:hover { gap: 10px; }
+
+    .lvoc { padding: 96px 5%; background: var(--dark); }
+    .lvoc .stag { color: var(--accent2); font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 10px; }
+    .lvoc h2 { font-family: var(--ff-display); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 300; color: var(--cream); margin-bottom: 12px; }
+    .lvoc h2 em { font-style: italic; color: var(--accent2); }
+    .lvoc > .voc-wrap > p { font-size: .9rem; color: var(--sand); max-width: 520px; line-height: 1.8; }
+    .voc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 52px; }
+    .voc-s {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px; padding: 26px 22px; text-align: center; transition: background .3s;
+    }
+    .voc-s:hover { background: rgba(255,255,255,.11); }
+    .voc-n { font-family: var(--ff-display); font-size: 2.8rem; font-weight: 300; color: var(--primary); line-height: 1; margin-bottom: 12px; }
+    .voc-s h4 { font-family: var(--ff-display); font-size: 1rem; color: var(--cream); margin-bottom: 6px; }
+    .voc-s p { font-size: .78rem; color: var(--sand); line-height: 1.65; }
+
+    .lpruebas {
+      padding: 96px 5%;
+      background: var(--warm);
+      position: relative; overflow: hidden;
+    }
+    .lpruebas::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 68%);
+      opacity: .35; pointer-events: none;
+    }
+
+    .prb-grid-duo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      position: relative; z-index: 1;
+    }
+
+    .prb-card-duo {
+      background: var(--white);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--sand);
+      box-shadow: 0 8px 32px color-mix(in srgb, var(--dark) 7%, transparent);
+      transition: transform .35s, box-shadow .35s;
+      display: flex; flex-direction: column;
+    }
+    .prb-card-duo:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 56px color-mix(in srgb, var(--dark) 14%, transparent);
+    }
+
+    .prb-card-header {
+      height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .prb-card-header.domino {
+      background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 60%, var(--accent) 100%);
+    }
+    .prb-card-header.valores {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--dark) 60%, var(--primary) 100%);
+    }
+    .prb-card-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='5' cy='5' r='1.5' fill='%23ffffff' fill-opacity='0.12'/%3E%3C/svg%3E");
+    }
+    .prb-card-header-ico {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,.15);
+      border-radius: 20px; display: grid; place-items: center;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.2);
+      position: relative; z-index: 1;
+    }
+    .prb-card-header-ico svg { width: 38px; height: 38px; fill: #fff; }
+
+    .prb-badge {
+      position: absolute; top: 14px; left: 16px;
+      padding: 3px 12px; border-radius: 999px;
+      font-size: .65rem; font-weight: 500; letter-spacing: .09em; text-transform: uppercase;
+      background: rgba(255,255,255,.2); color: #fff;
+      backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.25);
+      z-index: 1;
+    }
+
+    .prb-card-body {
+      padding: 28px 28px 24px;
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .prb-card-body h4 {
+      font-family: var(--ff-display);
+      font-size: 1.4rem; font-weight: 600; color: var(--dark);
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .prb-card-body p {
+      font-size: .87rem; color: color-mix(in srgb, var(--primary) 50%, var(--ink));
+      line-height: 1.78; margin-bottom: 20px; flex: 1;
+    }
+
+    .prb-meta {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .prb-meta-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .76rem; color: color-mix(in srgb, var(--primary) 60%, var(--ink));
+      background: var(--cream); border-radius: 999px;
+      padding: 4px 12px; border: 1px solid var(--warm);
+    }
+    .prb-meta-item span.dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+    }
+
+    .prb-card-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 18px; border-top: 1px solid var(--warm);
+    }
+    .prb-card-foot .prb-time {
+      font-size: .78rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink));
+    }
+    .prb-btn-duo {
+      padding: 9px 22px; border-radius: 999px;
+      background: var(--primary); color: #fff;
+      font-family: var(--ff-body); font-size: .8rem; font-weight: 500;
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 30%, transparent);
+      transition: background .2s, transform .2s;
+      text-decoration: none; display: inline-block;
+    }
+    .prb-btn-duo:hover { background: var(--dark); transform: translateY(-2px); }
+
+    .lcursos { padding: 96px 5%; background: var(--white); }
+    .cur-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 26px; }
+    .cur-card { border-radius: 20px; overflow: hidden; border: 1px solid var(--warm); background: var(--cream); transition: transform .3s, box-shadow .3s; }
+    .cur-card:hover { transform: translateY(-6px); box-shadow: 0 18px 48px color-mix(in srgb, var(--dark) 11%, transparent); }
+    .cur-thumb { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem; position: relative; }
+    .cur-dur { position: absolute; bottom: 10px; right: 12px; background: rgba(0,0,0,.35); color: #fff; font-size: .68rem; font-family: 'DM Sans', sans-serif; padding: 2px 10px; border-radius: 999px; backdrop-filter: blur(6px); }
+    .cur-body { padding: 20px 22px 24px; }
+    .cur-lvl { font-size: .7rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--primary); margin-bottom: 6px; }
+    .cur-body h3 { font-family: var(--ff-display); font-size: 1.2rem; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+    .cur-body p { font-size: .82rem; color: color-mix(in srgb, var(--primary) 50%, var(--ink)); line-height: 1.7; margin-bottom: 16px; }
+    .cur-meta { display: flex; gap: 10px; font-size: .76rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+    .cur-enroll { display: block; width: 100%; margin-top: 14px; padding: 9px; text-align: center; border-radius: 999px; background: var(--primary); color: #fff; font-size: .83rem; font-weight: 500; border: none; cursor: pointer; transition: background .2s; }
+    .cur-enroll:hover { background: var(--dark); }
+
+    .lcta {
+      padding: 72px 5%; text-align: center;
+      background: linear-gradient(135deg, #181004 0%, #403010 50%, #604818 100%);
+      position: relative; overflow: hidden;
+    }
+    .lcta::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .lcta h2 { font-family: var(--ff-display); font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 300; color: #fff; margin-bottom: 12px; position: relative; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+    .lcta p { font-size: .9rem; color: rgba(255,243,230,.88); max-width: 440px; margin: 0 auto 32px; line-height: 1.8; position: relative; }
+    .btn-wh { padding: 13px 34px; border-radius: 999px; background: #fff; color: var(--primary); font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500; border: none; cursor: pointer; box-shadow: 0 6px 22px rgba(0,0,0,.22); transition: transform .2s, box-shadow .2s; position: relative; }
+    .btn-wh:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.26); }
+
+
+    .lcontacto { padding: 96px 5%; background: var(--cream); }
+    .con-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 72px; align-items: start; }
+    .con-info .stag { font-size: .72rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+    .con-info h2 { font-family: var(--ff-display); font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 300; color: var(--dark); margin-bottom: 14px; }
+    .con-info h2 em { font-style: italic; color: var(--primary); }
+    .con-info > p { font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink)); line-height: 1.8; }
+    .con-items { margin-top: 30px; }
+    .con-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--warm); }
+    .con-item:last-child { border-bottom: none; }
+    .con-ico { width: 38px; height: 38px; border-radius: 10px; background: var(--warm); display: grid; place-items: center; flex-shrink: 0; }
+    .con-ico svg { width: 16px; height: 16px; fill: var(--primary); }
+    .con-txt strong { display: block; font-size: .85rem; font-weight: 500; color: var(--dark); }
+    .con-txt span { font-size: .78rem; color: color-mix(in srgb, var(--primary) 50%, var(--ink)); }
+    .con-form { background: var(--white); border-radius: 22px; padding: 36px 32px; border: 1px solid var(--warm); box-shadow: 0 10px 36px color-mix(in srgb, var(--dark) 6%, transparent); }
+    .con-form h3 { font-family: var(--ff-display); font-size: 1.5rem; font-weight: 600; color: var(--dark); margin-bottom: 24px; }
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fg { margin-bottom: 16px; }
+    .fg label { display: block; font-size: .77rem; font-weight: 500; color: var(--dark); letter-spacing: .04em; margin-bottom: 5px; }
+    .fg input, .fg select, .fg textarea {
+      width: 100%; padding: 10px 14px; border-radius: 10px;
+      border: 1.5px solid var(--warm); background: var(--cream);
+      font-family: 'DM Sans', sans-serif; font-size: .85rem; color: var(--ink);
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+    }
+    .fg textarea { resize: vertical; min-height: 90px; }
+    .fsub { width: 100%; padding: 13px; border-radius: 999px; background: var(--primary); color: #fff; font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500; border: none; cursor: pointer; margin-top: 4px; transition: background .2s, transform .2s; }
+    .fsub:hover { background: var(--dark); transform: translateY(-2px); }
+
+
+    .lfooter { background: var(--ink); color: var(--sand); padding: 56px 5% 28px; }
+    .ft { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 44px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .fb-brand p { font-size: .82rem; line-height: 1.75; margin-top: 12px; color: rgba(220,200,164,.65); max-width: 240px; }
+    .fc h4 { font-family: var(--ff-display); font-size: .95rem; font-weight: 600; color: var(--cream); margin-bottom: 14px; }
+    .fc a { display: block; font-size: .82rem; color: rgba(220,200,164,.65); margin-bottom: 9px; text-decoration: none; transition: color .2s; }
+    .fc a:hover { color: var(--primary); }
+    .fb { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; font-size: .75rem; color: rgba(220,200,164,.38); }
+
+    /* ── Hamburger button ── */
+    .lnav-burger {
+      display: none;
+      flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px; padding: 8px;
+      background: none; border: none; cursor: pointer;
+      border-radius: 8px; transition: background .2s;
+    }
+    .lnav-burger:hover { background: var(--warm); }
+    .lnav-burger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--dark); border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+      transform-origin: center;
+    }
+    /* Animate to X when open */
+    .lnav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .lnav-burger.open span:nth-child(2) { opacity: 0; }
+    .lnav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile dropdown menu ── */
+    .lnav-mobile {
+      display: none;
+      position: absolute; top: var(--nav-h); left: 0; right: 0;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sand);
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      padding: 12px 4%;
+      flex-direction: column; gap: 2px;
+      z-index: 49;
+    }
+    .lnav-mobile.open { display: flex; }
+    .lnav-mobile li { list-style: none; }
+    .lnav-mobile a {
+      display: block; padding: 10px 16px; border-radius: 10px;
+      font-size: .9rem; font-weight: 400; color: var(--dark);
+      text-decoration: none; transition: background .2s, color .2s;
+      text-align: center;
+    }
+    .lnav-mobile a:hover, .lnav-mobile a.active {
+      background: var(--warm); color: var(--primary);
+    }
+    .lnav-mobile .pill-cursos {
+      background: var(--primary); color: #fff !important;
+      font-weight: 500; margin-top: 6px;
+    }
+    .lnav-mobile .pill-cursos:hover { background: var(--dark); }
+
+    /* Tablet: reducir padding y min-height del hero */
+    @media(max-width:1100px) {
+      .lhero { min-height: unset; padding: 56px 5% 64px; }
+    }
+    /* Tablet intermedio: colapsar a 1 columna y ocultar hero-card, pero mantener nav */
+    @media(max-width:1024px) and (min-width:901px) {
+      .lhero { grid-template-columns: 1fr; }
+      .hero-card { display: none; }
+    }
+
+    @media(max-width:900px) {
+      .banner-slider  { height: 340px; }
+      .banner-h       { font-size: clamp(1.4rem, 5vw, 2rem); }
+      .lhero {
+        grid-template-columns: 1fr;
+        min-height: unset;
+        padding: 48px 5% 56px;
+      }
+      .lnosotros, .con-grid { grid-template-columns: 1fr; }
+      .hero-card, .nos-visual { display: none; }
+      .ft             { grid-template-columns: 1fr 1fr; }
+      .lnav-links, .lnav-cta { display: none; }
+      .lnav-burger    { display: flex; }
+      .prb-grid-duo   { grid-template-columns: 1fr; }
+    }
+    @media(max-width:520px) {
+      .banner-slider { height: 280px; }
+      .lhero         { padding: 40px 5% 48px; }
+      .ft            { grid-template-columns: 1fr; }
+      .frow          { grid-template-columns: 1fr; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<nav class="lnav">
+  <div class="lnav-brand">
+    <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE" 
+     style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+    <div class="lnav-name">
+      <strong>Centro DHAE</strong>
+      <span>Desarrollo Humano Integral</span>
+    </div>
+  </div>
+  <ul class="lnav-links">
+    <li><a href="#" class="active">Inicio</a></li>
+    <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+    <li><a href="{% url 'servicios' %}">Servicios</a></li>
+    <li><a href="#">Productos</a></li>
+    <li><a href="#">Contacto</a></li>
+    <li><a href="{% url 'tests:index' %}">Pruebas</a></li>
+    <li><a href="{% url 'courses:curso_list' %}" class="pill-cursos">📚 Cursos</a></li>
+  </ul>
+  <!-- Hamburger (solo visible en móvil/tableta) -->
+  <button class="lnav-burger" id="navBurger" aria-label="Abrir menú" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Menú desplegable móvil -->
+<ul class="lnav-mobile" id="navMobile">
+  <li><a href="#" class="active">Inicio</a></li>
+  <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+  <li><a href="{% url 'servicios' %}">Servicios</a></li>
+  <li><a href="#">Productos</a></li>
+  <li><a href="#">Contacto</a></li>
+  <li><a href="{% url 'tests:index' %}">Pruebas</a></li>
+  <li><a href="{% url 'courses:curso_list' %}" class="pill-cursos">📚 Cursos</a></li>
+</ul>
+
+<div class="banner-slider" id="bannerSlider">
+
+  <div class="banner-slide active" style="background-image: url('{% static 'img/banner/banner-1.jpg' %}')">
+    <div class="banner-content">
+      <span class="banner-tag">Atención Psicológica</span>
+      <h2 class="banner-h">Un espacio seguro para <em>tu bienestar</em></h2>
+      <p class="banner-p">Acompañamiento profesional con un enfoque humano, ético y basado en evidencia científica.</p>
+      <button class="banner-btn">Agendar consulta</button>
+    </div>
+  </div>
+
+  <div class="banner-slide" style="background-image: url('{% static 'img/banner/banner-2.jpg' %}')">
+    <div class="banner-content">
+      <span class="banner-tag">Orientación Vocacional</span>
+      <h2 class="banner-h">Descubre tu <em>camino profesional</em></h2>
+      <p class="banner-p">Guiamos a jóvenes y adultos en la elección de carrera con instrumentos validados y acompañamiento personalizado.</p>
+      <button class="banner-btn">Conocer más</button>
+    </div>
+  </div>
+
+  <div class="banner-slide" style="background-image: url('{% static 'img/banner/banner-3.jpg' %}')">
+    <div class="banner-content">
+      <span class="banner-tag">Cursos de Capacitación</span>
+      <h2 class="banner-h">Formación continua para <em>equipos y empresas</em></h2>
+      <p class="banner-p">Programas especializados en desarrollo humano, liderazgo e inteligencia emocional para organizaciones.</p>
+      <button class="banner-btn">Ver cursos</button>
+    </div>
+  </div>
+
+  <div class="banner-slide" style="background-image: url('{% static 'img/banner/banner-4.jpg' %}')">
+    <div class="banner-content">
+      <span class="banner-tag">Bienestar Integral</span>
+      <h2 class="banner-h">Crecimiento humano <em>con propósito</em></h2>
+      <p class="banner-p">Creamos espacios de reflexión y crecimiento personal, combinando rigor científico con calidez humana.</p>
+      <button class="banner-btn">Nuestro enfoque</button>
+    </div>
+  </div>
+
+  <button class="banner-arrow prev" onclick="bannerMove(-1)">&#8592;</button>
+  <button class="banner-arrow next" onclick="bannerMove(1)">&#8594;</button>
+  <div class="banner-dots" id="bannerDots"></div>
+
+</div>
+
+<section class="lhero">
+  <div>
+    <div class="hero-badge"><i></i>Desarrollo Humano Integral</div>
+    <h1 class="hero-h1">Centro de atención <em>especializada</em> para tu bienestar</h1>
+    <p class="hero-p">Psicología, orientación vocacional y formación continua con un enfoque humano, ético y basado en evidencia.</p>
+    <div class="hero-btns">
+      <button class="btn-prim">Agendar consulta</button>
+      <button class="btn-sec">Conocer servicios</button>
+    </div>
+  </div>
+  <div class="hero-card">
+    <div class="hero-card-tag">+500 personas atendidas</div>
+    <div class="hero-card-top">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="34" r="18"/><path d="M20 82c0-16.57 13.43-30 30-30s30 13.43 30 30H20z"/></svg>
+    </div>
+    <div class="hero-card-body">
+      <h3>Próxima disponibilidad</h3>
+      <p>Citas presenciales y en línea. Primera sesión sin costo.</p>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-n">15+</div><div class="hstat-l">Años exp.</div></div>
+        <div class="hstat"><div class="hstat-n">8</div><div class="hstat-l">Especialistas</div></div>
+        <div class="hstat"><div class="hstat-n">30+</div><div class="hstat-l">Cursos</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-bar">
+  <div class="marquee-inner">
+    <span>Atención Psicológica</span><span>Orientación Vocacional</span>
+    <span>Cursos de Capacitación</span><span>Desarrollo Humano</span>
+    <span>Pruebas Psicométricas</span><span>Terapia Individual</span>
+    <span>Terapia Familiar</span><span>Formación Profesional</span>
+    <span>Atención Psicológica</span><span>Orientación Vocacional</span>
+    <span>Cursos de Capacitación</span><span>Desarrollo Humano</span>
+    <span>Pruebas Psicométricas</span><span>Terapia Individual</span>
+    <span>Terapia Familiar</span><span>Formación Profesional</span>
+  </div>
+</div>
+
+<section class="lnosotros">
+  <div class="nos-visual">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="35" r="20"/><path d="M18 84c0-17.67 14.33-32 32-32s32 14.33 32 32H18z"/></svg>
+    <div class="nos-float">
+      <div class="nf-dot">
+        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+      <div class="nf-txt">
+        <strong>Atención con calidez</strong>
+        <span>Ética y confidencialidad</span>
+      </div>
+    </div>
+  </div>
+  <div class="nos-content">
+    <div class="stag">Quiénes somos</div>
+    <h2>Centro <em>DHAE</em>: crecimiento humano con propósito</h2>
+    <p>Somos un centro especializado en desarrollo humano integral que ofrece servicios de atención psicológica, orientación vocacional y programas de capacitación para individuos, familias y organizaciones.</p>
+    <p>Nuestro equipo de profesionales combina rigor científico con un trato humano y cercano, creando espacios seguros para el crecimiento personal y profesional.</p>
+    <div class="nos-values">
+      <span class="nval">Ética profesional</span>
+      <span class="nval">Calidez humana</span>
+      <span class="nval">Evidencia científica</span>
+      <span class="nval">Confidencialidad</span>
+      <span class="nval">Inclusión</span>
+    </div>
+  </div>
+</section>
+
+<section class="lservicios">
+  <div class="sec-head">
+    <div class="stag">Nuestras áreas</div>
+    <h2>Servicios <em>especializados</em></h2>
+    <p>Un enfoque integral para el bienestar y el crecimiento de personas y organizaciones.</p>
+  </div>
+  <div class="srv-grid">
+
+    <div class="srv-card">
+      <div class="srv-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7z"/></svg>
+      </div>
+      <h3>Atención Psicológica</h3>
+      <p>Evaluación y acompañamiento terapéutico individual, de pareja y familiar con un enfoque humano y basado en evidencia.</p>
+      <div class="srv-link">Ver más →</div>
+    </div>
+
+    <div class="srv-card">
+      <div class="srv-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6L23 9 12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+      </div>
+      <h3>Orientación Vocacional</h3>
+      <p>Acompañamos a jóvenes y adultos en el descubrimiento de sus talentos e intereses mediante métodos validados.</p>
+      <div class="srv-link">Ver más →</div>
+    </div>
+
+    <div class="srv-card">
+      <div class="srv-ico">
+        <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+      </div>
+      <h3>Cursos de Capacitación</h3>
+      <p>Programas formativos para empresas e instituciones que buscan fortalecer habilidades en desarrollo humano.</p>
+      <div class="srv-link">Ver cursos →</div>
+    </div>
+
+    <div class="srv-card">
+      <div class="srv-ico">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+      </div>
+      <h3>Pruebas Psicométricas</h3>
+      <p>Aplicación e interpretación de instrumentos estandarizados para evaluación clínica, vocacional y organizacional.</p>
+      <div class="srv-link">Ver pruebas →</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="lvoc">
+  <div class="voc-wrap">
+    <div class="stag">Orientación Vocacional</div>
+    <h2>Descubre tu camino <em>profesional</em></h2>
+    <p>Proceso estructurado para guiarte en la elección de tu vocación con claridad y confianza.</p>
+    <div class="voc-grid">
+      <div class="voc-s"><div class="voc-n">01</div><h4>Diagnóstico</h4><p>Evaluamos intereses, habilidades y perfil de personalidad.</p></div>
+      <div class="voc-s"><div class="voc-n">02</div><h4>Pruebas</h4><p>Instrumentos estandarizados para un panorama objetivo.</p></div>
+      <div class="voc-s"><div class="voc-n">03</div><h4>Reflexión</h4><p>Acompañamiento en el proceso de autoconocimiento.</p></div>
+      <div class="voc-s"><div class="voc-n">04</div><h4>Plan de acción</h4><p>Informe personalizado con orientación de rutas formativas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="lpruebas">
+
+  <div class="sec-head">
+    <div class="stag">Evaluación psicológica</div>
+    <h2>Pruebas <em>psicométricas</em></h2>
+    <p>Instrumentos validados para obtener información objetiva con fines clínicos, educativos y organizacionales.</p>
+  </div>
+
+  <div class="prb-grid-duo">
+
+    <div class="prb-card-duo">
+      <div class="prb-card-header domino" 
+          style="background-image: url('{% static 'img/d48.png' %}'); 
+                  background-size: cover; background-position: center;">
+          <span class="prb-badge">Cognitiva · No verbal</span>
+          <div style="position:absolute; inset:0; background:rgba(32,24,8,0.45);"></div>
+      </div>
+      <div class="prb-card-body">
+        <h4>Test de Dominó D-48</h4>
+        <p>
+          Prueba de inteligencia no verbal diseñada por E. Anstey que evalúa la capacidad de razonamiento abstracto e inductivo. El evaluado debe identificar la regla lógica que rige secuencias de fichas de dominó y determinar la pieza faltante. Es ampliamente utilizada en contextos educativos, organizacionales y de orientación vocacional por su independencia del lenguaje y la cultura.
+        </p>
+        <div class="prb-meta">
+          <div class="prb-meta-item"><span class="dot"></span>48 problemas</div>
+          <div class="prb-meta-item"><span class="dot"></span>Razonamiento abstracto</div>
+          <div class="prb-meta-item"><span class="dot"></span>Desde 12 años</div>
+        </div>
+        <div class="prb-card-foot">
+          <span class="prb-time">⏱ 25 minutos</span>
+          <a href="{% url 'tests:inicio_domino' %}" class="prb-btn-duo">Realizar prueba</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="prb-card-duo">
+      <div class="prb-card-header valores" 
+          style="background-image: url('{% static 'img/allport.png' %}'); 
+                  background-size: cover; background-position: center;">
+          <span class="prb-badge">Personalidad · Valores</span>
+          <div style="position:absolute; inset:0; background:rgba(32,24,8,0.45);"></div>
+      </div>
+      <div class="prb-card-body">
+        <h4>Estudio de Valores de Allport</h4>
+        <p>
+          Instrumento desarrollado por Gordon Allport, Philip Vernon y Gardner Lindzey para medir la jerarquía de valores que motivan la conducta de una persona. Evalúa seis dimensiones: teórico, económico, estético, social, político y religioso. Es de gran utilidad en orientación vocacional, selección de personal y procesos de desarrollo humano, ya que revela las prioridades y motivaciones fundamentales del individuo.
+        </p>
+        <div class="prb-meta">
+          <div class="prb-meta-item"><span class="dot"></span>6 escalas de valores</div>
+          <div class="prb-meta-item"><span class="dot"></span>Motivación y carácter</div>
+          <div class="prb-meta-item"><span class="dot"></span>Adultos y jóvenes</div>
+        </div>
+        <div class="prb-card-foot">
+          <span class="prb-time">⏱ 20–30 minutos</span>
+          <a href="{% url 'tests:inicio_test_valores' %}" class="prb-btn-duo">Realizar prueba</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="lcursos">
+  <div class="sec-head">
+    <div class="stag">Formación continua</div>
+    <h2>Cursos de <em>Capacitación</em></h2>
+    <p>Programas para profesionales y empresas que buscan fortalecer competencias en desarrollo humano.</p>
+  </div>
+  <div class="cur-grid">
+
+    <div class="cur-card">
+      <div class="cur-thumb" style="background:linear-gradient(135deg,#8aab7e,#6b3d28)">
+        ❤<span class="cur-dur">16 hrs</span>
+      </div>
+      <div class="cur-body">
+        <div class="cur-lvl">Introductorio</div>
+        <h3>Inteligencia Emocional en el Trabajo</h3>
+        <p>Autoconciencia, empatía y regulación emocional para mejorar el clima organizacional.</p>
+        <div class="cur-meta"><span>👥 Grupal</span><span>📅 Online / Presencial</span></div>
+        <button class="cur-enroll">Inscribirse</button>
+      </div>
+    </div>
+
+    <div class="cur-card">
+      <div class="cur-thumb" style="background:linear-gradient(135deg,#b07050,#dcc8a4)">
+        🧠<span class="cur-dur">24 hrs</span>
+      </div>
+      <div class="cur-body">
+        <div class="cur-lvl">Intermedio</div>
+        <h3>Comunicación Asertiva</h3>
+        <p>Técnicas efectivas para la comunicación en entornos personales y profesionales.</p>
+        <div class="cur-meta"><span>👥 Grupal</span><span>📅 Presencial</span></div>
+        <button class="cur-enroll">Inscribirse</button>
+      </div>
+    </div>
+
+    <div class="cur-card">
+      <div class="cur-thumb" style="background:linear-gradient(135deg,#6b3d28,#f0e6d3)">
+        🌱<span class="cur-dur">32 hrs</span>
+      </div>
+      <div class="cur-body">
+        <div class="cur-lvl">Especialización</div>
+        <h3>Liderazgo y Desarrollo de Equipos</h3>
+        <p>Herramientas psicológicas para el liderazgo efectivo y gestión del cambio.</p>
+        <div class="cur-meta"><span>🏢 Empresarial</span><span>📅 In-company</span></div>
+        <button class="cur-enroll">Solicitar info</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="lcta">
+  <h2>¿Listo para dar el primer paso?</h2>
+  <p>Agenda una consulta sin costo y descubre cómo podemos acompañarte en tu proceso.</p>
+  <button class="btn-wh">Agenda tu consulta gratis</button>
+</div>
+
+<section class="lcontacto">
+  <div class="con-grid">
+
+    <div class="con-info">
+      <div class="stag">Contáctanos</div>
+      <h2>Hablemos sobre tu <em>proceso</em></h2>
+      <p>Estamos para resolver tus dudas y orientarte al servicio que mejor se adapte a tu situación.</p>
+      <div class="con-items">
+        <div class="con-item">
+          <div class="con-ico">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          </div>
+          <div class="con-txt"><strong>Teléfono / WhatsApp</strong><span>+52 (55) 0000-0000</span></div>
+        </div>
+        <div class="con-item">
+          <div class="con-ico">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div class="con-txt"><strong>Correo electrónico</strong><span>contacto@dhae.mx</span></div>
+        </div>
+        <div class="con-item">
+          <div class="con-ico">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+          </div>
+          <div class="con-txt"><strong>Ubicación</strong><span>Ciudad de México</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="con-form">
+      <h3>Envíanos un mensaje</h3>
+      <div class="frow">
+        <div class="fg"><label>Nombre</label><input type="text" placeholder="Tu nombre"/></div>
+        <div class="fg"><label>Apellido</label><input type="text" placeholder="Tu apellido"/></div>
+      </div>
+      <div class="fg"><label>Correo electrónico</label><input type="email" placeholder="tucorreo@ejemplo.com"/></div>
+      <div class="fg">
+        <label>Servicio de interés</label>
+        <select>
+          <option value="">Selecciona un servicio…</option>
+          <option>Atención Psicológica</option>
+          <option>Orientación Vocacional</option>
+          <option>Pruebas Psicométricas</option>
+          <option>Cursos de Capacitación</option>
+        </select>
+      </div>
+      <div class="fg"><label>Mensaje</label><textarea placeholder="¿Cómo podemos ayudarte?"></textarea></div>
+      <button class="fsub">Enviar mensaje</button>
+    </div>
+
+  </div>
+</section>
+
+<footer class="lfooter">
+  <div class="ft">
+
+    <div class="fb-brand">
+      <div class="lnav-brand" style="filter:brightness(1.5)">
+        <div class="lnav-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"/></svg>
+        </div>
+        <div class="lnav-name">
+          <strong style="color:#f9f4ed">Centro DHAE</strong>
+          <span>Desarrollo Humano Integral</span>
+        </div>
+      </div>
+      <p>Centro de Desarrollo Humano Integral y Atención Especializada S.C.</p>
+    </div>
+
+    <div class="fc">
+      <h4>Servicios</h4>
+      <a href="#">Atención Psicológica</a>
+      <a href="#">Orientación Vocacional</a>
+      <a href="#">Pruebas Psicométricas</a>
+      <a href="#">Cursos de Capacitación</a>
+    </div>
+
+    <div class="fc">
+      <h4>Centro DHAE</h4>
+      <a href="#">Nosotros</a>
+      <a href="#">Aviso de privacidad</a>
+    </div>
+
+    <div class="fc">
+      <h4>Contacto</h4>
+      <a href="#">+52 (55) 4015-9751</a>
+      <a href="#">centrodhae@gmail.com</a>
+      <a href="#">WhatsApp</a>
+    </div>
+
+  </div>
+  <div class="fb">
+    <span>© 2025 Centro DHAE S.C. — Todos los derechos reservados.</span>
+    <span>Hecho con ❤ en México</span>
+  </div>
+</footer>
+
+<script>
+  // ── Hamburger menu toggle ──
+  (function () {
+    const burger = document.getElementById('navBurger');
+    const mobileMenu = document.getElementById('navMobile');
+    burger.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      burger.classList.toggle('open', isOpen);
+      burger.setAttribute('aria-expanded', isOpen);
+    });
+    // Close menu when any link is clicked
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded', false);
+      });
+    });
+  })();
+</script>
+
+<script>
+  (function () {
+    const slider = document.getElementById('bannerSlider');
+    const slides = slider.querySelectorAll('.banner-slide');
+    const dotsContainer = document.getElementById('bannerDots');
+    let current = 0;
+    let timer;
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'banner-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    });
+
+    function goTo(index) {
+      slides[current].classList.remove('active');
+      dotsContainer.children[current].classList.remove('active');
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dotsContainer.children[current].classList.add('active');
+      resetTimer();
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => goTo(current + 1), 5500);
+    }
+
+    window.bannerMove = (dir) => goTo(current + dir);
+    resetTimer();
+  })();
+</script>
+
+</body>
+</html>

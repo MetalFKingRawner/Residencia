@@ -1,0 +1,1115 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Servicios — Centro DHAE</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --cream:   #faf7f0;
+      --warm:    #f0e8d4;
+      --sand:    #d8c898;
+      --primary: #a08848;
+      --dark:    #685820;
+      --ink:     #201808;
+      --accent:  #709888;
+      --accent2: #b8d0c8;
+      --white:   #ffffff;
+    }
+
+    body {
+      --nav-h: 68px;
+      --ff-display: 'Cormorant Garamond', Georgia, serif;
+      --ff-body: 'DM Sans', sans-serif;
+      font-family: var(--ff-body);
+      font-weight: 300;
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    /* ─── NAV ────────────────────────────── */
+    .lnav {
+      position: sticky; top: 0; z-index: 50;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4%;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sand);
+      box-shadow: 0 2px 16px rgba(0,0,0,.06);
+    }
+    .lnav-brand { display: flex; align-items: center; gap: 11px; }
+    .lnav-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--primary);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .lnav-icon svg { width: 22px; height: 22px; fill: #fff; }
+    .lnav-name { display: flex; flex-direction: column; line-height: 1.15; }
+    .lnav-name strong { font-family: var(--ff-display); font-size: 1rem; font-weight: 600; color: var(--dark); letter-spacing: .01em; }
+    .lnav-name span  { font-size: .7rem; color: var(--primary); font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+    .lnav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+    .lnav-links a {
+      text-decoration: none; padding: 6px 14px; border-radius: 999px;
+      font-size: .82rem; font-weight: 400; color: var(--dark);
+      transition: background .2s, color .2s;
+    }
+    .lnav-links a:hover { background: var(--warm); color: var(--primary); }
+    .lnav-links a.active { background: var(--warm); color: var(--primary); font-weight: 500; }
+    .lnav-links .pill-cursos { background: var(--primary); color: #fff !important; font-weight: 500; margin-left: 4px; }
+    .lnav-links .pill-cursos:hover { background: var(--dark); }
+    .lnav-cta {
+      padding: 8px 20px; border-radius: 999px;
+      background: var(--accent); color: #fff !important;
+      font-size: .82rem; font-weight: 500; transition: background .2s;
+    }
+    .lnav-cta:hover { background: var(--dark); }
+
+    /* ─── PAGE HERO ───────────────────────── */
+    .srv-hero {
+      position: relative;
+      background: var(--dark);
+      padding: 88px 5% 0;
+      overflow: hidden;
+      min-height: 340px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .srv-hero::before {
+      content: '';
+      position: absolute; top: -60px; right: -80px;
+      width: 560px; height: 560px; border-radius: 50%;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 65%);
+      opacity: .18; pointer-events: none;
+    }
+    .srv-hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 5%;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 70%);
+      opacity: .14; pointer-events: none;
+    }
+    .srv-hero-inner {
+      position: relative; z-index: 2;
+      max-width: 680px; padding-bottom: 56px;
+    }
+    .srv-hero-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 4px 14px; border-radius: 999px;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(6px);
+      font-size: .7rem; font-weight: 500;
+      color: var(--accent2); letter-spacing: .12em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .srv-hero-tag i {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent2); flex-shrink: 0;
+    }
+    .srv-hero h1 {
+      font-family: var(--ff-display);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 300; color: var(--cream);
+      line-height: 1.12; margin-bottom: 16px;
+    }
+    .srv-hero h1 em { font-style: italic; color: var(--accent2); }
+    .srv-hero p {
+      font-size: .95rem; color: rgba(255,255,255,.65);
+      line-height: 1.9; max-width: 500px;
+    }
+    /* Scallop wave separator */
+    .srv-hero-wave {
+      position: relative; z-index: 3;
+      margin-top: -1px;
+      line-height: 0;
+    }
+    .srv-hero-wave svg { display: block; width: 100%; }
+
+    /* ─── OVERVIEW PILLS ─────────────────── */
+    .srv-overview {
+      background: var(--white);
+      padding: 52px 5% 64px;
+    }
+    .srv-overview-grid {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: center; margin-bottom: 0;
+    }
+    .srv-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 999px;
+      background: var(--cream); border: 1.5px solid var(--sand);
+      font-size: .85rem; font-weight: 400; color: var(--dark);
+      cursor: pointer;
+      transition: background .25s, border-color .25s, color .25s, transform .2s;
+      text-decoration: none;
+    }
+    .srv-pill:hover {
+      background: var(--warm); border-color: var(--primary);
+      color: var(--primary); transform: translateY(-2px);
+    }
+    .srv-pill svg { width: 16px; height: 16px; fill: var(--primary); flex-shrink: 0; }
+
+    /* ─── MARQUEE ────────────────────────── */
+    .marquee-bar { overflow: hidden; background: var(--dark); padding: 12px 0; }
+    .marquee-inner {
+      display: flex; white-space: nowrap;
+      animation: mq 26s linear infinite;
+    }
+    .marquee-inner span {
+      display: inline-flex; align-items: center; gap: 14px;
+      color: var(--cream); font-size: .78rem;
+      letter-spacing: .1em; text-transform: uppercase; padding: 0 30px;
+    }
+    .marquee-inner span::before { content: '◆'; color: var(--sand); font-size: .5rem; }
+    @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ─── FEATURE SERVICE (Psicoterapia) ──── */
+    .srv-feature {
+      padding: 96px 5%;
+      background: var(--cream);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 72px;
+      align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .srv-feature::before {
+      content: ''; position: absolute; bottom: -100px; right: -80px;
+      width: 480px; height: 480px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 65%);
+      opacity: .3; pointer-events: none;
+    }
+    .srv-feature-visual {
+      position: relative; z-index: 1;
+    }
+    .srv-feature-img {
+      border-radius: 24px;
+      width: 100%; aspect-ratio: 4/3;
+      object-fit: cover;
+      box-shadow: 0 24px 64px color-mix(in srgb, var(--dark) 18%, transparent);
+      display: block;
+      /* Placeholder gradient — replace with <img src="{% static 'img/psicoterapia.jpg' %}"> */
+      background: linear-gradient(135deg, var(--accent2) 0%, var(--sand) 50%, var(--primary) 100%);
+      overflow: hidden;
+    }
+    .srv-feature-img-placeholder {
+      width: 100%; aspect-ratio: 4/3;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--accent2) 0%, var(--sand) 50%, var(--primary) 100%);
+      display: grid; place-items: center;
+      box-shadow: 0 24px 64px color-mix(in srgb, var(--dark) 18%, transparent);
+      position: relative;
+    }
+    .srv-feature-img-placeholder::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='1.5' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E");
+      border-radius: 24px;
+    }
+    .srv-feature-img-placeholder svg { width: 90px; height: 90px; fill: rgba(255,255,255,.35); position: relative; z-index: 1; }
+    .srv-feature-float {
+      position: absolute; bottom: -16px; left: -20px;
+      background: var(--white); border-radius: 18px; padding: 16px 20px;
+      box-shadow: 0 12px 36px rgba(0,0,0,.12);
+      display: flex; align-items: center; gap: 12px;
+      z-index: 2;
+    }
+    .sff-dot { width: 44px; height: 44px; border-radius: 13px; background: var(--primary); display: grid; place-items: center; flex-shrink: 0; }
+    .sff-dot svg { width: 22px; height: 22px; fill: #fff; }
+    .sff-txt strong { display: block; font-size: .85rem; font-weight: 500; color: var(--dark); }
+    .sff-txt span   { font-size: .74rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+
+    .srv-feature-content { position: relative; z-index: 1; }
+    .stag {
+      font-size: .72rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--primary); margin-bottom: 10px;
+    }
+    .srv-feature-content h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+      font-weight: 300; color: var(--dark); line-height: 1.18;
+      margin-bottom: 18px;
+    }
+    .srv-feature-content h2 em { font-style: italic; color: var(--primary); }
+    .srv-feature-content p {
+      font-size: .92rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      line-height: 1.9; margin-bottom: 14px;
+    }
+    .srv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0; }
+    .srv-tag {
+      padding: 5px 16px; border-radius: 999px;
+      background: var(--warm); border: 1px solid var(--sand);
+      font-size: .76rem; font-weight: 400; color: var(--dark);
+    }
+    .btn-prim {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 999px;
+      background: var(--primary); color: #fff;
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 500;
+      border: none; cursor: pointer; text-decoration: none;
+      box-shadow: 0 6px 22px color-mix(in srgb, var(--primary) 35%, transparent);
+      transition: background .2s, transform .2s;
+    }
+    .btn-prim:hover { background: var(--dark); transform: translateY(-2px); }
+    .btn-sec {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 999px;
+      background: transparent; color: var(--dark);
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 400;
+      border: 1.5px solid var(--sand); cursor: pointer; text-decoration: none;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .btn-sec:hover { border-color: var(--primary); background: var(--warm); transform: translateY(-2px); }
+    .srv-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* ─── MAIN SERVICES GRID ──────────────── */
+    .srv-main { padding: 96px 5%; background: var(--white); }
+    .sec-head { text-align: center; margin-bottom: 60px; }
+    .sec-head h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 300; color: var(--dark); margin-bottom: 12px;
+    }
+    .sec-head h2 em { font-style: italic; color: var(--primary); }
+    .sec-head p {
+      font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      max-width: 500px; margin: 0 auto; line-height: 1.8;
+    }
+
+    .srv-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+    }
+    .srv-card-full {
+      background: var(--cream);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--warm);
+      box-shadow: 0 4px 20px color-mix(in srgb, var(--dark) 5%, transparent);
+      transition: transform .35s, box-shadow .35s;
+      display: flex; flex-direction: column;
+    }
+    .srv-card-full:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 52px color-mix(in srgb, var(--dark) 12%, transparent);
+    }
+    .srv-card-header {
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .srv-card-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='5' cy='5' r='1.5' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E");
+    }
+    .srv-card-header.g1 { background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 60%, var(--accent) 100%); }
+    .srv-card-header.g2 { background: linear-gradient(135deg, var(--accent) 0%, var(--dark) 55%, var(--primary) 100%); }
+    .srv-card-header.g3 { background: linear-gradient(135deg, var(--primary) 0%, #8b6030 50%, var(--dark) 100%); }
+    .srv-card-header.g4 { background: linear-gradient(135deg, #547a6a 0%, var(--dark) 60%, var(--accent) 100%); }
+    .srv-card-header.g5 { background: linear-gradient(135deg, var(--dark) 0%, #547a6a 50%, var(--accent2) 100%); }
+    .srv-card-header-ico {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,.15);
+      border-radius: 20px; display: grid; place-items: center;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.22);
+      position: relative; z-index: 1;
+    }
+    .srv-card-header-ico svg { width: 36px; height: 36px; fill: #fff; }
+    .srv-card-badge {
+      position: absolute; top: 14px; left: 16px;
+      padding: 3px 12px; border-radius: 999px;
+      font-size: .64rem; font-weight: 500; letter-spacing: .09em; text-transform: uppercase;
+      background: rgba(255,255,255,.18); color: #fff;
+      backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.22);
+      z-index: 1;
+    }
+    /* Image placeholder for service cards */
+    .srv-card-img {
+      width: 100%; height: 180px;
+      object-fit: cover; display: block;
+      /* Replace src with {% static 'img/service-name.jpg' %} */
+    }
+
+    .srv-card-body {
+      padding: 28px 28px 24px;
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .srv-card-body h3 {
+      font-family: var(--ff-display);
+      font-size: 1.35rem; font-weight: 600; color: var(--dark);
+      margin-bottom: 10px; line-height: 1.2;
+    }
+    .srv-card-body p {
+      font-size: .86rem; color: color-mix(in srgb, var(--primary) 48%, var(--ink));
+      line-height: 1.8; flex: 1; margin-bottom: 20px;
+    }
+    .srv-card-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 18px;
+      border-top: 1px solid var(--warm);
+    }
+    .srv-card-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .8rem; font-weight: 500; color: var(--primary);
+      text-decoration: none; cursor: pointer;
+      transition: gap .2s;
+    }
+    .srv-card-link:hover { gap: 9px; }
+    .srv-card-link svg { width: 14px; height: 14px; fill: var(--primary); }
+    .srv-card-modality {
+      font-size: .74rem; color: color-mix(in srgb, var(--primary) 50%, var(--ink));
+      background: var(--warm); border-radius: 999px;
+      padding: 4px 12px; border: 1px solid var(--sand);
+    }
+
+    /* ─── SALUD INTEGRAL (Feature dark) ─── */
+    .srv-salud {
+      padding: 96px 5%;
+      background: var(--dark);
+      position: relative; overflow: hidden;
+    }
+    .srv-salud::before {
+      content: ''; position: absolute; top: -80px; left: -80px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 65%);
+      opacity: .15; pointer-events: none;
+    }
+    .srv-salud::after {
+      content: ''; position: absolute; bottom: -60px; right: -40px;
+      width: 360px; height: 360px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 68%);
+      opacity: .12; pointer-events: none;
+    }
+    .srv-salud-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+    .srv-salud .stag { color: var(--accent2); }
+    .srv-salud h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+      font-weight: 300; color: var(--cream);
+      line-height: 1.18; margin-bottom: 16px;
+    }
+    .srv-salud h2 em { font-style: italic; color: var(--accent2); }
+    .srv-salud p {
+      font-size: .92rem; color: rgba(255,255,255,.65);
+      line-height: 1.9; margin-bottom: 14px;
+    }
+    .srv-salud-pills { display: flex; flex-wrap: wrap; gap: 9px; margin: 22px 0 28px; }
+    .srv-salud-pill {
+      padding: 5px 16px; border-radius: 999px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+      font-size: .76rem; color: var(--accent2);
+    }
+    .btn-light {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 999px;
+      background: var(--accent2); color: var(--ink);
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 500;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: background .2s, transform .2s;
+    }
+    .btn-light:hover { background: #fff; transform: translateY(-2px); }
+
+    .srv-salud-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .salud-block {
+      border-radius: 20px; padding: 28px 22px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      transition: background .3s;
+    }
+    .salud-block:hover { background: rgba(255,255,255,.1); }
+    .salud-block:first-child { grid-column: span 2; }
+    .salud-ico {
+      width: 46px; height: 46px; border-radius: 13px;
+      background: rgba(255,255,255,.1);
+      display: grid; place-items: center;
+      margin-bottom: 14px;
+    }
+    .salud-ico svg { width: 24px; height: 24px; fill: var(--accent2); }
+    .salud-block h4 {
+      font-family: var(--ff-display); font-size: 1.05rem;
+      color: var(--cream); font-weight: 400; margin-bottom: 8px;
+    }
+    .salud-block p {
+      font-size: .78rem; color: rgba(255,255,255,.5);
+      line-height: 1.65; margin-bottom: 0;
+    }
+
+    /* ─── PROCESO / HOW IT WORKS ──────────── */
+    .srv-proceso {
+      padding: 96px 5%;
+      background: var(--warm);
+      position: relative; overflow: hidden;
+    }
+    .srv-proceso::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 420px; height: 420px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent2) 0%, transparent 65%);
+      opacity: .35; pointer-events: none;
+    }
+    .proceso-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 28px;
+      position: relative; z-index: 1;
+    }
+    .proceso-step {
+      background: var(--white); border-radius: 20px; padding: 32px 26px;
+      border: 1px solid var(--sand);
+      box-shadow: 0 4px 18px color-mix(in srgb, var(--dark) 6%, transparent);
+      position: relative;
+    }
+    .proceso-num {
+      font-family: var(--ff-display);
+      font-size: 3.2rem; font-weight: 300;
+      color: var(--sand); line-height: 1;
+      margin-bottom: 12px;
+    }
+    .proceso-ico {
+      width: 46px; height: 46px; border-radius: 13px;
+      background: var(--warm); display: grid; place-items: center;
+      margin-bottom: 14px;
+    }
+    .proceso-ico svg { width: 22px; height: 22px; fill: var(--primary); }
+    .proceso-step h4 {
+      font-family: var(--ff-display); font-size: 1.1rem;
+      font-weight: 600; color: var(--dark); margin-bottom: 8px;
+    }
+    .proceso-step p {
+      font-size: .84rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      line-height: 1.75;
+    }
+    .proceso-connector {
+      display: none; /* visible on desktop via flex trick */
+    }
+
+    /* ─── CTA ────────────────────────────── */
+    .lcta {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+      padding: 72px 5%; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .lcta::before {
+      content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 65%);
+    }
+    .lcta h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 300; color: #fff;
+      margin-bottom: 14px; position: relative; z-index: 1;
+    }
+    .lcta h2 em { font-style: italic; color: var(--accent2); }
+    .lcta p {
+      font-size: .92rem; color: rgba(255,255,255,.7);
+      max-width: 480px; margin: 0 auto 32px; line-height: 1.8;
+      position: relative; z-index: 1;
+    }
+    .lcta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+    .btn-wh {
+      padding: 13px 30px; border-radius: 999px;
+      background: #fff; color: var(--dark);
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 500;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: background .2s, transform .2s;
+      box-shadow: 0 6px 22px rgba(0,0,0,.2);
+    }
+    .btn-wh:hover { background: var(--cream); transform: translateY(-2px); }
+    .btn-wh-outline {
+      padding: 13px 30px; border-radius: 999px;
+      background: transparent; color: #fff;
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 400;
+      border: 1.5px solid rgba(255,255,255,.4); cursor: pointer; text-decoration: none;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .btn-wh-outline:hover { border-color: #fff; background: rgba(255,255,255,.1); transform: translateY(-2px); }
+
+    /* ─── CONTACT STRIP ───────────────────── */
+    .lcontacto {
+      padding: 96px 5%;
+      background: var(--white);
+    }
+    .con-grid {
+      display: grid; grid-template-columns: 1fr 1.3fr;
+      gap: 72px; align-items: start;
+    }
+    .con-info .stag { margin-bottom: 10px; }
+    .con-info h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 300; color: var(--dark); line-height: 1.2; margin-bottom: 14px;
+    }
+    .con-info h2 em { font-style: italic; color: var(--primary); }
+    .con-info > p {
+      font-size: .9rem; color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+      line-height: 1.85; margin-bottom: 32px;
+    }
+    .con-items { display: flex; flex-direction: column; gap: 18px; }
+    .con-item { display: flex; align-items: center; gap: 14px; }
+    .con-ico {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--warm); display: grid; place-items: center; flex-shrink: 0;
+    }
+    .con-ico svg { width: 20px; height: 20px; fill: var(--primary); }
+    .con-txt strong { display: block; font-size: .85rem; font-weight: 500; color: var(--dark); }
+    .con-txt span { font-size: .8rem; color: color-mix(in srgb, var(--primary) 55%, var(--ink)); }
+    .con-form { background: var(--cream); border-radius: 24px; padding: 36px; border: 1px solid var(--warm); }
+    .con-form h3 {
+      font-family: var(--ff-display); font-size: 1.5rem;
+      font-weight: 600; color: var(--dark); margin-bottom: 24px;
+    }
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .fg label { font-size: .78rem; font-weight: 500; color: var(--dark); letter-spacing: .03em; }
+    .fg input, .fg select, .fg textarea {
+      padding: 11px 16px; border-radius: 12px;
+      border: 1.5px solid var(--sand); background: var(--white);
+      font-family: var(--ff-body); font-size: .88rem; color: var(--ink);
+      outline: none; transition: border-color .2s;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--primary); }
+    .fg textarea { resize: vertical; min-height: 110px; }
+    .fg select { appearance: none; cursor: pointer; }
+    .fsub {
+      width: 100%; padding: 13px; border-radius: 12px;
+      background: var(--primary); color: #fff;
+      font-family: var(--ff-body); font-size: .9rem; font-weight: 500;
+      border: none; cursor: pointer;
+      transition: background .2s, transform .2s;
+    }
+    .fsub:hover { background: var(--dark); transform: translateY(-1px); }
+
+    /* ─── FOOTER ─────────────────────────── */
+    .lfooter {
+      background: var(--ink); padding: 0;
+    }
+    .ft {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px; padding: 64px 5% 48px;
+    }
+    .fb-brand p {
+      font-size: .82rem; color: rgba(255,255,255,.4);
+      line-height: 1.75; margin-top: 16px; max-width: 240px;
+    }
+    .fc h4 {
+      font-size: .72rem; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--sand); margin-bottom: 16px;
+    }
+    .fc a {
+      display: block; text-decoration: none;
+      font-size: .84rem; color: rgba(255,255,255,.5);
+      margin-bottom: 10px; transition: color .2s;
+    }
+    .fc a:hover { color: var(--cream); }
+    .fb {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 5%; border-top: 1px solid rgba(255,255,255,.08);
+      font-size: .76rem; color: rgba(255,255,255,.3);
+    }
+
+    /* ─── RESPONSIVE ─────────────────────── */
+    @media (max-width: 900px) {
+      .srv-feature { grid-template-columns: 1fr; gap: 48px; }
+      .srv-salud-inner { grid-template-columns: 1fr; gap: 48px; }
+      .srv-salud-visual { grid-template-columns: 1fr 1fr; }
+      .srv-salud-visual .salud-block:first-child { grid-column: span 2; }
+      .con-grid { grid-template-columns: 1fr; gap: 48px; }
+      .ft { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .lnav-links { display: none; }
+      .srv-hero h1 { font-size: 2rem; }
+      .frow { grid-template-columns: 1fr; }
+      .ft { grid-template-columns: 1fr; gap: 32px; }
+      .fb { flex-direction: column; gap: 8px; text-align: center; }
+      .srv-salud-visual { grid-template-columns: 1fr; }
+      .srv-salud-visual .salud-block:first-child { grid-column: span 1; }
+    }
+
+    /* ─── ANIMATIONS ─────────────────────── */
+    .fade-up {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════════ -->
+<nav class="lnav">
+  <div class="lnav-brand">
+    <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE" 
+     style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+    <div class="lnav-name">
+      <strong>Centro DHAE</strong>
+      <span>Desarrollo Humano Integral</span>
+    </div>
+  </div>
+
+  <ul class="lnav-links">
+    <li><a href="{% url 'home' %}">Inicio</a></li>
+    <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+    <li><a href="{% url 'servicios' %}" class="active">Servicios</a></li>
+    <li><a href="#">Productos</a></li>
+    <li><a href="#">Contacto</a></li>
+    <li><a href="{% url 'tests:index' %}">Pruebas</a></li>
+    <li><a href="#" class="pill-cursos">📚 Cursos</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ PAGE HERO ════════════════════════════════════ -->
+<section class="srv-hero">
+  <div class="srv-hero-inner">
+    <div class="srv-hero-tag"><i></i>Centro DHAE</div>
+    <h1>Nuestros <em>Servicios</em><br>Especializados</h1>
+    <p>Acompañamiento integral en psicoterapia, orientación, coaching y bienestar. Diseñado para personas, equipos y organizaciones que buscan crecer.</p>
+  </div>
+  <div class="srv-hero-wave">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 64" preserveAspectRatio="none" height="64">
+      <path d="M0,64 C240,0 480,64 720,32 C960,0 1200,64 1440,32 L1440,64 Z" fill="#faf7f0"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══ OVERVIEW PILLS ════════════════════════════════ -->
+<section class="srv-overview">
+  <div class="srv-overview-grid">
+    <a href="#psicoterapia" class="srv-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      Psicoterapia Integral
+    </a>
+    <a href="#vocacional" class="srv-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+      Orientación Vocacional
+    </a>
+    <a href="#coaching-edu" class="srv-pill">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      Coaching Educativo
+    </a>
+    <a href="#coaching-org" class="srv-pill">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Resilence Coaching Org.
+    </a>
+    <a href="#capacitacion" class="srv-pill">
+      <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.53 15.47 0 12.36 0c-1.98 0-3.73 1.05-4.78 2.62L6 4.5l-1.58-1.88C3.37 1.05 1.62 0-.36 0-3.47 0-6 2.53-6 5.64-6 8.4-4.21 10.58-1.84 12H-4v2h24v-2h-2.16C20.21 10.58 22 8.4 22 5.64 22 2.53 19.47 0 16.36 0z"/></svg>
+      Capacitación Empresarial
+    </a>
+    <a href="#salud" class="srv-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.857 4.065 2 6.857 2c1.723 0 3.619.84 5.143 2.508C13.524 2.84 15.42 2 17.143 2 19.935 2 23 3.857 23 7.191c0 4.105-5.37 8.863-11 14.402z"/></svg>
+      Salud Integral
+    </a>
+  </div>
+</section>
+
+<!-- ═══ MARQUEE ═══════════════════════════════════════ -->
+<div class="marquee-bar" aria-hidden="true">
+  <div class="marquee-inner">
+    <span>Psicoterapia</span>
+    <span>Orientación Vocacional</span>
+    <span>Coaching Educativo</span>
+    <span>Resilence Coaching</span>
+    <span>Capacitación Empresarial</span>
+    <span>Salud Integral</span>
+    <span>Sonoterapia</span>
+    <span>Neurociencias</span>
+    <span>Psicoterapia</span>
+    <span>Orientación Vocacional</span>
+    <span>Coaching Educativo</span>
+    <span>Resilence Coaching</span>
+    <span>Capacitación Empresarial</span>
+    <span>Salud Integral</span>
+    <span>Sonoterapia</span>
+    <span>Neurociencias</span>
+  </div>
+</div>
+
+<!-- ═══ PSICOTERAPIA INTEGRAL (feature) ══════════════ -->
+<section class="srv-feature fade-up" id="psicoterapia">
+  <div class="srv-feature-visual">
+    <!-- 
+      Para usar imagen real reemplaza el div.srv-feature-img-placeholder por:
+      <img class="srv-feature-img" src="{% static 'img/psicoterapia.jpg' %}" alt="Psicoterapia Integral">
+    -->
+    <div class="srv-feature-img-placeholder">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    <div class="srv-feature-float">
+      <div class="sff-dot">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <div class="sff-txt">
+        <strong>Enfoque Humanista</strong>
+        <span>Basado en neurociencias</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="srv-feature-content">
+    <div class="stag">Servicio principal</div>
+    <h2>Psicoterapia <em>Integral</em></h2>
+    <p>Apoyo psicológico en la prevención y tratamiento de distintos procesos cognitivos y emocionales, de manera individual o grupal, enfocados al bienestar y crecimiento integral de niñas, niños, adolescentes y adultos.</p>
+    <p>Nos apoyamos con métodos y técnicas con enfoque humanista, basados en las neurociencias para un acompañamiento profundo y efectivo.</p>
+    <div class="srv-tags">
+      <span class="srv-tag">Individual</span>
+      <span class="srv-tag">Grupal</span>
+      <span class="srv-tag">Niñas y niños</span>
+      <span class="srv-tag">Adolescentes</span>
+      <span class="srv-tag">Adultos</span>
+      <span class="srv-tag">Enfoque humanista</span>
+    </div>
+    <div class="srv-btns">
+      <a href="#contacto" class="btn-prim">Agendar consulta</a>
+      <a href="#contacto" class="btn-sec">Más información</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MAIN SERVICE CARDS ════════════════════════════ -->
+<section class="srv-main fade-up">
+  <div class="sec-head">
+    <div class="stag">Todos nuestros servicios</div>
+    <h2>Soluciones <em>especializadas</em> para cada etapa</h2>
+    <p>Cada servicio está diseñado para responder a necesidades específicas con un acompañamiento experto y humanista.</p>
+  </div>
+
+  <div class="srv-cards-grid">
+
+    <!-- ORIENTACIÓN VOCACIONAL -->
+    <div class="srv-card-full fade-up" id="vocacional">
+      <div class="srv-card-header g2">
+        <div class="srv-card-badge">Educativo</div>
+        <!--
+          Para usar imagen: reemplaza el div.srv-card-header por:
+          <img class="srv-card-img" src="{% static 'img/orientacion-vocacional.jpg' %}" alt="Orientación Vocacional">
+        -->
+        <div class="srv-card-header-ico">
+          <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+        </div>
+      </div>
+      <div class="srv-card-body">
+        <h3>Orientación Vocacional</h3>
+        <p>Apoyo a estudiantes para identificar su vocación profesional, apoyados en una batería de pruebas vocacionales y psicométricas, así como entrevista personalizada para un resultado preciso y orientador.</p>
+        <div class="srv-card-foot">
+          <a href="#contacto" class="srv-card-link">
+            Solicitar información
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </a>
+          <span class="srv-card-modality">Individual</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COACHING EDUCATIVO -->
+    <div class="srv-card-full fade-up" id="coaching-edu">
+      <div class="srv-card-header g3">
+        <div class="srv-card-badge">Institucional</div>
+        <!--
+          Para usar imagen: reemplaza el div.srv-card-header por:
+          <img class="srv-card-img" src="{% static 'img/coaching-educativo.jpg' %}" alt="Coaching Educativo">
+        -->
+        <div class="srv-card-header-ico">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        </div>
+      </div>
+      <div class="srv-card-body">
+        <h3>Coaching Educativo Institucional</h3>
+        <p>Metodología que favorece el máximo desarrollo institucional, con visión hacia el incremento de la motivación, el compromiso y la responsabilidad. Apoyados en Psicología, Pedagogía y neurociencias, ofertando diplomados y cursos de educación.</p>
+        <div class="srv-card-foot">
+          <a href="#contacto" class="srv-card-link">
+            Solicitar información
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </a>
+          <span class="srv-card-modality">Institucional</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESILENCE COACHING ORGANIZACIONAL -->
+    <div class="srv-card-full fade-up" id="coaching-org">
+      <div class="srv-card-header g4">
+        <div class="srv-card-badge">Organizacional</div>
+        <!--
+          Para usar imagen: reemplaza el div.srv-card-header por:
+          <img class="srv-card-img" src="{% static 'img/coaching-organizacional.jpg' %}" alt="Resilence Coaching Organizacional">
+        -->
+        <div class="srv-card-header-ico">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+      </div>
+      <div class="srv-card-body">
+        <h3>Resilence Coaching Organizacional</h3>
+        <p>Exploramos la capacidad de una organización para prosperar, mapeada por nuestro modelo de resiliencia. Obtenido el informe de diagnóstico, se determinan acciones para la promoción de la resiliencia en equipos de trabajo mediante diversas estrategias.</p>
+        <div class="srv-card-foot">
+          <a href="#contacto" class="srv-card-link">
+            Solicitar información
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </a>
+          <span class="srv-card-modality">Equipos / Empresa</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAPACITACIÓN EMPRESARIAL -->
+    <div class="srv-card-full fade-up" id="capacitacion">
+      <div class="srv-card-header g1">
+        <div class="srv-card-badge">Empresarial</div>
+        <!--
+          Para usar imagen: reemplaza el div.srv-card-header por:
+          <img class="srv-card-img" src="{% static 'img/capacitacion-empresarial.jpg' %}" alt="Capacitación Empresarial">
+        -->
+        <div class="srv-card-header-ico">
+          <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.53 15.47 0 12.36 0c-1.98 0-3.73 1.05-4.78 2.62L6 4.5 4.42 2.62C3.37 1.05 1.62 0-.36 0-3.47 0-6 2.53-6 5.64c0 2.76 1.79 4.94 4.16 6.36H-4v2h24v-2h-2.16C20.21 10.58 22 8.4 22 5.64 22 2.53 19.47 0 16.36 0z"/></svg>
+        </div>
+      </div>
+      <div class="srv-card-body">
+        <h3>Capacitación Empresarial</h3>
+        <p>Programas de formación continua para profesionales y empresas que buscan fortalecer competencias en desarrollo humano, liderazgo, comunicación asertiva e inteligencia emocional, con modalidades presenciales e in-company.</p>
+        <div class="srv-card-foot">
+          <a href="#contacto" class="srv-card-link">
+            Solicitar información
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+          </a>
+          <span class="srv-card-modality">In-company / Online</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ SALUD INTEGRAL (dark feature) ════════════════ -->
+<section class="srv-salud fade-up" id="salud">
+  <div class="srv-salud-inner">
+    <div>
+      <div class="stag">Bienestar holístico</div>
+      <h2>Salud Integral:<br><em>Prevent Holistic</em><br>Sonoterapia</h2>
+      <p>Un enfoque integrador que combina la prevención activa del bienestar físico, mental y emocional con técnicas de vanguardia como la sonoterapia, para equilibrar cuerpo, mente y espíritu.</p>
+      <p>Diseñado para quienes buscan una transformación profunda mediante prácticas holísticas avaladas por la ciencia y la experiencia terapéutica.</p>
+      <div class="srv-salud-pills">
+        <span class="srv-salud-pill">Prevención activa</span>
+        <span class="srv-salud-pill">Sonoterapia</span>
+        <span class="srv-salud-pill">Bienestar físico</span>
+        <span class="srv-salud-pill">Salud emocional</span>
+        <span class="srv-salud-pill">Enfoque holístico</span>
+      </div>
+      <a href="#contacto" class="btn-light">Conocer más</a>
+    </div>
+
+    <div class="srv-salud-visual">
+      <!-- 
+        Bloque principal — puedes reemplazar este bloque por:
+        <img src="{% static 'img/salud-integral.jpg' %}" alt="Salud Integral" style="border-radius:20px; width:100%; grid-column:span 2; object-fit:cover; height:220px;">
+      -->
+      <div class="salud-block">
+        <div class="salud-ico">
+          <svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.857 4.065 2 6.857 2c1.723 0 3.619.84 5.143 2.508C13.524 2.84 15.42 2 17.143 2 19.935 2 23 3.857 23 7.191c0 4.105-5.37 8.863-11 14.402z"/></svg>
+        </div>
+        <h4>Prevent Holistic</h4>
+        <p>Programa de prevención activa que integra hábitos saludables, nutrición consciente y manejo del estrés para fortalecer tu bienestar integral.</p>
+      </div>
+      <div class="salud-block">
+        <div class="salud-ico">
+          <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+        <h4>Sonoterapia</h4>
+        <p>Terapia con sonidos y vibraciones que promueven la relajación profunda y el equilibrio energético del organismo.</p>
+      </div>
+      <div class="salud-block">
+        <div class="salud-ico">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        </div>
+        <h4>Sesiones personalizadas</h4>
+        <p>Cada programa se adapta a tu perfil y necesidades únicas, con seguimiento continuo de tu proceso de bienestar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROCESO ════════════════════════════════════════ -->
+<section class="srv-proceso fade-up">
+  <div class="sec-head" style="margin-bottom: 52px;">
+    <div class="stag">¿Cómo funciona?</div>
+    <h2>Tu proceso en <em>4 pasos</em></h2>
+    <p>Un camino claro, acompañado desde el primer contacto hasta tu bienestar pleno.</p>
+  </div>
+  <div class="proceso-grid">
+    <div class="proceso-step">
+      <div class="proceso-num">01</div>
+      <div class="proceso-ico">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      </div>
+      <h4>Primer contacto</h4>
+      <p>Escríbenos o llámanos. Te orientamos sobre qué servicio se adapta mejor a tu situación o la de tu organización, sin costo.</p>
+    </div>
+    <div class="proceso-step">
+      <div class="proceso-num">02</div>
+      <div class="proceso-ico">
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+      </div>
+      <h4>Consulta inicial</h4>
+      <p>Realizamos una entrevista personalizada para conocer tu situación, establecer objetivos claros y diseñar un plan de intervención.</p>
+    </div>
+    <div class="proceso-step">
+      <div class="proceso-num">03</div>
+      <div class="proceso-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <h4>Proceso de atención</h4>
+      <p>Sesiones estructuradas con técnicas especializadas, seguimiento constante y ajustes según tu evolución y necesidades.</p>
+    </div>
+    <div class="proceso-step">
+      <div class="proceso-num">04</div>
+      <div class="proceso-ico">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg>
+      </div>
+      <h4>Cierre y seguimiento</h4>
+      <p>Evaluamos los avances logrados y acordamos un plan de seguimiento para consolidar tu bienestar y desarrollo a largo plazo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ════════════════════════════════════════════ -->
+<div class="lcta">
+  <h2>¿Listo para dar el <em>primer paso</em>?</h2>
+  <p>Agenda una consulta sin costo y descubre cómo podemos acompañarte en tu proceso de desarrollo y bienestar.</p>
+  <div class="lcta-btns">
+    <a href="#contacto" class="btn-wh">Agenda tu consulta gratis</a>
+    <a href="{% url 'nosotros' %}" class="btn-wh-outline">Conoce nuestro equipo</a>
+  </div>
+</div>
+
+<!-- ═══ CONTACTO ══════════════════════════════════════ -->
+<section class="lcontacto" id="contacto">
+  <div class="con-grid">
+    <div class="con-info">
+      <div class="stag">Contáctanos</div>
+      <h2>Hablemos sobre tu <em>proceso</em></h2>
+      <p>Estamos para resolver tus dudas y orientarte al servicio que mejor se adapte a tu situación personal, educativa u organizacional.</p>
+      <div class="con-items">
+        <div class="con-item">
+          <div class="con-ico">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          </div>
+          <div class="con-txt"><strong>Teléfono / WhatsApp</strong><span>+52 (55) 0000-0000</span></div>
+        </div>
+        <div class="con-item">
+          <div class="con-ico">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div class="con-txt"><strong>Correo electrónico</strong><span>contacto@dhae.mx</span></div>
+        </div>
+        <div class="con-item">
+          <div class="con-ico">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+          </div>
+          <div class="con-txt"><strong>Ubicación</strong><span>Ciudad de México</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="con-form">
+      <h3>Envíanos un mensaje</h3>
+      <div class="frow">
+        <div class="fg"><label>Nombre</label><input type="text" placeholder="Tu nombre"/></div>
+        <div class="fg"><label>Apellido</label><input type="text" placeholder="Tu apellido"/></div>
+      </div>
+      <div class="fg"><label>Correo electrónico</label><input type="email" placeholder="tucorreo@ejemplo.com"/></div>
+      <div class="fg">
+        <label>Servicio de interés</label>
+        <select>
+          <option value="">Selecciona un servicio…</option>
+          <option>Psicoterapia Integral</option>
+          <option>Orientación Vocacional</option>
+          <option>Coaching Educativo Institucional</option>
+          <option>Resilence Coaching Organizacional</option>
+          <option>Capacitación Empresarial</option>
+          <option>Salud Integral / Sonoterapia</option>
+        </select>
+      </div>
+      <div class="fg"><label>Mensaje</label><textarea placeholder="¿Cómo podemos ayudarte?"></textarea></div>
+      <button class="fsub">Enviar mensaje</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ════════════════════════════════════════ -->
+<footer class="lfooter">
+  <div class="ft">
+    <div class="fb-brand">
+      <div class="lnav-brand" style="filter:brightness(1.5)">
+        <div class="lnav-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"/></svg>
+        </div>
+        <div class="lnav-name">
+          <strong style="color:#f9f4ed">Centro DHAE</strong>
+          <span>Desarrollo Humano Integral</span>
+        </div>
+      </div>
+      <p>Centro de Desarrollo Humano Integral y Atención Especializada S.C.</p>
+    </div>
+    <div class="fc">
+      <h4>Servicios</h4>
+      <a href="#psicoterapia">Psicoterapia Integral</a>
+      <a href="#vocacional">Orientación Vocacional</a>
+      <a href="#coaching-edu">Coaching Educativo</a>
+      <a href="#coaching-org">Resilence Coaching</a>
+      <a href="#capacitacion">Capacitación Empresarial</a>
+      <a href="#salud">Salud Integral</a>
+    </div>
+    <div class="fc">
+      <h4>Centro DHAE</h4>
+      <a href="#">Nosotros</a>
+      <a href="#">Aviso de privacidad</a>
+    </div>
+
+    <div class="fc">
+      <h4>Contacto</h4>
+      <a href="#">+52 (55) 4015-9751</a>
+      <a href="#">centrodhae@gmail.com</a>
+      <a href="#">WhatsApp</a>
+    </div>
+  </div>
+  <div class="fb">
+    <span>© 2025 Centro DHAE S.C. — Todos los derechos reservados.</span>
+    <span>Hecho con ❤ en México</span>
+  </div>
+</footer>
+
+<script>
+  // Scroll fade-in animation
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  fadeEls.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

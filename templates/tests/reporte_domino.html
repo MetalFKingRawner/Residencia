@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Resultados - Test de Dominó D-48</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #2a4d6e;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        h1, h2, h3, h4 {
+            color: #ffffff;
+            margin-top: 0;
+            font-weight: bold; /* Negrita para todos los títulos */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px; /* Tamaño más grande */
+        }
+        h2 {
+            font-size: 24px; /* Tamaño más grande */
+        }
+        h3 {
+            font-size: 20px; /* Tamaño más grande */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 16px; /* Texto más grande en tablas */
+        }
+        th, td {
+            padding: 12px; /* Más padding para mejor legibilidad */
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px; /* Texto más grande */
+        }
+        th {
+            background-color: #f5f5f5;
+            font-size: 18px; /* Encabezados de tabla más grandes */
+            font-weight: bold;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .grafico {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .table-success {
+            background-color: #d4edda;
+            font-size: 16px; /* Texto más grande en detalles */
+        }
+        .table-danger {
+            background-color: #f8d7da;
+            font-size: 16px; /* Texto más grande en detalles */
+        }
+        .result-value {
+            font-size: 18px; /* Valores de resultados más grandes */
+            font-weight: bold;
+        }
+        .detail-table th {
+            font-size: 16px; /* Encabezados de tabla de detalles */
+        }
+        .detail-table td {
+            font-size: 15px; /* Texto en tabla de detalles */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>RESULTADOS DEL TEST DE DOMINÓ D-48</h1>
+            </div>
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>RESUMEN DE RESULTADOS</h2>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>Puntuación Total</th>
+                                    <td class="result-value">{{ resultado.puntuacion }} / 48</td>
+                                </tr>
+                                <tr>
+                                    <th>Percentil ({{ resultado.grupo_edad }})</th>
+                                    <td class="result-value">P {{ resultado.percentil }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Diagnóstico</th>
+                                    <td class="result-value"><strong>{{ resultado.diagnostico }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Eficiencia</th>
+                                    <td class="result-value">{{ resultado.eficiencia|floatformat:1 }}%</td>
+                                </tr>
+                                <tr>
+                                    <th>Tiempo Utilizado</th>
+                                    <td class="result-value">{{ resultado.tiempo_utilizado|floatformat:0 }} segundos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>GRÁFICO DE RENDIMIENTO</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="grafico">
+                            <!-- Imagen más pequeña (300px de ancho) -->
+                            <img src="data:image/png;base64,{{ grafico_base64 }}" 
+                                 alt="Gráfico de Rendimiento" 
+                                 style="max-width: 300px; height: auto; display: block; margin: 0 auto;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>DETALLE POR PROBLEMA</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Problema</th>
+                                    <th>Tu Respuesta</th>
+                                    <th>Respuesta Correcta</th>
+                                    <th>Resultado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for num, datos in resultado.respuestas.items %}
+                                <tr class="{% if datos.correcta %}table-success{% else %}table-danger{% endif %}">
+                                    <td>{{ num }}</td>
+                                    <td>{{ datos.respuesta_usuario }}</td>
+                                    <td>{{ datos.respuesta_correcta }}</td>
+                                    <td>
+                                        {% if datos.correcta %}
+                                            <strong>Correcto</strong>
+                                        {% else %}
+                                            <strong>Incorrecto</strong>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

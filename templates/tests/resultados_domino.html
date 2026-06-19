@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load static domino_tags %}
+
+{% block title %}Resultados - Test de Dominó D-48{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="text-center" style="color: white;">Resultados del Test de Dominó D-48</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header card-header-accent">
+                            <h4>Resumen de Resultados</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <th>Puntuación Total</th>
+                                            <td>{{ resultado.puntuacion }} / 48</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Percentil ({{ resultado.grupo_edad }})</th>
+                                            <td>P {{ resultado.percentil }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Diagnóstico</th>
+                                            <td class="fw-bold">{{ resultado.diagnostico }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Eficiencia</th>
+                                            <td>{{ resultado.eficiencia|floatformat:1 }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Tiempo Utilizado</th>
+                                            <td>{{ resultado.tiempo_utilizado|floatformat:0 }} segundos</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header card-header-accent">
+                            <h4>Gráfico de Rendimiento</h4>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="radarChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header card-header-accent">
+                            <h4>Detalle por Problema</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                <table class="table table-sm table-hover">
+                                    <thead class="sticky-top bg-light">
+                                        <tr>
+                                            <th>Problema</th>
+                                            <th>Tu Respuesta</th>
+                                            <th>Respuesta Correcta</th>
+                                            <th>Resultado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for num, datos in resultado.respuestas.items %}
+                                        <tr class="{% if datos.correcta %}table-success{% else %}table-danger{% endif %}">
+                                            <td>{{ num }}</td>
+                                            <td>{{ datos.respuesta_usuario }}</td>
+                                            <td>{{ datos.respuesta_correcta }}</td>
+                                            <td>
+                                                {% if datos.correcta %}
+                                                <i class="fas fa-check text-success"></i>
+                                                {% else %}
+                                                <i class="fas fa-times text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- En la sección de botones al final del archivo -->
+            <div class="text-center mt-4">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+                    Volver al Dashboard
+                </a>
+                <!-- Nuevo botón para PDF -->
+                <a href="{% url 'tests:reporte_domino' resultado_id=resultado.id %}" class="btn btn-outline-primary btn-lg ms-2">
+                    <i class="fas fa-download me-2"></i>Descargar Reporte PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-header-accent {
+        background: linear-gradient(135deg, var(--accent) 0%, #4e7060 100%);
+        color: white;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 20px;
+    }
+
+    .card-header-accent h4 {
+        color: white;
+        margin: 0;
+        font-size: 1.3rem;
+        text-align: center;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Se obtiene el contexto del canvas para la gráfica
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    
+    // Se extraen los valores de Django y se aseguran de que sean números.
+    // Usamos parseFloat para manejar posibles números decimales.
+    // Las comillas dobles alrededor de las variables de Django aseguran que se rendericen como cadenas,
+    // y luego parseFloat las convierte a números.
+    const puntuacionCruda = parseFloat("{{ resultado.puntuacion }}");
+    const percentilCrudo = parseFloat("{{ resultado.percentil }}");
+    const eficienciaCruda = parseFloat("{{ resultado.eficiencia }}");
+
+    // Calcular valores normalizados para la gráfica
+    // Aseguramos que la puntuación esté en una escala de 0 a 100.
+    const puntuacionNormalizada = (puntuacionCruda / 48) * 100;
+    // Percentil y eficiencia ya deberían estar en una escala de 0 a 100 si vienen del backend.
+    const percentilNormalizado = percentilCrudo;
+    const eficienciaNormalizada = eficienciaCruda;
+    
+    const data = {
+        labels: ['Puntuación', 'Percentil', 'Eficiencia'],
+        datasets: [{
+            label: 'Tu Rendimiento',
+            data: [
+                puntuacionNormalizada,
+                percentilNormalizado,
+                eficienciaNormalizada
+            ],
+            fill: true,
+            backgroundColor: 'rgba(58, 125, 125, 0.2)',
+            borderColor: 'rgb(58, 125, 125)',
+            pointBackgroundColor: 'rgb(58, 125, 125)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(58, 125, 125)'
+        }]
+    };
+    
+    const config = {
+        type: 'radar',
+        data: data,
+        options: {
+            scales: {
+                r: {
+                    angleLines: { display: true },
+                    min: 0,
+                    max: 100, // Los valores en la gráfica se escalarán de 0 a 100.
+                    ticks: { stepSize: 20 }
+                }
+            },
+            plugins: {
+                legend: { display: true },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const labels = ['Puntos', 'Percentil', 'Eficiencia (%)'];
+                            const values = [
+                                // Aquí también nos aseguramos de usar los valores crudos originales
+                                // para la visualización en el tooltip, pero redondeados para mejor lectura.
+                                `${Math.round(puntuacionCruda)}/48`,
+                                `${Math.round(percentilCrudo)}%`,
+                                `${Math.round(eficienciaCruda)}%`
+                            ];
+                            return `${labels[context.dataIndex]}: ${values[context.dataIndex]}`;
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    // Se crea la nueva instancia de la gráfica con los datos y la configuración.
+    new Chart(ctx, config);
+</script>
+{% endblock %}

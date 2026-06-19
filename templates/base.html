@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsyMetrics - {% block title %}{% endblock %}</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'img/test-mechanical.ico' %}" type="image/x-icon">
+
+    <!-- Font Awesome (íconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+    
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg py-3">
+        <div class="container">
+            <!-- Logo + Nombre -->
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                <img src="{% static 'img/test-mechanical.jpg' %}" alt="Logo" width="40" class="me-2">
+                <span class="fs-4 fw-bold navbar-brand-name">PsyMetrics</span>
+            </a>
+            
+            <!-- Menú Colapsable -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Elementos del Menú -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'home' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'tests:inicio_domino' %}">Test dominó D-48</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'tests:inicio_test_valores' %}">Test de Valores</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <!-- En el menú desplegable del usuario autenticado -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-2"></i>{{ user.full_name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <!-- Usuario anónimo -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core_login' %}">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'signup' %}">Registrarse</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow-1 bg-light">
+        {% block content %}
+        <!-- El contenido específico de cada página irá aquí -->
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer mt-auto">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2026 PsyMetrics. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-white text-decoration-none me-3">Políticas de Privacidad</a>
+                    <a href="#" class="text-white text-decoration-none">Contacto</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    
+    <!-- Script para mantener la aplicación activa (evitar sleep en Render) -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función que hace la petición de keep-alive
+        function keepAlive() {
+            fetch('/tests/health/')   // Ajusta la URL si es diferente
+                .then(response => {
+                    if (!response.ok) throw new Error('Error en health check');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('✅ PsyMetrics activo:', new Date().toLocaleTimeString());
+                })
+                .catch(error => {
+                    console.log('⚠️ Error en ping:', error);
+                });
+        }
+        
+        // Ping cada 4 minutos
+        setInterval(keepAlive, 4 * 60 * 1000);
+        
+        // Ping en interacciones del usuario
+        ['click', 'keypress'].forEach(event => {
+            document.addEventListener(event, keepAlive, { passive: true });
+        });
+        
+        // Primer ping al cargar la página
+        setTimeout(keepAlive, 2000);
+    });
+    </script>
+</body>
+</html>

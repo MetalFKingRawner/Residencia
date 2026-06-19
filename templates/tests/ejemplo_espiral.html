@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Dominó - Disposición en Espiral</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        .domino-spiral-container {
+            position: relative;
+            width: 600px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .domino-tile {
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            transform-origin: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .domino-tile.respuesta {
+            border: 2px dashed #999;
+            background-color: #f9f9f9;
+        }
+
+        .domino-half {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Línea divisoria vertical */
+        .domino-tile .domino-half:first-child {
+            border-bottom: 2px solid #333;
+        }
+
+        .domino-tile.respuesta .domino-half:first-child {
+            border-bottom: 2px dashed #999;
+        }
+
+        .dot {
+            position: absolute;
+            background-color: #333;
+            border-radius: 50%;
+        }
+
+        /* --- Tamaños progresivos siguiendo la imagen de referencia --- */
+        /* Ficha 1 (centro, pequeña) */
+        .tile-1 { 
+            width: 22px; 
+            height: 50px;
+            transform: translate(10px, -20px);
+        }
+        .tile-1 .dot { width: 4px; height: 4px; }
+        
+        /* Ficha 2 (abajo-izquierda) */
+        .tile-2 { 
+            width: 26px; 
+            height: 58px;
+            transform: translate(-40px, 40px) rotate(80deg);
+        }
+        .tile-2 .dot { width: 4.5px; height: 4.5px; }
+        
+        /* Ficha 3 (arriba-derecha) */
+        .tile-3 { 
+            width: 32px; 
+            height: 65px;
+            transform: translate(-115px, 5px) rotate(155deg);
+        }
+        .tile-3 .dot { width: 5px; height: 5px; }
+        
+        /* Ficha 4 (derecha) */
+        .tile-4 { 
+            width: 37px; 
+            height: 72px;
+            transform: translate(-110px, -85px) rotate(220deg);
+        }
+        .tile-4 .dot { width: 5.5px; height: 5.5px; }
+        
+        /* Ficha 5 (abajo-derecha) */
+        .tile-5 { 
+            width: 45px; 
+            height: 90px;
+            transform: translate(-10px, -135px) rotate(-90deg);
+        }
+        .tile-5 .dot { width: 6px; height: 6px; }
+        
+        /* Ficha 6 (abajo-izquierda) */
+        .tile-6 { 
+            width: 52px; 
+            height: 104px;
+            transform: translate(110px, -70px) rotate(-30deg);
+        }
+        .tile-6 .dot { width: 6.5px; height: 6.5px; }
+        
+        /* Ficha de respuesta (la más grande, abajo-centro) */
+        .respuesta { 
+            width: 56px; 
+            height: 112px;
+            transform: translate(120px, 75px) rotate(0deg);
+        }
+
+        /* --- Patrones de Puntos --- */
+        .dots-1 .dot-1 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        
+        .dots-2 .dot-1 { top: 30%; left: 30%; transform: translate(-50%, -50%); }
+        .dots-2 .dot-2 { top: 70%; left: 70%; transform: translate(-50%, -50%); }
+        
+        .dots-3 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-3 .dot-2 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dots-3 .dot-3 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+        
+        .dots-4 .dot-1 { top: 30%; left: 30%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-2 { top: 30%; left: 70%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-3 { top: 70%; left: 30%; transform: translate(-50%, -50%); }
+        .dots-4 .dot-4 { top: 70%; left: 70%; transform: translate(-50%, -50%); }
+        
+        .dots-5 .dot-1 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-2 { top: 25%; left: 75%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-4 { top: 75%; left: 25%; transform: translate(-50%, -50%); }
+        .dots-5 .dot-5 { top: 75%; left: 75%; transform: translate(-50%, -50%); }
+        
+        .dots-6 .dot-1 { top: 25%; left: 30%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-2 { top: 25%; left: 70%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-3 { top: 50%; left: 30%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-4 { top: 50%; left: 70%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-5 { top: 75%; left: 30%; transform: translate(-50%, -50%); }
+        .dots-6 .dot-6 { top: 75%; left: 70%; transform: translate(-50%, -50%); }
+
+    </style>
+</head>
+<body>
+
+<div class="domino-spiral-container">
+
+    <!-- Ficha 1 (primera, más pequeña) - 2|3 -->
+    <div class="domino-tile tile-1">
+        <div class="domino-half dots-2">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+        </div>
+        <div class="domino-half dots-3">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+        </div>
+    </div>
+
+    <!-- Ficha 2 - 3|4 -->
+    <div class="domino-tile tile-2">
+        <div class="domino-half dots-3">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>
+        </div>
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+    </div>
+
+    <!-- Ficha 3 - 4|5 -->
+    <div class="domino-tile tile-3">
+        <div class="domino-half dots-4">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div><div class="dot dot-4"></div>
+        </div>
+        <div class="domino-half dots-5">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div><div class="dot dot-4"></div><div class="dot dot-5"></div>
+        </div>
+    </div>
+
+    <!-- Ficha 4 - 5|6 -->
+    <div class="domino-tile tile-4">
+        <div class="domino-half dots-5">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div><div class="dot dot-4"></div><div class="dot dot-5"></div>
+        </div>
+        <div class="domino-half dots-6">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div><div class="dot dot-4"></div><div class="dot dot-5"></div><div class="dot dot-6"></div>
+        </div>
+    </div>
+    
+    <!-- Ficha 5 - 6|1 -->
+    <div class="domino-tile tile-5">
+        <div class="domino-half dots-6">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div><div class="dot dot-4"></div><div class="dot dot-5"></div><div class="dot dot-6"></div>
+        </div>
+        <div class="domino-half dots-1">
+            <div class="dot dot-1"></div>
+        </div>
+    </div>
+    
+    <!-- Ficha 6 - 1|2 -->
+    <div class="domino-tile tile-6">
+        <div class="domino-half dots-1">
+            <div class="dot dot-1"></div>
+        </div>
+        <div class="domino-half dots-2">
+            <div class="dot dot-1"></div><div class="dot dot-2"></div>
+        </div>
+    </div>
+
+    <!-- Ficha de Respuesta (la más grande) -->
+    <div class="domino-tile respuesta">
+         <div class="domino-half"></div>
+         <div class="domino-half"></div>
+    </div>
+</div>
+
+</body>
+</html>
