@@ -1,0 +1,1013 @@
+{
+  "test_info": {
+    "nombre": "Test de Valores de Allport",
+    "autor": "Gordon Allport",
+    "estructura_columnas": "Variable por pregunta (R,S,T,X,Y,Z)"
+  },
+  
+  "instrucciones": {
+    "primera_parte": {
+      "sistema_puntuacion": "Distribución de 3 puntos entre dos opciones: (3,0), (0,3), (2,1) o (1,2)",
+      "normas": "Debe responder todas las preguntas. No combinaciones diferentes. Sin límite de tiempo."
+    },
+    "segunda_parte": {
+      "sistema_puntuacion": "Asignación de rangos 4-3-2-1 a cuatro opciones",
+      "normas": "Omitir solo si imposible decidir. No repetir puntajes."
+    }
+  },
+
+  "primera_parte": [
+    {
+      "pagina": 2,
+      "preguntas": [
+        {
+          "id": 1,
+          "pregunta": "El principal objeto de la investigación científica es el descubrir la verdad y no darle una aplicación práctica.",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "SI",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "NO",
+              "columna": "S"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "pregunta": "La Biblia se debe mirar desde un punto de vista de su bella mitología y de su hermoso estilo literario y no como una revelación espiritual.",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "SI",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "NO",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "pregunta": "¿A cuál de los siguientes hombres cree que debe atribuírsele más mérito como contribuidor al progreso de la humanidad?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Aristóteles",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Simón Bolívar",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "pregunta": "Dando por hecho que usted tiene la habilidad necesaria, preferiría ser:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Banquero",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Político",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "pregunta": "¿Crees justificable que los grandes artistas como Beethoven, Wagner y Byron, hayan sido egoístas e indeferentes a los sentimientos de otros?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Si",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "No",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "pregunta": "¿Cuál de estas dos disciplinas cree que llegará a tener en el futuro mayor valor para la humanidad?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Matemáticas",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Teología",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "pregunta": "¿Cuál considera usted que debe ser la función más importante de los grandes dirigentes modernos?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Inducir a la gente a obtener resultados prácticos",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Inducir a la gente a interesarse por los derechos de otros seres humanos",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "pregunta": "Cuando presencia una ceremonia pomposa(eclesiástica o académica, toma de posesión de un alto puesto, etc.), qué le impresiona más:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "El colorido y la formalidad del acto mismo",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "La influencia y la fuerza del grupo",
+              "columna": "Y"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pagina": 3,
+      "preguntas": [
+        {
+          "id": 9,
+          "pregunta": "¿Cuáles de estos rasgos de carácter, considera más deseables?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Los altos ideales y el respeto",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "El desinterés y la condolencia",
+              "columna": "T"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "pregunta": "Si fuera un profesor universitario y tuviera la habilidad necesaria, preferiría dar clase de:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Literatura",
+              "columna": "X"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Física y química",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "pregunta": "Si viera las siguientes noticias en el periódico matutino, con encabezados de igual tamaño ¿Cuál leería con más atención?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Dignatarios de la iglesia resuelven importante problema religioso",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Grandes mejoras en las condiciones del mercado",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "pregunta": "En las mismas circunstancias de la pregunta anterior:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "La suprema corte anuncia su decisión",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Nueva teoría científica es promulgada",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "pregunta": "Cuando visita una catedral le impresiona más el sentido de reverencia y religiosidad que las características arquitectónicas y los frescos e imágenes?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Si",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "No",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "pregunta": "Suponiendo que tenga tiempo disponible, preferiría utilizarlo en:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Desarrollar maestría en su habilidad favorita",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Hacer labor social o de servicio público",
+              "columna": "T"
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "pregunta": "En una exposición le gusta más ir a lugares donde pueda ver:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Nuevos productos industriales",
+              "columna": "Y"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Aparatos científicos tales como microscopios, péndulos, brújulas, etc.",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "pregunta": "Si tuviera la oportunidad y si ninguna de estas dos actividades existiesen en donde usted vive, que preferiría fundar:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Una institución donde se debaten problemas nacionales",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Una orquesta de música clásica",
+              "columna": "X"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pagina": 4,
+      "preguntas": [
+        {
+          "id": 17,
+          "pregunta": "La finalidad de las iglesias en la actualidad debería ser:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Exaltar las tendencias altruístas y caritativas",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Fomentar la relación espiritual y el sentido de comunión con el altísimo",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "pregunta": "Si tuviera que pasar algún tiempo en una sala de espera y hubiera solo dos revistas, ¿cuál escogería?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Seminario de estudios científicos",
+              "columna": "X"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Arte y decoración",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "pregunta": "Preferiría usted escuchar una serie de conferencias sobre:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Comparación de méritos en los sistemas de gobierno de España y nuestro país",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Comparación del desarrollo de las grandes creencias religiosas",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "pregunta": "¿Cuál de las siguientes funciones de la educación formal considera más importante?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "La preparación que da en los aspectos de utilidad práctica y recompensa monetaria",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "La preparación que da para participar en las actividades de la comunidad y en la ayuda de seres",
+              "columna": "S"
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "pregunta": "Tiene usted más interés en leer relatos sobre la vida y obra de hombres como:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Alejandor, Julio César y Carlomagno",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Aristóteles, Sócrates y Kant",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "pregunta": "¿Nuestro actual desarrollo industrial y científico es muestra de mayor grado de civilización que el alcanzado por cualquier otra sociedad de tiempos anteriores, por ejemplo, los griegos?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Si",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "No",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "pregunta": "Si estuviera empleado en una organización industrial y suponiendo que los sueldos fueran iguales preferiría usted:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Ser consejero de empleados",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Tener un puesto administrativo",
+              "columna": "T"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pagina": 5,
+      "preguntas": [
+        {
+          "id": 24,
+          "pregunta": "Si de dos libros tuviera que elegir uno, ¿cuál de los dos siguientes escogería?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Historia de la religión en nuestro país",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Historia del desarrollo industrial en nuestro país",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "pregunta": "Aprovecharía más a la sociedad moderna:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Mayor preocupación por lo derechos y el bienestar de los ciudadanos",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Mayor conocimiento de las leyes fundamentales del comportamiento humano",
+              "columna": "S"
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "pregunta": "Si usted estuviera en condiciones propicias para elevar el nivel de la vida o para modificar la opinión pública según sus deseos, preferíria usar su influencia para:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Elevar el nivel de la vida",
+              "columna": "X"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Influir la opinión pública",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "pregunta": "¿Qué preferiría escuchar? Una serie de conferencias populares sobre:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "El progreso de los servicios sociales en la ciudad de donde usted reside",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Pintores contemporáneos",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 28,
+          "pregunta": "La evidencia acumulada hasta ahora parece demostrar que el universo se ha desarrollado hasta su estado actual de acuerdo con leyes naturales de tal manera que no será necesario recurrir a una causa primera, propósito cósmico o divinidad para explicarlo:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Estoy de acuerdo con esta afirmación",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Estoy en desacuerdo",
+              "columna": "T"
+            }
+          ]
+        },
+        {
+          "id": 29,
+          "pregunta": "En el periódico dominical, ¿qué es lo que usted leería con más interés?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Las secciones de compra y venta de casas y precios del mercado",
+              "columna": "X"
+            },
+            {
+              "letra": "b",
+              "respuesta": "La información sobre galerías de pinturas",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "pregunta": "¿Qué considera usted más importante en el desarrollo de la educación de los hijos?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "La religión",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "La educación física",
+              "columna": "Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "segunda_parte": [
+    {
+      "pagina": 7,
+      "preguntas": [
+        {
+          "id": 31,
+          "pregunta": "Le parece a usted que un buen gobierno debe preocuparse más por:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Dar más ayuda a los pobres, enfermos y ancianos",
+              "columna": "Z"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Desarrollar la industria y el comercio",
+              "columna": "T"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Introducir los más elevados principios de la ética en su política y en su diplomacia",
+              "columna": "X"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Colocar a la nación en una posición de prestigio y respeto en relación con otras naciones",
+              "columna": "R"
+            }
+          ]
+        },
+        {
+          "id": 32,
+          "pregunta": "En su opinión, ¿Cómo podría utilizar mejor el domingo un hombre de negocios que trabaja toda la semana?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Leyendo libros serios para elevar su nivel cultural",
+              "columna": "Y"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Tratando de ganar jugando al 'tenis' o compitiendo en carreras",
+              "columna": "R"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Concurriendo a escuchar conciertos sinfónicos",
+              "columna": "S"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Concurriendo a escuchar un sermón religioso de gran trascendencia",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 33,
+          "pregunta": "Si pudiera alterar el programa de enseñanza en su localidad, trataría usted de:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Darle mayor importancia al estudio de las bellas artes",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Incrementar el interés por el estudio de los problemas sociales",
+              "columna": "Z"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Dotar de mayor número de aparatos y elementos indispensables a los laboratorios",
+              "columna": "Y"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Aumentar el valor práctico de la enseñanza",
+              "columna": "T"
+            }
+          ]
+        },
+        {
+          "id": 34,
+          "pregunta": "En amigos de su propio sexo, prefiere usted a uno que:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Sea eficiente, trabajador y que tenga manera práctica de pensar",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Se interese seriamente en pensar acerca de su actitud hacia la vida",
+              "columna": "X"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Posea cualidades como lider y organizador",
+              "columna": "R"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Demuestre sensibilidad artística y sentimental",
+              "columna": "S"
+            }
+          ]
+        },
+        {
+          "id": 35,
+          "pregunta": "Si viviera en una ciudad pequeña y progresista y tuviera más ingresos de los necesarios para cubrir todas sus necesidades, preferiría:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Aplicar este dinero para ayudar al progreso industrial y comercial",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Ayudar a los grupos religiosos a desarrollar sus actividades",
+              "columna": "X"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Cederlo para el desarrollo de la investigación científica de la localidad",
+              "columna": "Y"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Darlo a una sociedad para el fomento del bienestar familiar",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 36,
+          "pregunta": "Cuando va usted al teatro, por lo regular disfruta más:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Los argumentos que tratan sobre la vida de grandes hombres",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "El ballet o representaciones similares",
+              "columna": "S"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Argumentos que versan sobre el sufrimiento humano y el amor",
+              "columna": "Z"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Argumentos que se proponen demostrar algún punto de vista",
+              "columna": "Y"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pagina": 8,
+      "preguntas": [
+        {
+          "id": 37,
+          "pregunta": "Suponiendo que usted tenga la habilidad necesaria y que el sueldo para cada uno de los siguientes empleos fuera el mismo, ¿cuál preferiría usted desempeñar?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Matemático",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Gerente de ventas",
+              "columna": "Z"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Sacerdote",
+              "columna": "S"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Político",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 38,
+          "pregunta": "Si tuviera suficiente tiempo y dinero, le gustaría más:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Hacer una colección de esculturas y pinturas escogidas",
+              "columna": "R"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Establecer un centro para el cuidado y rehabilitación de retrasadps mentales",
+              "columna": "Y"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Postularse para senador o ministro de estado",
+              "columna": "X"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Establecer un negocio o una organización industrial de su propiedad",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 39,
+          "pregunta": "Estando en una velada con amigos íntimos del propio sexo, ¿qué tema preferiría usted tratar?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "El significado de la vida",
+              "columna": "S"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Las últimas novedades en el campo de la ciencia",
+              "columna": "T"
+            },
+            {
+              "letra": "c",
+              "respuesta": "La literatura",
+              "columna": "R"
+            },
+            {
+              "letra": "d",
+              "respuesta": "El socialismo y el mejoramiento social",
+              "columna": "Y"
+            }
+          ]
+        },
+        {
+          "id": 40,
+          "pregunta": "¿Qué preferiría usted hacer en sus vacaciones venideras si tuviera la habiliadad y los medios?",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Escribir y publicar un ensayo o artículo original sobre biología",
+              "columna": "T"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Permanecer en un rincón lejano del país donde se pueda disfrutar de hermosos paisajes",
+              "columna": "R"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Inscribirse en un torneo local de tenis u ptrp deporte",
+              "columna": "X"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Iniciarse en un nuevo campo de negocios",
+              "columna": "Z"
+            }
+          ]
+        },
+        {
+          "id": 41,
+          "pregunta": "Las grandes exploraciones y descubrimientos como los de Colón, Magallanes, Marco polo y Byrd, le parecen más significativos a causa de que:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Representan las conquistas del hombre sobre las fuerzas de la naturaleza",
+              "columna": "X"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Acrecientan nuestro conocimiento sobre la geografía, la meteorología, la oceanografía, etc.",
+              "columna": "T"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Son lazos de unión para los intereses y sentimientos de todas las naciones",
+              "columna": "Y"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Cada uno de ellos contribuye un poco a la comprensión del universo",
+              "columna": "S"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pagina": 9,
+      "preguntas": [
+        {
+          "id": 42,
+          "pregunta": "Debemos normar nuestra conducta de acuerdo con, o brindar nuestra mayor lealtad a:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Nuestra fe religiosa",
+              "columna": "Z"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Nuestros ideales de la belleza",
+              "columna": "T"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Nuestros compañeros o la organización para la cual trabajamos",
+              "columna": "S"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Nuestros ideales acerca de la caridad",
+              "columna": "X"
+            }
+          ]
+        },
+        {
+          "id": 43,
+          "pregunta": "Hasta que punto admira usted a las siguientes personas:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "La fundadora de la Cruz roja: Florence Nightingale",
+              "columna": "X"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Napoleón",
+              "columna": "Y"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Henry ford",
+              "columna": "S"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Galileo",
+              "columna": "R"
+            }
+          ]
+        },
+        {
+          "id": 44,
+          "pregunta": "(Responder si eres o te identificas del sexo masculino) Al escoger a su esposa preferiría usted una mujer que:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Pueda adquirir prestigio social y se gane la admiración de los demás",
+              "columna": "Y"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Guste de ayudar a la gente",
+              "columna": "X"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Sea fundamentalmente espiritual en sus actitudes hacia la vida",
+              "columna": "Z"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Tenga talento artístico",
+              "columna": "T"
+            }
+          ]
+        },
+        {
+          "id": 45,
+          "pregunta": "(Responder si eres o te identificas del sexo femenino) Preferiría usted un esposo que",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Tenga éxito en su profesión y se gane la admiración de los demás",
+              "columna": "Y"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Le guste ayudar a la gente",
+              "columna": "X"
+            },
+            {
+              "letra": "c",
+              "respuesta": "Sea fundamentalmente espiritual en sus actitudes hacia la vida",
+              "columna": "Z"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Tenga talento artístico",
+              "columna": "T"
+            }
+          ]
+        },
+        {
+          "id": 46,
+          "pregunta": "Examinando el cuadro de Leonardo da Vinci 'La última cena', tendería usted a pensar de él:",
+          "columnas_opciones": [
+            {
+              "letra": "a",
+              "respuesta": "Como la expresión de las más altas aspiraciones y sentimientos espirituales",
+              "columna": "Z"
+            },
+            {
+              "letra": "b",
+              "respuesta": "Como uno de los más valiosos e irremplazables cuadros que jamás se hayan pintado",
+              "columna": "S"
+            },
+            {
+              "letra": "c",
+              "respuesta": "En relación a las múltiples habilidades de Leonardo y su lugar en la historia",
+              "columna": "R"
+            },
+            {
+              "letra": "d",
+              "respuesta": "Como la quinta esencia de la armonía y la composición",
+              "columna": "T"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "criterios_calificacion": {
+    "procedimiento": [
+      "Asegurarse que todas las prguntas hayan sido contestadas",
+      "Si no todas las preguntas fueron contestadas, se puede dar igual puntuación a las contestaciones alternativas de cada pregunta que haya sido omitida, de la siguiente forma:",
+      "Primera parte: Se asigna 1 1/2 (uno y medio) puntos por cada alternativa. La suma de los puntos de (a) y (b) debe ser siempre igual a 3",
+      "Segunda parte: 2 1/2 (dos y medio) puntos por cada alternativa. La suma de los puntos de las cuatro alternativas de cada pregunta debe ser siempre igual a 10.",
+      "Sumar verticalmente cada columna (R,S,T,X,Y,Z) por página",
+      "Transferir totales al Cuadro 1 con asignaciones específicas por página:",
+      {
+        "pagina_2": {"R": "Teórico", "S": "Económico", "T": "Estético", "X": "Social", "Y": "Político", "Z": "Religioso"},
+        "pagina_3": {"Z": "Teórico", "Y": "Económico", "X": "Estético", "T": "Social", "S": "Político", "R": "Religioso"},
+        "pagina_4": {"X": "Teórico", "R": "Económico", "Z": "Estético", "S": "Social", "T": "Político", "Y": "Religioso"},
+        "pagina_5": {"S": "Teórico", "X": "Económico", "Y": "Estético", "R": "Social", "Z": "Político", "T": "Religioso"},
+        "pagina_7": {"Y": "Teórico", "T": "Económico", "S": "Estético", "Z": "Social", "R": "Político", "X": "Religioso"},
+        "pagina_8": {"T": "Teórico", "Z": "Económico", "R": "Estético", "Y": "Social", "X": "Político", "S": "Religioso"},
+        "pagina_9": {"R": "Teórico", "S": "Económico", "T": "Estético", "X": "Social", "Y": "Político", "Z": "Religioso"}
+      },
+      "Aplicar correcciones por columna: Teórico(-4), Económico(-5), Estético(+6), Social(-1), Político(+3), Religioso(+1)",
+      "Suma total debe ser 240 antes de correcciones"
+    ]
+  },
+
+  "interpretacion_valores": {
+    "valores": [
+      {
+        "nombre": "Teórico",
+        "descripcion": "Búsqueda de la verdad mediante investigación con proceso lógico y ordenado",
+        "meta": "Conocimiento"
+      },
+      {
+        "nombre": "Económico",
+        "descripcion": "Valor de utilidad en relaciones, enfoque práctico y materialista",
+        "meta": "Acumulación de bienes y ahorro de energía"
+      },
+      {
+        "nombre": "Estético",
+        "descripcion": "Satisfacción en contemplación/producción de belleza",
+        "meta": "Producción de belleza"
+      },
+      {
+        "nombre": "Social",
+        "descripcion": "Búsqueda de compañía y servicio a otros",
+        "meta": "Ayuda a los demás"
+      },
+      {
+        "nombre": "Político",
+        "descripcion": "Uso de conocimientos para lograr poder y dirigir",
+        "meta": "Tener poder"
+      },
+      {
+        "nombre": "Religioso",
+        "descripcion": "Orientación según convicciones éticas/religiosas",
+        "meta": "Acceso a la divinidad"
+      }
+    ],
+    "consideraciones": "Los valores determinan metas importantes. Debe existir congruencia entre valor, meta y profesión para lograr objetivos."
+  }
+}
