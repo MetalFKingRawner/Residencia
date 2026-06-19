@@ -1,0 +1,9 @@
+Django==5.0.3
+django_ckeditor==6.7.3
+django_embed_video==1.4.10
+matplotlib==3.11.0
+numpy==2.4.6
+xhtml2pdf==0.2.17
+gunicorn
+dj-database-url
+psycopg2-binary
