@@ -1,4 +1,5 @@
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent 
 print("BASE_DIR:", BASE_DIR)
@@ -7,9 +8,9 @@ print("Templates path:", BASE_DIR / 'templates')
 
 SECRET_KEY = 'django-insecure-76l$=a@sb41v+p3*w69w(ix-c5zjgit)@#!r%pwb=j98vs4(vm'
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,15 +67,22 @@ WSGI_APPLICATION = 'psycho_platform.wsgi.application'
 
 # Database
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'psyco',
+#        'USER': 'postgres',
+#        'PASSWORD': 'hangar81',
+#        'HOST': 'localhost',  # O la dirección de tu servidor de base de datos
+#        'PORT': '5432',       # Puerto por defecto de PostgreSQL
+#    }
+#}
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'psyco',
-        'USER': 'postgres',
-        'PASSWORD': 'hangar81',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=f"postgresql://neondb_owner:npg_QsjPqh9t1oYr@ep-crimson-band-a6g42xbo-pooler.us-west-2.aws.neon.tech/neondb",
+        conn_max_age=600,
+        ssl_require=True  # Neon y Railway pueden requerir SSL
+    )
 }
 
 
@@ -132,3 +141,20 @@ DEFAULT_FROM_EMAIL = 'no-reply@centrodhae.com'
 ADMIN_EMAIL = 'admin@centrodhae.com'   # cámbialo por el email real
 
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
+# Añade al final del archivo
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # 
