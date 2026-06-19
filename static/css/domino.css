@@ -1,0 +1,161 @@
+/* Estilos base del Test de Dominó */
+.domino-matrix {
+  display: grid;
+  gap: 20px;
+  justify-content: center;
+}
+
+.domino-tile {
+  width: 60px;  /* Reducido de 80px */
+  height: 120px; /* Reducido de 160px */
+  background: linear-gradient(145deg, #e3fcec, #f1eafc);
+  border: 2px solid #d1c1e0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 
+              inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  transition: all 0.15s ease;
+}
+
+.domino-tile.respuesta {
+  background: #f7f7f9;
+  border: 2px dashed #d1c1e0;
+}
+
+.domino-half {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.domino-half:first-child {
+  border-bottom: 2px solid #bababa;
+}
+
+.domino-tile.respuesta .domino-half:first-child {
+  border-bottom: 2px dashed #ccc;
+}
+
+.domino-input {
+  width: 60%;
+  max-width: 40px;
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  background: transparent;
+  color: #4f4f4f;
+  outline: none;
+  padding: 0;
+}
+
+/* Patrones de puntos */
+.dot {
+  width: 14px;
+  height: 14px;
+  background-color: #6f6f6f;
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* --------------------
+           8. Patrones de posición (1 a 6 puntos)
+           -------------------- */
+        .dots-1 .dot-1 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-2 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-2 .dot-2 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-2 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-3 .dot-3 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-3 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-4 .dot-4 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-3 {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-4 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-5 .dot-5 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-1 {
+            top: 25%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-2 {
+            top: 25%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-3 {
+            top: 50%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-4 {
+            top: 50%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-5 {
+            top: 75%; left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .dots-6 .dot-6 {
+            top: 75%; left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+/* Temporizador */
+.timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: #2A4D6E;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  display: inline-block;
+}
