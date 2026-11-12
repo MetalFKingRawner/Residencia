@@ -10,5 +10,5 @@ urlpatterns = [
     path('<slug:slug>/leccion/<int:orden>/', views.LeccionDetailView.as_view(), name='leccion_detail'),
     path('<slug:slug>/leccion/<int:orden>/completar/', views.completar_leccion, name='completar_leccion'),
     path('<slug:slug>/solicitar/', views.solicitar_acceso, name='solicitar_acceso'),
-    path('<slug:slug>/certificado/', views.certificado_pendiente, name='descargar_certificado'),
+    path('<slug:slug>/certificado/', views.descargar_certificado, name='descargar_certificado'),
 ]
