@@ -381,14 +381,10 @@
   }
   .srv-salud-inner {
     position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 72px; align-items: center;
   }
   .srv-salud .stag { color: var(--accent2); }
-  .srv-salud-head {
-    text-align: center;
-    max-width: 620px;
-    margin: 0 auto 56px;
-  }
-  .srv-salud-head .stag { justify-content: center; }
   .srv-salud h2 {
     font-family: var(--ff-display);
     font-size: clamp(1.9rem, 3.2vw, 2.8rem);
@@ -400,8 +396,7 @@
     font-size: .92rem; color: rgba(255,255,255,.65);
     line-height: 1.9; margin-bottom: 14px;
   }
-  .srv-salud-head .btn-light { margin-top: 10px; }
-  .srv-salud-pills { display: flex; flex-wrap: wrap; gap: 9px; margin: 22px 0 28px; justify-content: center; }
+  .srv-salud-pills { display: flex; flex-wrap: wrap; gap: 9px; margin: 22px 0 28px; }
   .srv-salud-pill {
     padding: 5px 16px; border-radius: 999px;
     background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
@@ -417,37 +412,33 @@
   }
   .btn-light:hover { background: #fff; transform: translateY(-2px); }
 
-  /* Two-row grid: 3 holistic-health service cards per row */
   .srv-salud-visual {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
   }
   .salud-block {
-    border-radius: 20px; padding: 30px 24px;
+    border-radius: 20px; padding: 28px 22px;
     background: rgba(255,255,255,.06);
     border: 1px solid rgba(255,255,255,.1);
-    transition: background .3s, transform .3s, border-color .3s;
+    transition: background .3s;
   }
-  .salud-block:hover {
-    background: rgba(255,255,255,.1);
-    border-color: rgba(255,255,255,.2);
-    transform: translateY(-4px);
-  }
+  .salud-block:hover { background: rgba(255,255,255,.1); }
+  .salud-block:first-child { grid-column: span 2; }
   .salud-ico {
     width: 46px; height: 46px; border-radius: 13px;
     background: rgba(255,255,255,.1);
     display: grid; place-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .salud-ico svg { width: 24px; height: 24px; fill: var(--accent2); }
   .salud-block h4 {
-    font-family: var(--ff-display); font-size: 1.1rem;
+    font-family: var(--ff-display); font-size: 1.05rem;
     color: var(--cream); font-weight: 400; margin-bottom: 8px;
   }
   .salud-block p {
-    font-size: .8rem; color: rgba(255,255,255,.5);
-    line-height: 1.7; margin-bottom: 0;
+    font-size: .78rem; color: rgba(255,255,255,.5);
+    line-height: 1.65; margin-bottom: 0;
   }
 
   /* ─── PROCESO / HOW IT WORKS ──────────── */
@@ -597,7 +588,9 @@
     .srv-hero-layout { grid-template-columns: 1fr; gap: 40px; }
     .srv-hero-visual { max-width: 480px; margin: 0 auto; }
     .srv-feature { grid-template-columns: 1fr; gap: 48px; }
+    .srv-salud-inner { grid-template-columns: 1fr; gap: 48px; }
     .srv-salud-visual { grid-template-columns: 1fr 1fr; }
+    .srv-salud-visual .salud-block:first-child { grid-column: span 2; }
     .con-grid { grid-template-columns: 1fr; gap: 48px; }
   }
   @media (max-width: 640px) {
@@ -605,8 +598,8 @@
     .srv-hero h1 { font-size: 2rem; }
     .srv-hero-img-badge { right: 0; bottom: -12px; }
     .frow { grid-template-columns: 1fr; }
-    .srv-salud-head { margin-bottom: 40px; }
     .srv-salud-visual { grid-template-columns: 1fr; }
+    .srv-salud-visual .salud-block:first-child { grid-column: span 1; }
   }
 
   /* ─── ANIMATIONS ─────────────────────── */
@@ -631,6 +624,7 @@
     </div>
     <!-- Image column -->
     <div class="srv-hero-visual">
+
       <img src="{% static 'img/banner/acompanamiento.jpg' %}" alt="Servicios DHAE"
              style="border-radius:24px; width:100%; aspect-ratio:4/3; object-fit:cover;
                     box-shadow:0 28px 72px rgba(0,0,0,.35);">
@@ -706,6 +700,7 @@
 <!-- ═══ PSICOTERAPIA INTEGRAL (feature) ══════════════ -->
 <section class="srv-feature fade-up" id="psicoterapia">
   <div class="srv-feature-visual">
+
     <img class="srv-feature-img" src="{% static 'img/banner/psicointegral.jpg' %}" alt="Psicoterapia Integral">
     <div class="srv-feature-float">
       <div class="sff-dot">
@@ -752,6 +747,7 @@
     <div class="srv-card-full fade-up" id="vocacional">
       <div class="srv-card-header g2">
         <div class="srv-card-badge">Educativo</div>
+
         <img class="srv-card-img" src="{% static 'img/banner/orientacion_vocacional.jpg' %}" alt="Orientación Vocacional">
       </div>
       <div class="srv-card-body">
@@ -771,6 +767,7 @@
     <div class="srv-card-full fade-up" id="coaching-edu">
       <div class="srv-card-header g3">
         <div class="srv-card-badge">Institucional</div>
+
         <img class="srv-card-img" src="{% static 'img/banner/educativo.jpg' %}" alt="Coaching Educativo">
       </div>
       <div class="srv-card-body">
@@ -790,6 +787,7 @@
     <div class="srv-card-full fade-up" id="coaching-org">
       <div class="srv-card-header g4">
         <div class="srv-card-badge">Organizacional</div>
+
         <img class="srv-card-img" src="{% static 'img/banner/couching_empresarial.webp' %}" alt="Resilence Coaching Organizacional">
       </div>
       <div class="srv-card-body">
@@ -809,6 +807,7 @@
     <div class="srv-card-full fade-up" id="capacitacion">
       <div class="srv-card-header g1">
         <div class="srv-card-badge">Empresarial</div>
+
         <img class="srv-card-img" src="{% static 'img/banner/couching.webp' %}" alt="Capacitación Empresarial">
       </div>
       <div class="srv-card-body">
@@ -830,14 +829,14 @@
 <!-- ═══ SALUD INTEGRAL (dark feature) ════════════════ -->
 <section class="srv-salud fade-up" id="salud">
   <div class="srv-salud-inner">
-
-    <div class="srv-salud-head">
+    <div>
       <div class="stag">Bienestar holístico</div>
-      <h2>Salud Integral: <em>Prevent Holistic</em></h2>
-      <p>Un enfoque integrador que combina la prevención activa del bienestar físico, mental y emocional con técnicas de vanguardia, para equilibrar cuerpo, mente y espíritu.</p>
+      <h2>Salud Integral:<br><em>Prevent Holistic</em><br>Sonoterapia</h2>
+      <p>Un enfoque integrador que combina la prevención activa del bienestar físico, mental y emocional con técnicas de vanguardia como la sonoterapia, para equilibrar cuerpo, mente y espíritu.</p>
       <p>Diseñado para quienes buscan una transformación profunda mediante prácticas holísticas avaladas por la ciencia y la experiencia terapéutica.</p>
       <div class="srv-salud-pills">
         <span class="srv-salud-pill">Prevención activa</span>
+        <span class="srv-salud-pill">Sonoterapia</span>
         <span class="srv-salud-pill">Bienestar físico</span>
         <span class="srv-salud-pill">Salud emocional</span>
         <span class="srv-salud-pill">Enfoque holístico</span>
@@ -846,6 +845,7 @@
     </div>
 
     <div class="srv-salud-visual">
+
       <div class="salud-block">
         <div class="salud-ico">
           <svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.857 4.065 2 6.857 2c1.723 0 3.619.84 5.143 2.508C13.524 2.84 15.42 2 17.143 2 19.935 2 23 3.857 23 7.191c0 4.105-5.37 8.863-11 14.402z"/></svg>
@@ -862,34 +862,12 @@
       </div>
       <div class="salud-block">
         <div class="salud-ico">
-          <svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
         </div>
-        <h4>Acupuntura</h4>
-        <p>Técnica milenaria que estimula puntos específicos del cuerpo para aliviar tensión, restaurar el flujo de energía y favorecer el equilibrio físico y emocional.</p>
-      </div>
-      <div class="salud-block">
-        <div class="salud-ico">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.3"/><path d="M12 9c-2.8 0-5 2-5.6 4.6l-.9 3.9 1.9.5.8-3.4c.2.1.4.2.6.3v6.1h2v-5h1v5h2v-6.1c.2-.1.4-.2.6-.3l.8 3.4 1.9-.5-.9-3.9C17 11 14.8 9 12 9z"/></svg>
-        </div>
-        <h4>Talleres de Meditación</h4>
-        <p>Espacios grupales guiados para desarrollar la atención plena, reducir el estrés y cultivar la calma mental en el día a día.</p>
-      </div>
-      <div class="salud-block">
-        <div class="salud-ico">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="6" r="2.6"/><circle cx="12" cy="18" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="12" r="2.6"/></svg>
-        </div>
-        <h4>Flores de Bach</h4>
-        <p>Esencias florales naturales que ayudan a equilibrar estados emocionales como la ansiedad, el miedo o la tristeza, de forma suave y no invasiva.</p>
-      </div>
-      <div class="salud-block">
-        <div class="salud-ico">
-          <svg viewBox="0 0 24 24"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>
-        </div>
-        <h4>Retiros</h4>
-        <p>Experiencias inmersivas de desconexión y crecimiento personal en contacto con la naturaleza, diseñadas para renovar cuerpo, mente y espíritu.</p>
+        <h4>Sesiones personalizadas</h4>
+        <p>Cada programa se adapta a tu perfil y necesidades únicas, con seguimiento continuo de tu proceso de bienestar.</p>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -977,25 +955,57 @@
 
     <div class="con-form">
       <h3>Envíanos un mensaje</h3>
-      <div class="frow">
-        <div class="fg"><label>Nombre</label><input type="text" placeholder="Tu nombre"/></div>
-        <div class="fg"><label>Apellido</label><input type="text" placeholder="Tu apellido"/></div>
-      </div>
-      <div class="fg"><label>Correo electrónico</label><input type="email" placeholder="tucorreo@ejemplo.com"/></div>
-      <div class="fg">
-        <label>Servicio de interés</label>
-        <select>
-          <option value="">Selecciona un servicio…</option>
-          <option>Psicoterapia Integral</option>
-          <option>Orientación Vocacional</option>
-          <option>Coaching Educativo Institucional</option>
-          <option>Resilence Coaching Organizacional</option>
-          <option>Capacitación Empresarial</option>
-          <option>Salud Integral / Sonoterapia</option>
-        </select>
-      </div>
-      <div class="fg"><label>Mensaje</label><textarea placeholder="¿Cómo podemos ayudarte?"></textarea></div>
-      <button class="fsub">Enviar mensaje</button>
+
+      <!-- Bloque de mensajes de confirmación / error -->
+      {% if messages %}
+        {% for message in messages %}
+          <div style="padding: 12px 16px; margin-bottom: 20px; border-radius: 10px; font-size: 0.85rem; 
+                      {% if message.tags == 'success' %}background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;{% else %}background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" action="{% url 'servicios' %}#contacto">
+        {% csrf_token %}
+
+        <div class="frow">
+          <div class="fg">
+            <label for="nombre">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+          </div>
+          <div class="fg">
+            <label for="email">Correo electrónico *</label>
+            <input type="email" id="email" name="email" required placeholder="tu@email.com">
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="Opcional">
+          </div>
+          <div class="fg">
+            <label for="servicio">Servicio de interés</label>
+            <select id="servicio" name="servicio">
+              <option value="">Selecciona una opción</option>
+              <option value="Psicoterapia Integral">Psicoterapia Integral</option>
+              <option value="Orientación Vocacional">Orientación Vocacional</option>
+              <option value="Coaching Educativo">Coaching Educativo</option>
+              <option value="Resilience Coaching Org.">Resilience Coaching Org.</option>
+              <option value="Capacitación Empresarial">Capacitación Empresarial</option>
+              <option value="Salud Integral">Salud Integral</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label for="mensaje">Mensaje *</label>
+          <textarea id="mensaje" name="mensaje" required placeholder="¿En qué podemos ayudarte?"></textarea>
+        </div>
+
+        <button type="submit" class="fsub">Enviar mensaje</button>
+      </form>
     </div>
   </div>
 </section>
