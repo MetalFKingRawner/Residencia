@@ -25,9 +25,33 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
+from django.core.exceptions import PermissionDenied
+from panel.mixins import GRUPO_DIRECTIVO
+
+from functools import wraps
+from django.core.exceptions import PermissionDenied
+from core.models import ConfiguracionPlataforma
+
+def requiere_pruebas_activas(vista):
+    """Bloquea el acceso a una vista de pruebas cuando pruebas_activas está en False,
+    salvo para staff o superusuarios."""
+    @wraps(vista)
+    def envoltura(request, *args, **kwargs):
+        config, _ = ConfiguracionPlataforma.objects.get_or_create(id=1)
+        if not config.pruebas_activas and not (request.user.is_staff or request.user.is_superuser):
+            raise PermissionDenied("La plataforma de pruebas está cerrada en este momento.")
+        return vista(request, *args, **kwargs)
+    return envoltura
+
 logger = logging.getLogger(__name__)
 
-@login_required
+def _verificar_acceso_resultado(usuario, resultado):
+    """Solo el dueño, el staff o el Directivo pueden ver un resultado."""
+    es_dueno = resultado.usuario_id == usuario.id
+    es_personal = usuario.is_staff or usuario.groups.filter(name=GRUPO_DIRECTIVO).exists()
+    if not (es_dueno or es_personal):
+        raise PermissionDenied("No tienes permiso para ver este resultado.")
+
 def inicio_test_valores(request):
     test = TestValores.objects.get(nombre="Test de Valores de Allport")
     primera_parte = ParteTest.objects.get(test=test, tipo='PRIMERA')
@@ -47,6 +71,7 @@ def inicio_segundo_test_valores(request):
         'segunda_parte': segunda_parte
     })
 
+@login_required
 def primera_parte_valores(request):
     test = TestValores.objects.get(nombre="Test de Valores de Allport")
     primera_parte = ParteTest.objects.get(test=test, tipo='PRIMERA')
@@ -71,6 +96,7 @@ def primera_parte_valores(request):
         'total_preguntas': preguntas.count()
     })
 
+@login_required
 def segunda_parte_valores(request):
     test = TestValores.objects.get(nombre="Test de Valores de Allport")
     segunda_parte = ParteTest.objects.get(test=test, tipo='SEGUNDA')
@@ -406,12 +432,14 @@ def mostrar_resultados_valores(request):
     response['Expires'] = '0'
     return response
 
+@login_required
 def generar_pdf_valores(request, resultado_id):
     try:
         resultado = ResultadoValores.objects.get(id=resultado_id)
     except ResultadoValores.DoesNotExist:
         return HttpResponse("No hay resultados disponibles", status=404)
-    
+
+    _verificar_acceso_resultado(request.user, resultado)
     valoress = ['Teórico', 'Económico', 'Estético', 'Social', 'Político', 'Religioso']
     puntuaciones = [
         resultado.teorico,
@@ -486,13 +514,14 @@ def generar_pdf_valores(request, resultado_id):
         return HttpResponse('Error al generar el PDF: %s' % html)
     return response
 
-@login_required
 def inicio_domino(request):
     test = TestDomino.objects.get(nombre="Test de Dominó D-48")
     return render(request, 'tests/inicio_domino.html', {
         'test': test
     })
 
+@login_required
+@requiere_pruebas_activas
 def test_domino(request):
     request.session['tiempo_inicio_domino'] = timezone.now().timestamp()
     numeros_problemas = list(range(1, 49))
@@ -539,6 +568,7 @@ def detalle_problema_domino(request, problema_id):
         'matriz': matriz
     })
 
+@login_required
 def calcular_resultados_domino(request):
     if request.method == 'POST':
         tiempo_inicio_ts = request.session.get('tiempo_inicio_domino')
@@ -666,12 +696,16 @@ def calcular_resultados_domino(request):
     
     return redirect('tests:test_domino')
 
+@login_required
 def resultados_domino(request, resultado_id):
     resultado = get_object_or_404(ResultadoDomino, id=resultado_id)
+    _verificar_acceso_resultado(request.user, resultado)
     return render(request, 'tests/resultados_domino.html', {'resultado': resultado})
 
+@login_required
 def generar_pdf_domino(request, resultado_id):
     resultado = get_object_or_404(ResultadoDomino, id=resultado_id)
+    _verificar_acceso_resultado(request.user, resultado)
     
     puntuacion = resultado.puntuacion
     percentil = resultado.percentil
