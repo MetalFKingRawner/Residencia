@@ -72,7 +72,6 @@
     aspect-ratio: 4/3;
     width: 100%;
     box-shadow: 0 28px 72px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.07);
-    /* Placeholder gradient — replace with <img src="{% static 'img/servicios-hero.jpg' %}"> */
     background: linear-gradient(145deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 60%, var(--dark)) 40%, var(--dark) 100%);
     display: grid; place-items: center;
     position: relative;
@@ -187,7 +186,6 @@
     object-fit: cover;
     box-shadow: 0 24px 64px color-mix(in srgb, var(--dark) 18%, transparent);
     display: block;
-    /* Placeholder gradient — replace with <img src="{% static 'img/psicoterapia.jpg' %}"> */
     background: linear-gradient(135deg, var(--accent2) 0%, var(--sand) 50%, var(--primary) 100%);
     overflow: hidden;
   }
@@ -329,7 +327,6 @@
   .srv-card-img {
     width: 100%; height: 180px;
     object-fit: cover; display: block;
-    /* Replace src with {% static 'img/service-name.jpg' %} */
   }
 
   .srv-card-body {
@@ -634,12 +631,6 @@
     </div>
     <!-- Image column -->
     <div class="srv-hero-visual">
-      <!--
-        Reemplaza el bloque de abajo por:
-        <img src="{% static 'img/servicios-hero.jpg' %}" alt="Servicios DHAE"
-             style="border-radius:24px; width:100%; aspect-ratio:4/3; object-fit:cover;
-                    box-shadow:0 28px 72px rgba(0,0,0,.35);">
-      -->
       <img src="{% static 'img/banner/acompanamiento.jpg' %}" alt="Servicios DHAE"
              style="border-radius:24px; width:100%; aspect-ratio:4/3; object-fit:cover;
                     box-shadow:0 28px 72px rgba(0,0,0,.35);">
