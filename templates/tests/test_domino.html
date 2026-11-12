@@ -564,34 +564,16 @@
 </style>
 
 <script>
-  // Validación de inputs
-  //document.querySelectorAll('.domino-input').forEach(input => {
-  //  input.addEventListener('input', function() {
-      // Limitar a un solo dígito
-  //    if (this.value.length > 1) {
-  //      this.value = this.value.slice(0, 1);
-  //    }
-      
-      // Permitir solo números 0-6
-  //    if (!/^[0-6]$/.test(this.value)) {
-  //      this.value = '';
-  //    }
-  //  });
-  //});
-
-  // Validar que solo se ingrese un dígito entre 0 y 6 en cada input de la ficha vacía
-        const inputsRespuesta = document.querySelectorAll('.domino-input');
-        inputsRespuesta.forEach(input => {
-            input.addEventListener('input', () => {
-                const val = input.value;
-                if (!/^[0-6]$/.test(val)) {
-                    input.value = '';
-                }
-            });
-        });
+document.addEventListener("DOMContentLoaded", function() {
+  // Clave única para guardar este test en específico
+  const storageKey = 'psymetrics_domino_test_data';
   
-  // Temporizador (ejemplo básico)
-  let tiempoRestante = 25 * 60; // 25 minutos en segundos
+  // 1. Recuperar datos guardados al cargar la página
+  const savedData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+  // --- CONFIGURACIÓN DEL TEMPORIZADOR ---
+  // Si hay un tiempo guardado lo usamos, si no, iniciamos en 25 minutos (1500 segundos)
+  let tiempoRestante = savedData.tiempoRestante !== undefined ? parseInt(savedData.tiempoRestante) : 25 * 60;
   const timerElement = document.getElementById('tiempo-restante');
   
   function actualizarTemporizador() {
@@ -601,44 +583,35 @@
     
     if (tiempoRestante <= 0) {
       clearInterval(timerInterval);
+      localStorage.removeItem(storageKey); // Limpiar memoria porque el test terminó
       document.getElementById('test-domino-form').submit();
     } else {
       tiempoRestante--;
+      // Guardar el tiempo actual en localStorage cada segundo
+      const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      currentData.tiempoRestante = tiempoRestante;
+      localStorage.setItem(storageKey, JSON.stringify(currentData));
     }
   }
 
-  // Agregar en el script existente
-  //inputsRespuesta.forEach(input => {
-  //  input.addEventListener('input', function() {
-  //    if(this.value.length > 0) {
-  //      this.parentElement.parentElement.classList.remove('respuesta');
-  //      this.parentElement.parentElement.style.border = '2px solid #28a745';
-  //    }
-  //  });
-  //});
-
-  // Función para validar una ficha completa
+  // --- VALIDACIONES DE FICHAS Y ERRORES ---
   function validarFicha(ficha) {
     const inputs = ficha.querySelectorAll('.domino-input');
     let valido = true;
-    
     inputs.forEach(input => {
       if (input.value === '') {
         input.style.border = '2px solid #dc3545';
         valido = false;
       } else {
-        input.style.border = ''; // Restablecer si estaba marcado
+        input.style.border = ''; 
       }
     });
-    
     return valido;
   }
 
-  // Mensajes de error debajo de cada problema
   function mostrarError(problemaId, mensaje) {
     const errorId = `error-${problemaId}`;
     let errorElement = document.getElementById(errorId);
-    
     if (!errorElement) {
       errorElement = document.createElement('div');
       errorElement.id = errorId;
@@ -647,38 +620,45 @@
         .closest('.card-body')
         .appendChild(errorElement);
     }
-    
     errorElement.textContent = mensaje;
     return errorElement;
   }
 
-  // Ocultar error cuando se corrige
   function ocultarError(problemaId) {
     const errorElement = document.getElementById(`error-${problemaId}`);
     if (errorElement) errorElement.remove();
   }
 
-  // Validación en tiempo real
+  // --- RESTAURAR INPUTS Y MANEJO DE EVENTOS ---
   document.querySelectorAll('.domino-input').forEach(input => {
+    // A. Restaurar valor si existía en localStorage
+    if (savedData[input.name]) {
+      input.value = savedData[input.name];
+    }
+
+    // B. Evento cuando el usuario escribe algo nuevo
     input.addEventListener('input', function() {
-      // Validar solo dígitos 0-6
+      // 1. Validar que solo se ingrese un dígito entre 0 y 6
       if (!/^[0-6]$/.test(this.value)) {
         this.value = '';
-        return;
       }
+
+      // 2. Guardar el nuevo valor en localStorage en tiempo real
+      const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      currentData[this.name] = this.value;
+      localStorage.setItem(storageKey, JSON.stringify(currentData));
       
-      // Obtener elementos relacionados
+      // 3. Validación visual en tiempo real
       const ficha = this.closest('.domino-tile');
       const problemaId = this.name.split('_')[1];
       
-      // Validar ambos campos
       if (validarFicha(ficha)) {
         ocultarError(problemaId);
       }
     });
   });
 
-  // Validación al enviar el formulario
+  // --- ENVÍO DEL FORMULARIO ---
   document.getElementById('test-domino-form').addEventListener('submit', function(e) {
     let formularioValido = true;
     
@@ -689,27 +669,30 @@
         mostrarError(problemaId, 'Por favor complete ambos valores de la ficha');
         formularioValido = false;
         
-        // Animación para llamar la atención
+        // Animación de error
         ficha.animate([
           { transform: 'translateX(0)' },
           { transform: 'translateX(-10px)' },
           { transform: 'translateX(10px)' },
           { transform: 'translateX(0)' }
-        ], {
-          duration: 500,
-          iterations: 2
-        });
+        ], { duration: 500, iterations: 2 });
       }
     });
     
     if (!formularioValido) {
-      e.preventDefault();
+      e.preventDefault(); // Detenemos el envío
       // Desplazarse al primer error
       const primerError = document.querySelector('.domino-input[style*="border: 2px solid rgb(220, 53, 69)"]');
       if (primerError) primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      // Si todo es válido y se va a enviar a Django, limpiamos el localStorage!
+      localStorage.removeItem(storageKey);
     }
   });
   
+  // Ejecutamos una vez inmediatamente para no tener 1 segundo de retraso visual y arrancamos intervalo
+  actualizarTemporizador(); 
   const timerInterval = setInterval(actualizarTemporizador, 1000);
+});
 </script>
 {% endblock %}

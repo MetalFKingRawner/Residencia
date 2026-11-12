@@ -1,0 +1,810 @@
+<!-- templates/panel/leccion_form.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block titulo_pagina %}<span>{{ titulo_pagina }}</span>{% endblock %}
+
+{% block extra_head %}
+{# Assets de CKEditor: JS y CSS que necesitan los widgets del formset #}
+{{ recurso_formset.media }}
+<style>
+    /* ── Breadcrumb ── */
+    .lf-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .75rem;
+        color: rgba(32,24,8,.45);
+        margin-bottom: 32px;
+    }
+    .lf-breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color .18s;
+    }
+    .lf-breadcrumb a:hover { color: var(--dark); }
+    .lf-breadcrumb i { font-size: .6rem; opacity: .5; }
+
+    /* ── Wrapper centrado ── */
+    .lf-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    /* ── Card ── */
+    .lf-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        border: 1px solid rgba(216,200,152,.35);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+    }
+
+    /* ── Encabezado de la card ── */
+    .lf-card-header {
+        padding: 24px 32px 20px;
+        border-bottom: 1px solid rgba(216,200,152,.3);
+        background: var(--cream);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .lf-card-icon {
+        width: 40px; height: 40px;
+        border-radius: 9px;
+        background: rgba(160,136,72,.1);
+        border: 1px solid rgba(160,136,72,.22);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .95rem;
+        color: var(--primary);
+        flex-shrink: 0;
+    }
+    .lf-card-header-text h2 {
+        font-family: var(--ff-display);
+        font-size: 1.25rem;
+        font-weight: 400;
+        color: var(--dark);
+        line-height: 1.2;
+    }
+    .lf-card-header-text h2 em {
+        font-style: italic;
+        color: var(--primary);
+    }
+    .lf-card-header-text p {
+        font-size: .74rem;
+        color: rgba(32,24,8,.4);
+        margin-top: 3px;
+    }
+
+    /* ── Cuerpo del formulario ── */
+    .lf-body {
+        padding: 28px 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    /* ── Grupo de campo ── */
+    .lf-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .lf-label {
+        font-size: .74rem;
+        font-weight: 500;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: rgba(32,24,8,.5);
+    }
+    .lf-hint {
+        font-size: .72rem;
+        color: rgba(32,24,8,.38);
+        margin-top: 2px;
+    }
+    .lf-error {
+        font-size: .73rem;
+        color: #c85050;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .lf-error::before {
+        content: '\f071';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: .65rem;
+    }
+
+    /* ── Inputs ── */
+    .lf-body input[type="text"],
+    .lf-body input[type="number"],
+    .lf-body input[type="url"],
+    .lf-body textarea,
+    .lf-body select {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--sand);
+        background: var(--white);
+        font-family: var(--ff-body);
+        font-size: .85rem;
+        font-weight: 300;
+        color: var(--ink);
+        transition: border-color .18s, box-shadow .18s;
+        outline: none;
+        appearance: none;
+    }
+    .lf-body input[type="text"]:focus,
+    .lf-body input[type="number"]:focus,
+    .lf-body input[type="url"]:focus,
+    .lf-body textarea:focus,
+    .lf-body select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(160,136,72,.12);
+    }
+    .lf-body input[type="number"] {
+        max-width: 140px;
+    }
+
+    /* ── Checkbox personalizado ── */
+    .lf-check-wrap {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+        background: var(--cream);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: 9px;
+        cursor: pointer;
+        transition: border-color .18s, background .18s;
+    }
+    .lf-check-wrap:has(input:checked) {
+        border-color: rgba(112,152,136,.4);
+        background: rgba(112,152,136,.06);
+    }
+    .lf-check-wrap input[type="checkbox"] {
+        width: 17px; height: 17px;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+        margin-top: 2px;
+        cursor: pointer;
+    }
+    .lf-check-text strong {
+        display: block;
+        font-size: .83rem;
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 2px;
+    }
+    .lf-check-text span {
+        font-size: .72rem;
+        color: rgba(32,24,8,.42);
+    }
+
+    /* ── Divisor ── */
+    .lf-divider {
+        height: 1px;
+        background: rgba(216,200,152,.3);
+        margin: 4px 0;
+    }
+
+    /* ── Acciones ── */
+    .lf-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 20px 32px;
+        border-top: 1px solid rgba(216,200,152,.25);
+        background: var(--cream);
+    }
+    .lf-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        font-family: var(--ff-body);
+        transition: background .18s, box-shadow .18s, transform .12s;
+    }
+    .lf-btn:hover { transform: translateY(-1px); }
+
+    .lf-btn-cancel {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        color: var(--dark);
+    }
+    .lf-btn-cancel:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .lf-btn-save {
+        background: var(--primary);
+        color: var(--white);
+        box-shadow: 0 2px 8px rgba(160,136,72,.25);
+    }
+    .lf-btn-save:hover {
+        background: var(--dark);
+        box-shadow: 0 4px 16px rgba(104,88,32,.3);
+        color: var(--white);
+    }
+
+    /* ══════════════════════════════════════════
+       SECCIÓN DE RECURSOS
+    ══════════════════════════════════════════ */
+
+    /* Encabezado de sección */
+    .lf-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .lf-section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: .74rem;
+        font-weight: 500;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: rgba(32,24,8,.5);
+    }
+    .lf-section-title i {
+        font-size: .8rem;
+        color: var(--primary);
+        opacity: .75;
+    }
+
+    /* Botón "Añadir recurso" */
+    .lf-btn-add-recurso {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 7px;
+        font-size: .76rem;
+        font-weight: 500;
+        font-family: var(--ff-body);
+        background: var(--white);
+        border: 1px dashed rgba(160,136,72,.5);
+        color: var(--primary);
+        cursor: pointer;
+        transition: background .18s, border-color .18s;
+    }
+    .lf-btn-add-recurso:hover {
+        background: rgba(160,136,72,.06);
+        border-color: var(--primary);
+    }
+
+    /* Contenedor de filas de recurso */
+    #recurso-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* Fila individual de recurso */
+    .recurso-row {
+        border: 1px solid rgba(216,200,152,.45);
+        border-radius: 10px;
+        background: var(--cream);
+        overflow: hidden;
+    }
+    .recurso-row-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        border-bottom: 1px solid rgba(216,200,152,.3);
+        background: rgba(216,200,152,.15);
+        cursor: pointer;
+        user-select: none;
+    }
+    .recurso-row-header-left {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: .82rem;
+        font-weight: 500;
+        color: var(--dark);
+    }
+    .recurso-row-header-left i.recurso-tipo-icon {
+        font-size: .8rem;
+        color: var(--primary);
+        width: 16px;
+        text-align: center;
+    }
+    .recurso-row-header-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .recurso-btn-delete {
+        background: none;
+        border: none;
+        padding: 4px 7px;
+        border-radius: 6px;
+        font-size: .78rem;
+        color: rgba(32,24,8,.35);
+        cursor: pointer;
+        transition: color .15s, background .15s;
+        font-family: var(--ff-body);
+    }
+    .recurso-btn-delete:hover {
+        color: #c85050;
+        background: rgba(200,80,80,.07);
+    }
+    .recurso-toggle-icon {
+        font-size: .65rem;
+        color: rgba(32,24,8,.35);
+        transition: transform .2s;
+    }
+    .recurso-row.collapsed .recurso-toggle-icon {
+        transform: rotate(-90deg);
+    }
+
+    /* Cuerpo de la fila */
+    .recurso-row-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .recurso-row.collapsed .recurso-row-body {
+        display: none;
+    }
+
+    /* Handle de arrastre drag & drop */
+    .recurso-drag-handle {
+        display: flex;
+        align-items: center;
+        padding: 2px 4px;
+        cursor: grab;
+        color: rgba(32,24,8,.25);
+        font-size: .78rem;
+        border-radius: 4px;
+        transition: color .15s, background .15s;
+        /* Evitar que el grab active el toggle de colapsar */
+        touch-action: none;
+    }
+    .recurso-drag-handle:hover {
+        color: var(--primary);
+        background: rgba(160,136,72,.08);
+    }
+    .recurso-drag-handle:active { cursor: grabbing; }
+
+    /* Fila siendo arrastrada (clase que añade SortableJS) */
+    .recurso-row.sortable-ghost {
+        opacity: .35;
+        background: rgba(160,136,72,.08);
+        border: 1px dashed var(--primary);
+    }
+    .recurso-row.sortable-chosen { box-shadow: 0 4px 18px rgba(160,136,72,.2); }
+
+    /* Fila interna: solo tipo (el orden ya no se muestra) */
+    .recurso-meta-row {
+        display: grid;
+        grid-template-columns: 1fr 130px;
+        gap: 14px;
+        align-items: end;
+    }
+    .recurso-meta-row--solo-tipo {
+        grid-template-columns: 1fr;
+    }
+
+    /* Campos condicionales */
+    .recurso-campo {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .recurso-campo[hidden] { display: none; }
+
+    /* Fila marcada para eliminar */
+    .recurso-row.to-delete {
+        opacity: .45;
+        pointer-events: none;
+    }
+    .recurso-row.to-delete .recurso-btn-delete {
+        pointer-events: auto; /* Permitir "Deshacer" incluso con la fila bloqueada */
+    }
+    .recurso-row.to-delete .recurso-row-header {
+        background: rgba(200,80,80,.06);
+        border-color: rgba(200,80,80,.2);
+    }
+
+    /* Empty state */
+    .recurso-empty {
+        text-align: center;
+        padding: 28px 16px;
+        border: 1px dashed rgba(216,200,152,.5);
+        border-radius: 10px;
+        color: rgba(32,24,8,.35);
+        font-size: .8rem;
+    }
+    .recurso-empty i {
+        display: block;
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+        opacity: .4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="lf-breadcrumb">
+    <a href="{% url 'panel:curso_list' %}">Cursos</a>
+    <i class="fas fa-chevron-right"></i>
+    <a href="{% url 'panel:leccion_list' curso.pk %}">{{ curso.titulo }}</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>{{ titulo_pagina }}</span>
+</nav>
+
+<!-- Card centrada -->
+<div class="lf-wrap">
+    <div class="lf-card">
+
+        <!-- Encabezado -->
+        <div class="lf-card-header">
+            <div class="lf-card-icon">
+                <i class="fas fa-{% if object %}pen{% else %}plus{% endif %}"></i>
+            </div>
+            <div class="lf-card-header-text">
+                <h2>{{ titulo_pagina|cut:"Lección — " }} <em>lección</em></h2>
+                <p>{{ curso.titulo }}</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        {# enctype necesario para subir archivos de recursos #}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="lf-body">
+
+                <!-- Título -->
+                <div class="lf-field">
+                    <label class="lf-label" for="{{ form.titulo.id_for_label }}">Título</label>
+                    {{ form.titulo }}
+                    {% if form.titulo.errors %}
+                        <span class="lf-error">{{ form.titulo.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Orden -->
+                <div class="lf-field">
+                    <label class="lf-label" for="{{ form.orden.id_for_label }}">Orden</label>
+                    {{ form.orden }}
+                    <span class="lf-hint">Número que determina la posición de esta lección en el curso.</span>
+                    {% if form.orden.errors %}
+                        <span class="lf-error">{{ form.orden.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="lf-divider"></div>
+
+                <!-- Vista previa gratuita -->
+                <div class="lf-field">
+                    <label class="lf-check-wrap">
+                        {{ form.vista_previa_gratis }}
+                        <div class="lf-check-text">
+                            <strong>Vista previa gratuita</strong>
+                            <span>Los usuarios sin inscripción podrán ver esta lección de forma libre.</span>
+                        </div>
+                    </label>
+                    {% if form.vista_previa_gratis.errors %}
+                        <span class="lf-error">{{ form.vista_previa_gratis.errors|join:", " }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="lf-divider"></div>
+
+                <!-- ══ SECCIÓN DE RECURSOS ══ -->
+                <div>
+                    <div class="lf-section-header">
+                        <span class="lf-section-title">
+                            <i class="fas fa-paperclip"></i>
+                            Recursos de la lección
+                        </span>
+                        <button type="button" class="lf-btn-add-recurso" id="btn-add-recurso">
+                            <i class="fas fa-plus"></i> Añadir recurso
+                        </button>
+                    </div>
+
+                    {# Management form obligatorio para que Django procese el formset #}
+                    {{ recurso_formset.management_form }}
+
+                    <div id="recurso-list">
+                        <div class="recurso-empty" id="recurso-empty-state" style="display:none">
+                            <i class="fas fa-box-open"></i>
+                            Aún no hay recursos. Usa el botón de arriba para añadir el primero.
+                        </div>
+                        {% for r_form in recurso_formset %}
+                            {% include "panel/partials/_recurso_row.html" with r_form=r_form forloop=forloop %}
+                        {% endfor %}
+                    </div>
+
+                    {# Errores globales del formset (p. ej. duplicados) #}
+                    {% if recurso_formset.non_form_errors %}
+                        <span class="lf-error" style="margin-top:8px">
+                            {{ recurso_formset.non_form_errors|join:", " }}
+                        </span>
+                    {% endif %}
+                </div>
+                <!-- ══ FIN RECURSOS ══ -->
+
+            </div>
+
+            <!-- Acciones -->
+            <div class="lf-actions">
+                <a href="{% url 'panel:leccion_list' curso.pk %}" class="lf-btn lf-btn-cancel">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="lf-btn lf-btn-save">
+                    <i class="fas fa-check"></i> Guardar lección
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ══ TEMPLATE VACÍO PARA CLONACIÓN JS ══
+     Django no renderiza este form en el formset, solo lo usamos para clonar.
+     data-empty-form es el atributo que leerá el JS.
+-->
+<template id="recurso-empty-form">
+    {% with recurso_formset.empty_form as r_form %}
+        {% include "panel/partials/_recurso_row.html" with r_form=r_form forloop=None %}
+    {% endwith %}
+</template>
+
+{% endblock %}
+
+
+{% block extra_js %}
+{# SortableJS: drag & drop sin dependencias, con soporte touch nativo #}
+
+{# Constrain images in ALL CKEditor instances (existing + new) #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof CKEDITOR === 'undefined') return;
+    CKEDITOR.on('instanceReady', function (evt) {
+        var head = evt.editor.document.getHead();
+        var style = new CKEDITOR.dom.element('style');
+        style.setText(
+            'img { max-width: 100% !important; height: auto !important; display: block; }' +
+            'body { overflow-x: hidden; }'   /* ← evita el scroll horizontal en responsive */
+        );
+        head.append(style);
+    });
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    /* ── Iconos por tipo de recurso ── */
+    const TIPO_ICONS = {
+        texto:   'fa-align-left',
+        video:   'fa-play-circle',
+        archivo: 'fa-file-alt',
+        audio:   'fa-headphones',
+    };
+    const TIPO_LABELS = {
+        texto:   'Texto / Lectura',
+        video:   'Video embebido',
+        archivo: 'Documento descargable',
+        audio:   'Audio (MP3/Podcast)',
+        '':      'Recurso nuevo',
+    };
+
+    /* ── Referencias DOM ── */
+    const list          = document.getElementById('recurso-list');
+    const emptyState    = document.getElementById('recurso-empty-state');
+    const btnAdd        = document.getElementById('btn-add-recurso');
+    const emptyTemplate = document.getElementById('recurso-empty-form');
+    const totalFormsInput = () =>
+        document.getElementById('id_recursos-TOTAL_FORMS');
+
+    /* ── Actualizar visibilidad del empty state ── */
+    function refreshEmptyState() {
+        const rows = list.querySelectorAll('.recurso-row:not(.to-delete)');
+        if (emptyState) emptyState.style.display = rows.length ? 'none' : 'block';
+    }
+
+    /* ── Mostrar/ocultar campos según tipo ── */
+    function syncCampos(row) {
+        const tipoSelect = row.querySelector('select[name$="-tipo"]');
+        if (!tipoSelect) return;
+        const tipo = tipoSelect.value;
+        row.querySelectorAll('.recurso-campo[data-tipos]').forEach(campo => {
+            const tipos = campo.dataset.tipos.split(',');
+            campo.hidden = !tipos.includes(tipo);
+            if (campo.hidden) {
+                campo.querySelectorAll('input, textarea, select').forEach(el => {
+                    if (el.type !== 'hidden') el.value = '';
+                });
+            }
+        });
+
+        const icon  = row.querySelector('.recurso-tipo-icon');
+        const label = row.querySelector('.recurso-tipo-label');
+        if (icon)  icon.className = `fas ${TIPO_ICONS[tipo] || 'fa-cube'} recurso-tipo-icon`;
+        if (label) label.textContent = TIPO_LABELS[tipo] || 'Recurso';
+    }
+
+    /* ── Toggle colapsar/expandir fila ── */
+    function bindToggle(row) {
+        const header = row.querySelector('.recurso-row-header');
+        header.addEventListener('click', e => {
+            if (e.target.closest('.recurso-btn-delete')) return;
+            row.classList.toggle('collapsed');
+        });
+    }
+
+    /* ── Marcar para eliminar ── */
+    function bindDelete(row) {
+        const btn         = row.querySelector('.recurso-btn-delete');
+        const deleteInput = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+
+        btn.addEventListener('click', () => {
+            if (deleteInput && deleteInput.checked === false) {
+                // ── Caso A: fila existente (con PK) o fila nueva ──
+                // En ambos casos: NO eliminar del DOM, marcar DELETE y ocultar.
+                // Esto evita huecos en los índices del formset.
+                deleteInput.checked = true;
+                row.style.display = 'none';
+                row.classList.add('to-delete', 'collapsed');
+            } else if (!deleteInput) {
+                // ── Fallback: si por alguna razón no hay checkbox DELETE ──
+                // Vaciar campos y ocultar sin tocar TOTAL_FORMS
+                row.style.display = 'none';
+                row.classList.add('to-delete');
+                row.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(el => {
+                    el.value = '';
+                    el.removeAttribute('required');
+                });
+            }
+            refreshEmptyState();
+            updateOrden();
+        });
+    }
+
+    /* ── Inicializar una fila (nueva o existente) ── */
+    function initRow(row) {
+        syncCampos(row);
+        bindToggle(row);
+        bindDelete(row);
+
+        const tipoSelect = row.querySelector('select[name$="-tipo"]');
+        if (tipoSelect) tipoSelect.addEventListener('change', () => syncCampos(row));
+    }
+
+    /* ── Inicializar CKEditor en una fila recién clonada ── */
+    const CKEDITOR_CONFIG = {
+        skin: 'moono-lisa',
+        toolbar: 'dhae_toolbar',
+        toolbar_dhae_toolbar: [
+            ['Font', 'FontSize'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
+            ['TextColor', 'BGColor'],
+            '/',
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+            ['Link', 'Unlink'],
+            ['Image', 'Table', 'HorizontalRule'],
+            ['RemoveFormat', 'Maximize'],
+        ],
+        font_names:
+            'Arial/Arial, Helvetica, sans-serif;' +
+            'Calibri/Calibri, sans-serif;' +
+            'Georgia/Georgia, serif;' +
+            'Times New Roman/Times New Roman, Times, serif;' +
+            'Verdana/Verdana, Geneva, sans-serif;' +
+            'Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;',
+        fontSize_sizes: '10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;24/24px;28/28px;36/36px',
+        width: '100%',
+        height: 300,
+        removePlugins: 'stylesheetparser,exportpdf',
+        extraPlugins: 'font',
+        removeButtons: '',
+        forcePasteAsPlainText: false,
+        allowedContent: true,
+    };
+
+    function initCKEditor(row) {
+        const textarea = row.querySelector('textarea[id*="contenido_texto"]');
+        if (!textarea || typeof CKEDITOR === 'undefined') return;
+
+        const editorId = textarea.id;
+        if (CKEDITOR.instances[editorId]) {
+            CKEDITOR.instances[editorId].destroy(true);
+        }
+        CKEDITOR.replace(editorId, CKEDITOR_CONFIG);
+    }
+
+    /* ── Añadir fila nueva (clonar empty_form) ── */
+    btnAdd.addEventListener('click', () => {
+        const tf    = totalFormsInput();
+        const index = parseInt(tf.value);
+
+        const html = emptyTemplate.innerHTML.replaceAll('__prefix__', index);
+        const tmp  = document.createElement('div');
+        tmp.innerHTML = html;
+        const newRow = tmp.querySelector('.recurso-row');
+
+        if (emptyState) emptyState.style.display = 'none';
+        list.appendChild(newRow);
+        tf.value = index + 1;
+
+        initRow(newRow);
+        initCKEditor(newRow);
+        updateOrden();
+        newRow.classList.remove('collapsed');
+        newRow.querySelector('select[name$="-tipo"]')?.focus();
+    });
+
+    /* ── Inicializar filas existentes al cargar la página ── */
+    list.querySelectorAll('.recurso-row').forEach(row => {
+        const hasPk = row.querySelector('input[name$="-id"]')?.value;
+        if (!hasPk) {
+            // Fila vacía del extra=1: ocultarla Y decrementar TOTAL_FORMS
+            // para que Django no espere datos para este índice al guardar.
+            row.style.display = 'none';
+            row.classList.add('to-delete');
+            const tf = totalFormsInput();
+            tf.value = parseInt(tf.value) - 1;
+            return;
+        }
+        initRow(row);
+    });
+    refreshEmptyState();
+
+    /* ── Drag & drop con SortableJS ── */
+    function updateOrden() {
+        list.querySelectorAll('.recurso-row:not(.to-delete)').forEach((row, i) => {
+            const ordenInput = row.querySelector('input[name$="-orden"]');
+            if (ordenInput) ordenInput.value = i + 1;
+        });
+    }
+
+    Sortable.create(list, {
+        handle: '.recurso-drag-handle',
+        ghostClass:  'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        animation: 150,
+        onEnd: updateOrden,
+    });
+
+    updateOrden();
+
+    /* ── Sincronizar CKEditor → textarea antes de enviar el form ── */
+    document.querySelector('form').addEventListener('submit', () => {
+        if (typeof CKEDITOR === 'undefined') return;
+        for (const id in CKEDITOR.instances) {
+            CKEDITOR.instances[id].updateElement();
+        }
+    });
+
+})();
+</script>
+{% endblock extra_js %}

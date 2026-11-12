@@ -5,8 +5,8 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="row">
-        <div class="col-md-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 mb-4">
             <!-- Tarjeta de Perfil -->
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white text-center">
@@ -48,136 +48,162 @@
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-8">
-            <!-- Historial de Pruebas -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h3 class="card-title mb-0">Historial de Pruebas</h3>
+
+        <div class="col-lg-6 mb-4">
+            <!-- Tarjeta de Seguridad -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-shield-alt me-2"></i>Seguridad</h3>
                 </div>
                 <div class="card-body">
-                    <ul class="nav nav-tabs mb-3" id="pruebasTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="valores-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#valores" type="button" role="tab">
-                                Test de Valores
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="domino-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#domino" type="button" role="tab">
-                                Test de Dominó
-                            </button>
-                        </li>
-                    </ul>
-                    
-                    <div class="tab-content" id="pruebasTabContent">
-                        <!-- Tab Test de Valores -->
-                        <div class="tab-pane fade show active" id="valores" role="tabpanel">
-                            {% if resultados_valores %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Fecha</th>
-                                            <th>Valor Dominante</th>
-                                            <th>Puntuaciones</th>
-                                            <th>Reporte</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for resultado in resultados_valores %}
-                                        <tr>
-                                            <td>{{ resultado.fecha_completado|date:"d M Y" }}</td>
-                                            <td class="fw-bold">{{ resultado.valor_dominante }}</td>
-                                            <td>
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    <span class="badge bg-primary">T: {{ resultado.teorico }}</span>
-                                                    <span class="badge bg-success">E: {{ resultado.economico }}</span>
-                                                    <span class="badge bg-info">Es: {{ resultado.estetico }}</span>
-                                                    <span class="badge bg-warning">S: {{ resultado.social }}</span>
-                                                    <span class="badge bg-danger">P: {{ resultado.politico }}</span>
-                                                    <span class="badge bg-secondary">R: {{ resultado.religioso }}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'tests:reporte_valores' resultado.id %}" 
-                                                   class="btn btn-sm btn-outline-success">
-                                                    <i class="fas fa-download me-1"></i> Descargar
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %}
-                            <div class="text-center py-4">
-                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                                <p class="mb-0">No has completado ningún Test de Valores</p>
-                                <a href="{% url 'inicio_test_valores' %}" class="btn btn-outline-success mt-3">
-                                    Realizar Test
-                                </a>
-                            </div>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Tab Test de Dominó -->
-                        <div class="tab-pane fade" id="domino" role="tabpanel">
-                            {% if resultados_domino %}
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Fecha</th>
-                                            <th>Puntuación</th>
-                                            <th>Percentil</th>
-                                            <th>Diagnóstico</th>
-                                            <th>Reporte</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for resultado in resultados_domino %}
-                                        <tr>
-                                            <td>{{ resultado.fecha|date:"d M Y" }}</td>
-                                            <td class="fw-bold">{{ resultado.puntuacion }} pts</td>
-                                            <td>{{ resultado.percentil|floatformat }}%</td>
-                                            <td>
-                                                <span class="badge 
-                                                    {% if resultado.diagnostico == 'Superior' %}bg-success
-                                                    {% elif resultado.diagnostico == 'Superior a término medio' %}bg-primary
-                                                    {% elif resultado.diagnostico == 'Término medio' %}bg-info
-                                                    {% elif resultado.diagnostico == 'Inferior al término medio' %}bg-warning
-                                                    {% else %}bg-danger
-                                                    {% endif %}">
-                                                    {{ resultado.diagnostico }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'tests:resultados_domino' resultado.id %}" 
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    Ver Detalles
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %}
-                            <div class="text-center py-4">
-                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                                <p class="mb-0">No has completado ningún Test de Dominó</p>
-                                <a href="{% url 'inicio_domino' %}" class="btn btn-outline-success mt-3">
-                                    Realizar Test
-                                </a>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <p class="text-muted mb-3">Actualiza tu contraseña periódicamente para mantener tu cuenta protegida.</p>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                        <i class="fas fa-key me-2"></i>Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Resultados -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Mis Resultados</h3>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-3">Consulta el historial completo de tus pruebas psicométricas y cursos desde tu dashboard.</p>
+                    <a href="{% url 'dashboard' %}" class="btn btn-success">
+                        <i class="fas fa-tachometer-alt me-2"></i>Ir al Dashboard
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal: Cambiar Contraseña -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="passwordChangeForm" novalidate>
+                {% csrf_token %}
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="passwordModalLabel"><i class="fas fa-key me-2"></i>Cambiar Contraseña</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="passwordFormAlert" class="alert alert-danger d-none" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label for="old_password" class="form-label">Contraseña actual</label>
+                        <input type="password" class="form-control" id="old_password" name="old_password" autocomplete="current-password" required>
+                        <div class="invalid-feedback" id="error_old_password"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password1" class="form-label">Nueva contraseña</label>
+                        <input type="password" class="form-control" id="new_password1" name="new_password1" autocomplete="new-password" required>
+                        <div class="invalid-feedback" id="error_new_password1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password2" class="form-label">Confirmar nueva contraseña</label>
+                        <input type="password" class="form-control" id="new_password2" name="new_password2" autocomplete="new-password" required>
+                        <div class="invalid-feedback" id="error_new_password2"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="passwordSubmitBtn">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('passwordChangeForm');
+    const alertBox = document.getElementById('passwordFormAlert');
+    const submitBtn = document.getElementById('passwordSubmitBtn');
+    const fieldIds = ['old_password', 'new_password1', 'new_password2'];
+    const modalEl = document.getElementById('passwordModal');
+
+    function resetFormState() {
+        alertBox.classList.add('d-none');
+        alertBox.classList.remove('alert-success');
+        alertBox.classList.add('alert-danger');
+        alertBox.textContent = '';
+        fieldIds.forEach(function (field) {
+            document.getElementById(field).classList.remove('is-invalid');
+            document.getElementById('error_' + field).textContent = '';
+        });
+    }
+
+    modalEl.addEventListener('hidden.bs.modal', function () {
+        form.reset();
+        resetFormState();
+    });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        resetFormState();
+
+        submitBtn.disabled = true;
+        const originalBtnHtml = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
+        const formData = new FormData(form);
+
+        fetch("{% url 'change_password_ajax' %}", {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: formData
+        })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data };
+            });
+        })
+        .then(function (result) {
+            if (result.status === 200 && result.data.success) {
+                alertBox.classList.remove('d-none', 'alert-danger');
+                alertBox.classList.add('alert-success');
+                alertBox.textContent = result.data.message;
+                form.reset();
+                setTimeout(function () {
+                    bootstrap.Modal.getInstance(modalEl).hide();
+                }, 1500);
+            } else {
+                const errors = result.data.errors || {};
+                Object.keys(errors).forEach(function (field) {
+                    const messages = errors[field].map(function (err) {
+                        return err.message || err;
+                    }).join(' ');
+
+                    const input = document.getElementById(field);
+                    const errorDiv = document.getElementById('error_' + field);
+
+                    if (input && errorDiv) {
+                        input.classList.add('is-invalid');
+                        errorDiv.textContent = messages;
+                    } else {
+                        alertBox.classList.remove('d-none');
+                        alertBox.textContent = messages;
+                    }
+                });
+            }
+        })
+        .catch(function () {
+            alertBox.classList.remove('d-none');
+            alertBox.textContent = 'Ocurrió un error inesperado. Intenta nuevamente.';
+        })
+        .finally(function () {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnHtml;
+        });
+    });
+});
+</script>
 {% endblock %}

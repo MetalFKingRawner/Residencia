@@ -21,7 +21,27 @@
     <!-- Font Awesome (íconos) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    {% block extra_css %}{% endblock %}
+
 </head>
+
+<style>
+    .lfooter { background: var(--ink); color: var(--sand); padding: 56px 5% 28px; }
+
+    .ft { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 44px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,.07); }
+
+    .fb-brand p { font-size: .82rem; line-height: 1.75; margin-top: 12px; color: rgba(220,200,164,.65); max-width: 240px; }
+
+    .fc h4 { font-family: var(--ff-display); font-size: .95rem; font-weight: 600; color: var(--cream); margin-bottom: 14px; }
+
+    .fc a { display: block; font-size: .82rem; color: rgba(220,200,164,.65); margin-bottom: 9px; text-decoration: none; transition: color .2s; }
+
+    .fc a:hover { color: var(--primary); }
+
+    .fb { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; font-size: .75rem; color: rgba(220,200,164,.38); }
+
+</style>
+
 <body class="d-flex flex-column min-vh-100">
     
     <!-- Navbar -->
@@ -42,13 +62,24 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'home' %}">Inicio</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" 
+                        href="{% url 'home' %}">
+                            Inicio
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tests:inicio_domino' %}">Test dominó D-48</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'tests' and 'domino' in request.resolver_match.url_name %}active{% endif %}" 
+                        href="{% url 'tests:inicio_domino' %}">
+                            Test dominó D-48
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tests:inicio_test_valores' %}">Test de Valores</a>
+                        <a class="nav-link {% if request.resolver_match.app_name == 'tests' and 'valores' in request.resolver_match.url_name %}active{% endif %}" 
+                        href="{% url 'tests:inicio_test_valores' %}">
+                            Test de Valores
+                        </a>
                     </li>
                     {% if user.is_authenticated %}
                         <!-- En el menú desplegable del usuario autenticado -->
@@ -57,7 +88,12 @@
                                 <i class="fas fa-user-circle me-2"></i>{{ user.full_name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                {% if es_sistema or es_directivo or es_instructor %}
+                                    <li><a class="dropdown-item" href="{% url 'panel:dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Panel Administrativo</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                {% endif %}
                                 <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
@@ -71,18 +107,35 @@
                             </ul>
                         </li>
                     {% else %}
-                        <!-- Usuario anónimo -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'core_login' %}">Iniciar Sesión</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'signup' %}">Registrarse</a>
-                        </li>
+                        {% if CONFIG.pruebas_activas %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'core_login' %}">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'signup' %}">Registrarse</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="badge bg-secondary text-light ms-3">
+                                    <i class="fas fa-lock me-1"></i> Evaluaciones cerradas
+                                </span>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!-- Contenido Principal -->
     <main class="flex-grow-1 bg-light">
@@ -92,19 +145,47 @@
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer mt-auto">
-        <div class="container py-4">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0">&copy; 2026 PsyMetrics. Todos los derechos reservados.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <a href="#" class="text-white text-decoration-none me-3">Políticas de Privacidad</a>
-                    <a href="#" class="text-white text-decoration-none">Contacto</a>
-                </div>
-            </div>
+    <footer class="lfooter">
+  <div class="ft">
+
+    <div class="fb-brand">
+      <div class="lnav-brand" style="filter:brightness(1.5)">
+        <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE"
+          style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+        <div class="lnav-name">
+          <strong style="color:#f9f4ed">Centro DHAE</strong>
+          <span>Desarrollo Humano Integral</span>
         </div>
-    </footer>
+      </div>
+      <p>Centro de Desarrollo Humano Integral y Atención Especializada S.C.</p>
+    </div>
+
+    <div class="fc">
+      <h4>Servicios</h4>
+      <a href="{% url 'servicios' %}">Atención Psicológica</a>
+      <a href="{% url 'servicios' %}">Orientación Vocacional</a>
+      <a href="{% url 'tests:index' %}">Pruebas Psicométricas</a>
+      <a href="{% url 'courses:curso_list' %}">Cursos de Capacitación</a>
+    </div>
+
+    <div class="fc">
+      <h4>Centro DHAE</h4>
+      <a href="{% url 'nosotros' %}">Nosotros</a>
+    </div>
+
+    <div class="fc">
+      <h4>Contacto</h4>
+      <a href="tel:+525540159751">+52 (55) 4015-9751</a>
+      <a>centrodhae@gmail.com</a>
+      <a href="https://wa.me/529511353324" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    </div>
+
+  </div>
+  <div class="fb">
+    <span>© <span id="ftYear"></span> Centro DHAE S.C. — Todos los derechos reservados.</span>
+    <span>Hecho con ❤ en México</span>
+  </div>
+</footer>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

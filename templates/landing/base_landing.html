@@ -1,0 +1,305 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Centro DHAE — Desarrollo Humano Integral{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --cream:   #faf7f0;
+      --warm:    #f0e8d4;
+      --sand:    #d8c898;
+      --primary: #a08848;
+      --dark:    #685820;
+      --ink:     #201808;
+      --accent:  #709888;
+      --accent2: #b8d0c8;
+      --white:   #ffffff;
+    }
+
+    body {
+      --nav-h: 68px;
+      --ff-display: 'Cormorant Garamond', Georgia, serif;
+      --ff-body: 'DM Sans', sans-serif;
+      font-family: var(--ff-body);
+      font-weight: 300;
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    .lnav {
+      position: sticky; top: 0; z-index: 50;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4%;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sand);
+      box-shadow: 0 2px 16px rgba(0,0,0,.06);
+    }
+
+    .lnav-brand {
+      display: flex; align-items: center; gap: 11px;
+    }
+
+    .lnav-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--primary);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+
+    .lnav-icon svg { width: 22px; height: 22px; fill: #fff; }
+
+    .lnav-name {
+      display: flex; flex-direction: column; line-height: 1.15;
+    }
+
+    .lnav-name strong {
+      font-family: var(--ff-display);
+      font-size: 1rem; font-weight: 600;
+      color: var(--dark); letter-spacing: .01em;
+    }
+
+    .lnav-name span {
+      font-size: .7rem; color: var(--primary);
+      font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+    }
+
+    .lnav-links {
+      display: flex; align-items: center; gap: 2px; list-style: none;
+    }
+
+    .lnav-links a {
+      text-decoration: none;
+      padding: 6px 14px; border-radius: 999px;
+      font-size: .82rem; font-weight: 400; color: var(--dark);
+      transition: background .2s, color .2s;
+    }
+
+    .lnav-links a:hover { background: var(--warm); color: var(--primary); }
+
+    .lnav-links .pill-cursos {
+      background: var(--primary); color: #fff !important;
+      font-weight: 500; margin-left: 4px;
+    }
+
+    .lnav-links .pill-cursos:hover { background: var(--dark); }
+
+    .lnav-links a.active { background: var(--warm); color: var(--primary); font-weight: 500; }
+
+    .lnav-cta {
+      padding: 8px 20px; border-radius: 999px;
+      background: var(--accent); color: #fff !important;
+      font-size: .82rem; font-weight: 500;
+      transition: background .2s;
+    }
+
+    .lnav-cta:hover { background: var(--dark); }
+
+    .lfooter { background: var(--ink); color: var(--sand); padding: 56px 5% 28px; }
+
+    .ft { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 44px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,.07); }
+
+    .fb-brand p { font-size: .82rem; line-height: 1.75; margin-top: 12px; color: rgba(220,200,164,.65); max-width: 240px; }
+
+    .fc h4 { font-family: var(--ff-display); font-size: .95rem; font-weight: 600; color: var(--cream); margin-bottom: 14px; }
+
+    .fc a { display: block; font-size: .82rem; color: rgba(220,200,164,.65); margin-bottom: 9px; text-decoration: none; transition: color .2s; }
+
+    .fc a:hover { color: var(--primary); }
+
+    .fb { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; font-size: .75rem; color: rgba(220,200,164,.38); }
+
+    /* ── Hamburger button ── */
+    .lnav-burger {
+      display: none;
+      flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px; padding: 8px;
+      background: none; border: none; cursor: pointer;
+      border-radius: 8px; transition: background .2s;
+    }
+
+    .lnav-burger:hover { background: var(--warm); }
+
+    .lnav-burger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--dark); border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+      transform-origin: center;
+    }
+
+    /* Animate to X when open */
+    .lnav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+
+    .lnav-burger.open span:nth-child(2) { opacity: 0; }
+
+    .lnav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile dropdown menu ── */
+    .lnav-mobile {
+      display: none;
+      position: absolute; top: var(--nav-h); left: 0; right: 0;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sand);
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      padding: 12px 4%;
+      flex-direction: column; gap: 2px;
+      z-index: 49;
+    }
+
+    .lnav-mobile.open { display: flex; }
+
+    .lnav-mobile li { list-style: none; }
+
+    .lnav-mobile a {
+      display: block; padding: 10px 16px; border-radius: 10px;
+      font-size: .9rem; font-weight: 400; color: var(--dark);
+      text-decoration: none; transition: background .2s, color .2s;
+      text-align: center;
+    }
+
+    .lnav-mobile a:hover, .lnav-mobile a.active {
+      background: var(--warm); color: var(--primary);
+    }
+
+    .lnav-mobile .pill-cursos {
+      background: var(--primary); color: #fff !important;
+      font-weight: 500; margin-top: 6px;
+    }
+
+    .lnav-mobile .pill-cursos:hover { background: var(--dark); }
+
+    @media(max-width:900px) {
+      .ft             { grid-template-columns: 1fr 1fr; }
+      .lnav-links, .lnav-cta { display: none; }
+      .lnav-burger    { display: flex; }
+    }
+
+    @media(max-width:520px) {
+      .ft            { grid-template-columns: 1fr; }
+    }
+
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<nav class="lnav">
+  <div class="lnav-brand">
+    <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE" 
+     style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+    <div class="lnav-name">
+      <strong>Centro DHAE</strong>
+      <span>CENTRO DE DESARROLLO HUMANO INTEGRAL Y ATENCIÓN ESPECIALIZADA S.C.</span>
+    </div>
+  </div>
+  <ul class="lnav-links">
+    <li><a href="{% url 'home' %}" class="active">Inicio</a></li>
+    <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+    <li><a href="{% url 'servicios' %}">Servicios</a></li>
+    <li><a href="{% url 'tests:index' %}">Pruebas</a></li>
+    <li><a href="{% url 'courses:curso_list' %}" class="pill-cursos">📚 Cursos</a></li>
+  </ul>
+  <!-- Hamburger (solo visible en móvil/tableta) -->
+  <button class="lnav-burger" id="navBurger" aria-label="Abrir menú" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Menú desplegable móvil -->
+<ul class="lnav-mobile" id="navMobile">
+  <li><a href="{% url 'home' %}" class="active">Inicio</a></li>
+  <li><a href="{% url 'nosotros' %}">Nosotros</a></li>
+  <li><a href="{% url 'servicios' %}">Servicios</a></li>
+  <li><a href="#">Productos</a></li>
+  <li><a href="#">Contacto</a></li>
+  <li><a href="{% url 'tests:index' %}">Pruebas</a></li>
+  <li><a href="{% url 'courses:curso_list' %}" class="pill-cursos">📚 Cursos</a></li>
+</ul>
+
+{% block content %}{% endblock %}
+
+<footer class="lfooter">
+  <div class="ft">
+
+    <div class="fb-brand">
+      <div class="lnav-brand" style="filter:brightness(1.5)">
+        <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE"
+          style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+        <div class="lnav-name">
+          <strong style="color:#f9f4ed">Centro DHAE</strong>
+          <span>Desarrollo Humano Integral</span>
+        </div>
+      </div>
+      <p>Centro de Desarrollo Humano Integral y Atención Especializada S.C.</p>
+    </div>
+
+    <div class="fc">
+      <h4>Servicios</h4>
+      <a href="{% url 'servicios' %}">Atención Psicológica</a>
+      <a href="{% url 'servicios' %}">Orientación Vocacional</a>
+      <a href="{% url 'tests:index' %}">Pruebas Psicométricas</a>
+      <a href="{% url 'courses:curso_list' %}">Cursos de Capacitación</a>
+    </div>
+
+    <div class="fc">
+      <h4>Centro DHAE</h4>
+      <a href="{% url 'nosotros' %}">Nosotros</a>
+    </div>
+
+    <div class="fc">
+      <h4>Contacto</h4>
+      <a href="tel:+525540159751">+52 (55) 4015-9751</a>
+      <a>centrodhae@gmail.com</a>
+      <a href="https://wa.me/529511353324" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    </div>
+
+  </div>
+  <div class="fb">
+    <span>© <span id="ftYear"></span> Centro DHAE S.C. — Todos los derechos reservados.</span>
+    <span>Hecho con ❤ en México</span>
+  </div>
+</footer>
+
+<script>
+  // ── Año dinámico en el footer ──
+  document.getElementById('ftYear').textContent = new Date().getFullYear();
+
+  // ── Hamburger menu toggle ──
+  (function () {
+    const burger = document.getElementById('navBurger');
+    const mobileMenu = document.getElementById('navMobile');
+    burger.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      burger.classList.toggle('open', isOpen);
+      burger.setAttribute('aria-expanded', isOpen);
+    });
+    // Close menu when any link is clicked
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded', false);
+      });
+    });
+  })();
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

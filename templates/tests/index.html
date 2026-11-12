@@ -3,167 +3,427 @@
 
 {% block title %}Inicio - PsyMetrics{% endblock %}
 
-{% block content %}
-<section class="hero-section py-5 position-relative overflow-hidden">
-    <div class="position-absolute top-0 end-0 w-50 h-100 bg-accent opacity-10" style="clip-path: polygon(100% 0, 100% 100%, 0 0);"></div>
-    
-    <div class="container position-relative z-1">
-        <div class="row align-items-center">
-            <div class="col-lg-6 order-lg-1 order-2 text-center text-lg-start">
-                <h1 class="display-4 fw-bold mb-4">
-                    Descubre tu potencial con 
-                    <span class="text-accent-platform"><em>PsyMetrics</em></span>
-                </h1>
-                <p class="lead mb-4">Plataforma profesional de evaluaciones psicológicas y psicométricas con resultados precisos y confiables</p>
-                <a href="#evaluaciones" class="btn btn-platform btn-lg px-5 py-3 mt-3">
-                    Explorar Evaluaciones <i class="fas fa-arrow-right ms-2"></i>
-                </a>
-            </div>
-            <div class="col-lg-6 order-lg-2 order-1 mb-4 mb-lg-0 text-center">
-                <div class="position-relative">
-                    <img src="{% static 'img/001.jpg' %}" alt="Evaluaciones profesionales" 
-                         class="img-fluid rounded-3 shadow-lg animate__animated animate__fadeIn">
-                    <div class="position-absolute top-0 start-0 w-100 h-100 rounded-3" 
-                         style="background: linear-gradient(145deg, rgba(42,77,110,0.3), rgba(253,184,51,0.2)); z-index: 1;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+{% block extra_css %}
+<style>
+  /* ── HERO ── */
+  .pm-hero {
+    min-height: 80vh; display: grid; grid-template-columns: 1.05fr 1fr;
+    align-items: center; gap: 56px;
+    padding: 72px 6% 80px;
+    background: var(--cream);
+    position: relative; overflow: hidden;
+  }
+  .pm-hero::before {
+    content: ''; position: absolute; top: -140px; right: -120px;
+    width: 640px; height: 640px; border-radius: 50%;
+    background: radial-gradient(circle, var(--accent2) 0%, transparent 65%);
+    opacity: .4; pointer-events: none;
+  }
+  .pm-hero::after {
+    content: ''; position: absolute; bottom: -110px; left: 2%;
+    width: 340px; height: 340px; border-radius: 50%;
+    background: radial-gradient(circle, var(--sand) 0%, transparent 68%);
+    opacity: .5; pointer-events: none;
+  }
+  .pm-hero-text { position: relative; z-index: 2; }
+  .pm-hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 16px; border-radius: 999px;
+    background: var(--warm); border: 1px solid var(--sand);
+    font-size: .72rem; font-weight: 500;
+    color: var(--platform-action-dark); letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .pm-hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--platform-action); display: inline-block; }
+  .pm-hero h1 {
+    font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+    font-weight: 300; line-height: 1.14; margin-bottom: 20px; letter-spacing: -.01em;
+  }
+  .pm-hero-desc {
+    font-size: .95rem; line-height: 1.85;
+    color: color-mix(in srgb, var(--primary) 50%, var(--ink));
+    max-width: 470px; margin-bottom: 32px;
+  }
+  .pm-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .pm-access-note {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: .78rem; color: var(--primary);
+    margin-top: 24px;
+  }
+  .pm-access-note i { color: var(--platform-action); }
+  .pm-hero-visual { position: relative; z-index: 2; }
+  .pm-hero-img-wrap {
+    position: relative; border-radius: 24px; overflow: hidden;
+    box-shadow: 0 28px 64px color-mix(in srgb, var(--dark) 18%, transparent);
+    background: linear-gradient(145deg, var(--accent2), var(--sand));
+  }
+  .pm-hero-img-wrap img { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; mix-blend-mode: multiply; }
+  .pm-hero-img-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(145deg, rgba(160,136,72,.3), rgba(112,152,136,.28));
+    mix-blend-mode: soft-light;
+  }
+  .pm-float-card {
+    position: absolute; bottom: -22px; left: -22px;
+    background: var(--white); border-radius: 18px; padding: 16px 20px;
+    box-shadow: 0 12px 36px rgba(0,0,0,.12);
+    min-width: 180px;
+    border: 1px solid var(--warm);
+  }
+  .pm-float-card .fc-icon { font-size: 1.3rem; margin-bottom: 5px; }
+  .pm-float-card .fc-val { font-family: var(--ff-display); font-size: 1.5rem; font-weight: 600; color: var(--dark); line-height: 1; }
+  .pm-float-card .fc-lbl { font-size: .72rem; color: var(--primary); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; margin-top: 3px; }
+  .pm-float-card2 {
+    position: absolute; top: -18px; right: -18px;
+    background: var(--platform-action); border-radius: 18px; padding: 14px 18px;
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--platform-action) 38%, transparent);
+    min-width: 150px;
+  }
+  .pm-float-card2 .fc-val { font-family: var(--ff-display); font-size: 1.3rem; font-weight: 600; color: #fff; line-height: 1; }
+  .pm-float-card2 .fc-lbl { font-size: .68rem; color: rgba(255,255,255,.8); font-weight: 400; letter-spacing: .04em; margin-top: 3px; }
 
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-5 display-5 fw-bold text-primary">Nuestras Evaluaciones</h2>
-        
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-hover">
-                    <div class="card-img-container position-relative overflow-hidden">
-                        <img src="{% static 'img/test-psychological.jpg' %}" 
-                             class="card-img-top" 
-                             alt="Pruebas psicológicas"
-                             style="height: 200px; object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="h4 mb-3">Psicológicas</h3>
-                        <p class="card-text text-muted">Evaluación de personalidad, inteligencia emocional y salud mental.</p>
-                    </div>
-                </div>
-            </div>
+  /* ── SECTION HEAD (shared) ── */
+  .pm-sec-head { text-align: center; max-width: 620px; margin: 0 auto 48px; }
+  .pm-sec-tag {
+    display: inline-block; font-size: .72rem; font-weight: 500;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--platform-action-dark);
+    margin-bottom: 10px;
+  }
+  .pm-sec-head h2 { font-weight: 300; }
+  .pm-sec-head p {
+    font-size: .92rem; line-height: 1.8;
+    color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+    margin-top: 10px;
+  }
 
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-hover">
-                    <div class="card-img-container position-relative overflow-hidden">
-                        <img src="{% static 'img/test-psychometric.jpg' %}"  
-                             class="card-img-top" 
-                             alt="Pruebas psicológicas"
-                             style="height: 200px; object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="h4 mb-3">Psicométricas</h3>
-                        <p class="card-text text-muted">Evaluación de habilidades, aptitudes, personalidad, rasgos conductuales y competencias clave.</p>
-                    </div>
-                </div>
-            </div>
+  /* ── EVALUACIONES GRID ── */
+  .pm-evals { padding: 80px 6%; background: var(--cream); position: relative; }
+  .pm-evals-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .pm-eval-card {
+    background: var(--white); border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--warm);
+    transition: transform .3s, box-shadow .3s;
+    position: relative;
+  }
+  .pm-eval-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(0,0,0,.1); }
+  .pm-eval-thumb {
+    height: 170px; position: relative; overflow: hidden;
+  }
+  .pm-eval-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+  .pm-eval-card:hover .pm-eval-thumb img { transform: scale(1.05); }
+  .pm-eval-thumb::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(32,24,8,.35), transparent 60%);
+  }
+  .pm-eval-icon {
+    position: absolute; bottom: 12px; left: 14px; z-index: 2;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--platform-action); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--platform-action) 45%, transparent);
+  }
+  .pm-eval-body { padding: 20px 22px 24px; }
+  .pm-eval-body h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+  .pm-eval-body p {
+    font-size: .84rem; line-height: 1.7;
+    color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+    margin: 0;
+  }
 
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-hover">
-                    <div class="card-img-container position-relative overflow-hidden">
-                        <img src="{% static 'img/test-logic.png' %}"
-                             class="card-img-top" 
-                             alt="Pruebas psicológicas"
-                             style="height: 200px; object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="h4 mb-3">Lógicas</h3>
-                        <p class="card-text text-muted">Evaluación de la capacidad para analizar información, identificar patrones y llegar a conclusiones lógicas.</p>
-                    </div>
-                </div>
-            </div>
+  /* ── COMO FUNCIONA ── */
+  .pm-how { padding: 80px 6%; background: var(--warm); position: relative; overflow: hidden; }
+  .pm-how::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23a08848' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .pm-how-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+    position: relative; z-index: 1; max-width: 1000px; margin: 0 auto;
+  }
+  .pm-how-grid::before {
+    content: ''; position: absolute; top: 36px; left: 14%; right: 14%;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--sand) 20%, var(--sand) 80%, transparent);
+    pointer-events: none;
+  }
+  .pm-how-step { text-align: center; position: relative; z-index: 1; }
+  .pm-how-num {
+    width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 18px;
+    background: var(--white); border: 1.5px solid var(--sand);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--ff-display); font-size: 1.6rem; font-weight: 600;
+    color: var(--platform-action-dark); box-shadow: 0 6px 20px rgba(0,0,0,.06);
+  }
+  .pm-how-step h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+  .pm-how-step p { font-size: .84rem; line-height: 1.75; color: color-mix(in srgb, var(--primary) 40%, var(--ink)); max-width: 260px; margin: 0 auto; }
 
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-hover">
-                    <div class="card-img-container position-relative overflow-hidden">
-                        <img src="{% static 'img/test-mechanical.jpg' %}"
-                             class="card-img-top" 
-                             alt="Pruebas psicológicas"
-                             style="height: 200px; object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <h3 class="h4 mb-3">Mecánicas</h3>
-                        <p class="card-text text-muted">Evaluación de la capacidad de para comprender y aplicar principios mecánicos para resolver problemas.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+  /* ── ACCESO RESTRINGIDO ── */
+  .pm-access { padding: 76px 6%; background: var(--cream); }
+  .pm-access-card {
+    max-width: 980px; margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--white); border: 1px solid var(--warm); border-radius: 24px;
+    padding: 40px 44px; box-shadow: 0 16px 44px rgba(0,0,0,.05);
+    text-align: center;
+  }
+  .pm-access-icon {
+    width: 56px; height: 56px; border-radius: 16px; flex-shrink: 0;
+    background: var(--warm); color: var(--platform-action-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 18px;
+  }
+  .pm-access-card h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; }
+  .pm-access-card p.pm-access-lead {
+    font-size: .92rem; line-height: 1.8; text-align: justify; text-justify: inter-word;
+    color: color-mix(in srgb, var(--primary) 45%, var(--ink));
+    margin: 0 auto 22px; max-width: 640px;
+  }
+  .pm-access-points {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    text-align: left; width: 100%;
+  }
+  .pm-access-point {
+    border-left: 2px solid var(--sand); padding-left: 14px;
+  }
+  .pm-access-point .ap-title {
+    font-size: .8rem; font-weight: 600; color: var(--dark); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pm-access-point .ap-title i { color: var(--platform-action); font-size: .75rem; }
+  .pm-access-point p { font-size: .78rem; line-height: 1.65; color: var(--primary); margin: 0; }
 
-<section class="py-5 section-steps">
-    <div class="container">
-        <h2 class="text-center mb-5 display-5 fw-bold text-primary">¿Cómo funciona?</h2>
-        
-        <div class="steps-process">
-            <div class="step-card">
-                <div class="step-number bg-primary text-white rounded-circle">
-                    <span>1</span>
-                </div>
-                <div class="step-content">
-                    <h3 class="h4">Elige tu prueba</h3>
-                    <p>Selecciona entre nuestro catálogo de evaluaciones validadas</p>
-                </div>
-            </div>
-            
-            <div class="step-arrow">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-            
-            <div class="step-card">
-                <div class="step-number bg-primary text-white rounded-circle">
-                    <span>2</span>
-                </div>
-                <div class="step-content">
-                    <h3 class="h4">Responde con sinceridad</h3>
-                    <p>Completa la evaluación siguiendo las instrucciones específicas</p>
-                </div>
-            </div>
-            
-            <div class="step-arrow">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-            
-            <div class="step-card">
-                <div class="step-number bg-primary text-white rounded-circle">
-                    <span>3</span>
-                </div>
-                <div class="step-content">
-                    <h3 class="h4">Obtén tus resultados</h3>
-                    <p>Recibe un análisis detallado de tus resultados al instante</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+  /* ── CTA FINAL ── */
+  .pm-cta { padding: 88px 6%; text-align: center; }
+  .pm-cta h2 { color: #fff; font-weight: 300; text-shadow: 0 1px 8px rgba(0,0,0,.25); margin-bottom: 14px; }
+  .pm-cta .lead { font-size: .94rem; color: rgba(255,243,230,.88); line-height: 1.85; max-width: 540px; margin: 0 auto 14px; }
+  .pm-cta-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 16px; border-radius: 999px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(216,200,152,.35);
+    font-size: .72rem; font-weight: 500; color: var(--sand);
+    letter-spacing: .06em; margin-bottom: 28px;
+  }
+  .pm-cta-badge i { color: var(--accent2); }
 
-<section class="py-5 bg-accent">
-    <div class="container text-center">
-        <h2 class="text-white mb-4">¿Listo para comenzar?</h2>
-        <p class="lead text-white mb-5">Regístrate gratis y obtén acceso inmediato a tus resultados detallados</p>
-        <a href="#" class="btn btn-wh btn-lg px-5 py-3">Crear Cuenta Gratis</a>
-    </div>
-</section>
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .pm-evals-grid { grid-template-columns: repeat(2, 1fr); }
+    .pm-access-points { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    .pm-hero { grid-template-columns: 1fr; min-height: auto; padding: 48px 5% 56px; gap: 40px; text-align: center; }
+    .pm-hero::before, .pm-hero::after { display: none; }
+    .pm-float-card, .pm-float-card2 { display: none; }
+    .pm-hero-desc { margin-left: auto; margin-right: auto; }
+    .pm-hero-badge { margin-left: auto; margin-right: auto; }
+    .pm-hero-actions { justify-content: center; }
+    .pm-access-note { justify-content: center; width: 100%; }
+    .pm-evals-grid { grid-template-columns: 1fr; }
+    .pm-how-grid { grid-template-columns: 1fr; gap: 36px; max-width: 320px; }
+    .pm-how-grid::before { display: none; }
+    .pm-access-card { padding: 32px 24px; }
+    .pm-access-points { grid-template-columns: 1fr; text-align: left; }
+  }
+
+  /* ── ANIMACIONES ── */
+  @keyframes pmFadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .pm-hero-text > * { animation: pmFadeUp .7s ease both; }
+  .pm-hero-badge { animation-delay: 0s; }
+  .pm-hero h1 { animation-delay: .1s; }
+  .pm-hero-desc { animation-delay: .2s; }
+  .pm-hero-actions { animation-delay: .3s; }
+  .pm-access-note { animation-delay: .4s; }
+  .pm-hero-visual { animation: pmFadeUp .8s .2s ease both; }
+
+  /* Visible por defecto siempre — nunca depende de JS para mostrarse.
+     Si el navegador soporta scroll-driven animations, se anima de forma progresiva;
+     si no, simplemente se queda visible sin animación (fallback seguro). */
+  .animate-on-scroll { opacity: 1; transform: none; }
+  @supports (animation-timeline: view()) {
+    .animate-on-scroll {
+      animation: pmFadeUp .6s ease both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+</style>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-    window.addEventListener('scroll', function() {
-        const elements = document.querySelectorAll('.animate-on-scroll');
-        elements.forEach(element => {
-            const position = element.getBoundingClientRect();
-            if(position.top < window.innerHeight) {
-                element.classList.add('animate__fadeInUp');
-            }
-        });
-    });
-</script>
+{% block content %}
+
+<!-- HERO -->
+<section class="pm-hero">
+  <div class="pm-hero-text">
+    <div class="pm-hero-badge">
+      <span class="dot"></span>
+      Evaluación profesional certificada
+    </div>
+    <h1>
+      Descubre tu potencial con
+      <span class="text-accent-platform"><em>PsyMetrics</em></span>
+    </h1>
+    <p class="pm-hero-desc">
+      Plataforma profesional de evaluaciones psicológicas y psicométricas con resultados precisos y confiables, diseñada para instituciones y grupos de evaluación.
+    </p>
+    <div class="pm-hero-actions">
+      <a href="#evaluaciones" class="btn-platform btn-lg px-5 py-3">
+        Explorar Evaluaciones <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+    <div class="pm-access-note">
+      <i class="fas fa-lock"></i>
+      Acceso por invitación · gestionado por tu institución o administrador
+    </div>
+  </div>
+  <div class="pm-hero-visual">
+    <div class="pm-hero-img-wrap">
+      <img src="{% static 'img/001.jpg' %}" alt="Evaluaciones profesionales">
+      <div class="pm-hero-img-overlay"></div>
+    </div>
+    <div class="pm-float-card">
+      <div class="fc-icon">📊</div>
+      <div class="fc-val">4 áreas</div>
+      <div class="fc-lbl">de evaluación</div>
+    </div>
+    <div class="pm-float-card2">
+      <div class="fc-val" style="display:flex;align-items:center;gap:6px"><span style="font-size:.9rem">✓</span>100%</div>
+      <div class="fc-lbl">confiable</div>
+    </div>
+  </div>
+</section>
+
+<!-- EVALUACIONES -->
+<section class="pm-evals" id="evaluaciones">
+  <div class="pm-sec-head">
+    <span class="pm-sec-tag">Catálogo</span>
+    <h2 class="display-5">Nuestras Evaluaciones</h2>
+    <p>Instrumentos validados para medir distintas dimensiones del desempeño y la personalidad.</p>
+  </div>
+
+  <div class="pm-evals-grid">
+    <div class="pm-eval-card animate-on-scroll">
+      <div class="pm-eval-thumb">
+        <img src="{% static 'img/test-psychological.jpg' %}" alt="Pruebas psicológicas">
+        <span class="pm-eval-icon"><i class="fas fa-brain"></i></span>
+      </div>
+      <div class="pm-eval-body">
+        <h3>Psicológicas</h3>
+        <p>Evaluación de personalidad, inteligencia emocional y salud mental.</p>
+      </div>
+    </div>
+
+    <div class="pm-eval-card animate-on-scroll">
+      <div class="pm-eval-thumb">
+        <img src="{% static 'img/test-psychometric.jpg' %}" alt="Pruebas psicométricas">
+        <span class="pm-eval-icon"><i class="fas fa-chart-line"></i></span>
+      </div>
+      <div class="pm-eval-body">
+        <h3>Psicométricas</h3>
+        <p>Evaluación de habilidades, aptitudes, personalidad, rasgos conductuales y competencias clave.</p>
+      </div>
+    </div>
+
+    <div class="pm-eval-card animate-on-scroll">
+      <div class="pm-eval-thumb">
+        <img src="{% static 'img/test-logic.png' %}" alt="Pruebas lógicas">
+        <span class="pm-eval-icon"><i class="fas fa-puzzle-piece"></i></span>
+      </div>
+      <div class="pm-eval-body">
+        <h3>Lógicas</h3>
+        <p>Evaluación de la capacidad para analizar información, identificar patrones y llegar a conclusiones lógicas.</p>
+      </div>
+    </div>
+
+    <div class="pm-eval-card animate-on-scroll">
+      <div class="pm-eval-thumb">
+        <img src="{% static 'img/test-mechanical.jpg' %}" alt="Pruebas mecánicas">
+        <span class="pm-eval-icon"><i class="fas fa-cogs"></i></span>
+      </div>
+      <div class="pm-eval-body">
+        <h3>Mecánicas</h3>
+        <p>Evaluación de la capacidad para comprender y aplicar principios mecánicos para resolver problemas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="pm-how" id="como-funciona">
+  <div class="pm-sec-head">
+    <span class="pm-sec-tag">Proceso</span>
+    <h2 class="display-5">¿Cómo funciona?</h2>
+    <p>Tres pasos simples una vez que tu cuenta ha sido habilitada.</p>
+  </div>
+
+  <div class="pm-how-grid">
+    <div class="pm-how-step animate-on-scroll">
+      <div class="pm-how-num">1</div>
+      <h3>Elige tu prueba</h3>
+      <p>Selecciona entre nuestro catálogo de evaluaciones validadas, según lo asignado por tu institución.</p>
+    </div>
+    <div class="pm-how-step animate-on-scroll">
+      <div class="pm-how-num">2</div>
+      <h3>Responde con sinceridad</h3>
+      <p>Completa la evaluación siguiendo las instrucciones específicas de cada instrumento.</p>
+    </div>
+    <div class="pm-how-step animate-on-scroll">
+      <div class="pm-how-num">3</div>
+      <h3>Obtén tus resultados</h3>
+      <p>Recibe un análisis detallado de tus resultados al instante, listo para revisión.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESO RESTRINGIDO -->
+<section class="pm-access" id="acceso">
+  <div class="pm-access-card animate-on-scroll">
+    <div class="pm-access-icon"><i class="fas fa-user-shield"></i></div>
+    <h2>Una plataforma de acceso controlado</h2>
+    <p class="pm-access-lead">
+      PsyMetrics no está abierta a registro público. Trabajamos con instituciones y grupos definidos, durante ventanas de evaluación específicas, para garantizar resultados confiables y un acompañamiento adecuado.
+    </p>
+    <div class="pm-access-points">
+      <div class="pm-access-point">
+        <div class="ap-title"><i class="fas fa-building"></i>Por institución</div>
+        <p>El acceso se habilita para organizaciones o grupos reducidos previamente autorizados.</p>
+      </div>
+      <div class="pm-access-point">
+        <div class="ap-title"><i class="fas fa-calendar-check"></i>Por periodo</div>
+        <p>Cada proceso de evaluación se abre en ventanas de tiempo determinadas por el administrador.</p>
+      </div>
+      <div class="pm-access-point">
+        <div class="ap-title"><i class="fas fa-key"></i>Por invitación</div>
+        <p>Las cuentas se crean exclusivamente desde la administración del sitio, no por registro libre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="py-5 bg-accent pm-cta">
+  <div class="container">
+    <div class="pm-cta-badge"><i class="fas fa-lock"></i> Acceso por invitación</div>
+    <h2 class="display-5">¿Listo para comenzar?</h2>
+    <p class="lead">Si tu institución ya cuenta con acceso, regístrate para obtener acceso inmediato a tus resultados detallados.</p>
+    
+    {% if CONFIG.pruebas_activas %}
+        <a href="{% url 'signup' %}" class="btn btn-wh btn-lg px-5 py-3 mt-3">
+            Crear Cuenta Gratis
+        </a>
+    {% else %}
+        <button class="btn btn-wh btn-lg px-5 py-3 mt-3" disabled style="opacity: 0.6; cursor: not-allowed;">
+            <i class="fas fa-ban me-2"></i>Inscripciones Cerradas
+        </button>
+        <p class="mt-3 text-white" style="font-size: 0.85rem; opacity: 0.8;">
+            El registro público no está disponible en este momento.
+        </p>
+    {% endif %}
+    
+  </div>
+</section>
+
 {% endblock %}

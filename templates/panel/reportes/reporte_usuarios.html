@@ -1,0 +1,225 @@
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Reporte de usuarios{% endblock %}
+{% block titulo_pagina %}<span>Reporte de usuarios</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    .ra-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .ra-stat { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        padding: 18px 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-card); }
+    .ra-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        border-radius: var(--radius) var(--radius) 0 0; }
+    .ra-stat-gold::before { background: var(--primary); }
+    .ra-stat-sage::before { background: var(--accent); }
+    .ra-stat-sand::before { background: var(--sand); }
+    .ra-stat-warm::before { background: #c09060; }
+    .ra-stat-label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: #aaa; font-weight: 500; margin-bottom: 6px; }
+    .ra-stat-value { font-family: var(--ff-display); font-size: 1.7rem; font-weight: 600; color: var(--dark); line-height: 1; }
+
+    .ra-filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 24px; background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius); padding: 16px 20px; }
+    .ra-filtros label { display: block; font-size: .68rem; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .ra-filtros input, .ra-filtros select { border: 1px solid var(--sand); border-radius: 8px; padding: 7px 10px;
+        font-family: var(--ff-body); font-size: .8rem; color: var(--ink); background: var(--cream); }
+    .ra-filtros input[type="text"] { min-width: 180px; }
+    .ra-filtros button { padding: 8px 20px; border-radius: 99px; border: none; background: var(--primary); color: #fff; font-size: .8rem; cursor: pointer; }
+    .ra-filtros button:hover { background: var(--dark); }
+
+    .ra-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .ra-panel { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        box-shadow: var(--shadow-card); padding: 18px 22px; }
+    .ra-panel-title { font-family: var(--ff-display); font-size: 1.02rem; font-weight: 600; color: var(--dark); margin-bottom: 14px; }
+    .ra-panel-title span { font-style: italic; color: var(--primary); }
+    .ra-chart-wrap { position: relative; height: 240px; }
+
+    .ra-table-wrap { overflow-x: auto; }
+    .ra-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .ra-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--sand);
+        font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: #999; }
+    .ra-table td { padding: 10px 12px; border-bottom: 1px solid #f0ebe0; color: var(--ink); }
+    .ra-pill { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: .7rem; }
+    .ra-pill.sistema { background: rgba(160,136,72,.12); color: var(--primary); }
+    .ra-pill.directivo { background: rgba(192,144,96,.12); color: #c09060; }
+    .ra-pill.instructor { background: rgba(112,152,136,.12); color: var(--accent); }
+    .ra-pill.estudiante { background: rgba(32,24,8,.06); color: rgba(32,24,8,.5); }
+    .ra-dot-estado { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .ra-dot-estado.activo { background: var(--accent); }
+    .ra-dot-estado.inactivo { background: #b05050; }
+
+    .ra-pagination { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+    .ra-pagination a, .ra-pagination span { padding: 6px 12px; border-radius: 8px; font-size: .78rem;
+        text-decoration: none; color: var(--dark); border: 1px solid var(--sand); }
+    .ra-pagination .current { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    @media (max-width: 1100px) {
+        .ra-stats { grid-template-columns: repeat(2, 1fr); }
+        .ra-charts { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'panel/reportes/_subnav.html' %}
+
+<!-- Filtros -->
+<form method="get" class="ra-filtros">
+    <div>
+        <label>Rol</label>
+        <select name="rol">
+            <option value="todos" {% if rol == 'todos' %}selected{% endif %}>Todos</option>
+            <option value="sistema" {% if rol == 'sistema' %}selected{% endif %}>Administrador del Sistema</option>
+            <option value="directivo" {% if rol == 'directivo' %}selected{% endif %}>Directivo / Coordinador</option>
+            <option value="instructor" {% if rol == 'instructor' %}selected{% endif %}>Instructor</option>
+            <option value="estudiante" {% if rol == 'estudiante' %}selected{% endif %}>Estudiante</option>
+        </select>
+    </div>
+    <div>
+        <label>Estado</label>
+        <select name="estado">
+            <option value="todos" {% if estado == 'todos' %}selected{% endif %}>Todos</option>
+            <option value="activo" {% if estado == 'activo' %}selected{% endif %}>Activo</option>
+            <option value="inactivo" {% if estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+        </select>
+    </div>
+    <div><label>Registrado desde</label><input type="date" name="desde" value="{{ desde }}"></div>
+    <div><label>Registrado hasta</label><input type="date" name="hasta" value="{{ hasta }}"></div>
+    <div>
+        <label>Buscar</label>
+        <input type="text" name="q" placeholder="Nombre, email o usuario..." value="{{ q }}">
+    </div>
+    <div>
+        <label>Ordenar por</label>
+        <select name="orden">
+            <option value="nombre" {% if orden == 'nombre' %}selected{% endif %}>Nombre</option>
+            <option value="fecha" {% if orden == 'fecha' %}selected{% endif %}>Más recientes</option>
+            <option value="inscripciones" {% if orden == 'inscripciones' %}selected{% endif %}>Más inscripciones</option>
+            <option value="pruebas" {% if orden == 'pruebas' %}selected{% endif %}>Más pruebas</option>
+        </select>
+    </div>
+    <button type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'panel:reporte_usuarios_pdf' %}"
+       style="background:#b05050; text-decoration:none; padding:8px 20px; border-radius:99px; color:#fff; font-size:.8rem; display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+    </a>
+</form>
+
+<!-- KPIs -->
+<div class="ra-stats">
+    <div class="ra-stat ra-stat-gold">
+        <div class="ra-stat-label">Total usuarios</div>
+        <div class="ra-stat-value">{{ total_usuarios }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sage">
+        <div class="ra-stat-label">Activos</div>
+        <div class="ra-stat-value">{{ activos }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sand">
+        <div class="ra-stat-label">Inactivos</div>
+        <div class="ra-stat-value">{{ inactivos }}</div>
+    </div>
+    <div class="ra-stat ra-stat-warm">
+        <div class="ra-stat-label">Resultados filtrados</div>
+        <div class="ra-stat-value">{{ page_obj.paginator.count }}</div>
+    </div>
+</div>
+
+<!-- Gráficas -->
+<div class="ra-charts">
+    <div class="ra-panel">
+        <div class="ra-panel-title">Distribución por <span>rol</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartRol"></canvas></div>
+    </div>
+    <div class="ra-panel">
+        <div class="ra-panel-title">Activos vs <span>inactivos</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartActivos"></canvas></div>
+    </div>
+</div>
+
+<div class="ra-panel" style="margin-bottom:24px;">
+    <div class="ra-panel-title">Nuevos usuarios por <span>mes</span></div>
+    <div class="ra-chart-wrap"><canvas id="chartNuevos"></canvas></div>
+</div>
+
+<!-- Tabla detallada -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Usuarios <span>({{ page_obj.paginator.count }})</span></div>
+    <div class="ra-table-wrap">
+        <table class="ra-table">
+            <thead>
+                <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Registrado</th><th>Estado</th><th>Inscripciones</th><th>Pruebas</th></tr>
+            </thead>
+            <tbody>
+                {% for fila in page_obj %}
+                <tr>
+                    <td>{{ fila.usuario.full_name }}</td>
+                    <td>{{ fila.usuario.email }}</td>
+                    <td>
+                        <span class="ra-pill {% if fila.rol == 'Administrador del Sistema' %}sistema{% elif fila.rol == 'Directivo / Coordinador' %}directivo{% elif fila.rol == 'Instructor' %}instructor{% else %}estudiante{% endif %}">
+                            {{ fila.rol }}
+                        </span>
+                    </td>
+                    <td>{{ fila.usuario.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="ra-dot-estado {% if fila.usuario.is_active %}activo{% else %}inactivo{% endif %}"></span>
+                        {% if fila.usuario.is_active %}Activo{% else %}Inactivo{% endif %}
+                    </td>
+                    <td>{{ fila.num_inscripciones }}</td>
+                    <td>{{ fila.num_pruebas }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="text-align:center; color:#aaa;">Sin usuarios en este rango de filtros.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="ra-pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">‹</a>
+        {% endif %}
+        <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{{ distribucion_rol|json_script:"data-rol" }}
+{{ activos_inactivos|json_script:"data-activos" }}
+{{ nuevos_usuarios_mes|json_script:"data-nuevos" }}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+(function() {
+    const rolData = JSON.parse(document.getElementById('data-rol').textContent);
+    const activosData = JSON.parse(document.getElementById('data-activos').textContent);
+    const nuevosData = JSON.parse(document.getElementById('data-nuevos').textContent);
+    const dorado = '#a08848', salvia = '#709888', arena = '#d8c898', calido = '#c09060', rojo = '#b05050';
+
+    new Chart(document.getElementById('chartRol'), {
+        type: 'pie',
+        data: { labels: rolData.labels, datasets: [{ data: rolData.data, backgroundColor: [dorado, calido, salvia, arena] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartActivos'), {
+        type: 'pie',
+        data: { labels: activosData.labels, datasets: [{ data: activosData.data, backgroundColor: [salvia, rojo] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartNuevos'), {
+        type: 'line',
+        data: { labels: nuevosData.labels, datasets: [{ label: 'Nuevos usuarios', data: nuevosData.data, borderColor: dorado, backgroundColor: 'transparent', tension: .3 }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+})();
+</script>
+{% endblock %}

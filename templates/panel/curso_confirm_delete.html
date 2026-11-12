@@ -1,0 +1,181 @@
+<!-- templates/panel/curso_confirm_delete.html -->
+{% extends 'panel/base_panel.html' %}
+
+{% block titulo %}Eliminar Curso{% endblock %}
+{% block titulo_pagina %}<span>Eliminar</span> curso{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ── Contenedor centrado ── */
+    .cd-wrap {
+        max-width: 480px;
+        margin: 40px auto 0;
+    }
+
+    /* ── Card de confirmación ── */
+    .cd-card {
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+    }
+
+    /* Franja de advertencia superior */
+    .cd-danger-stripe {
+        height: 4px;
+        background: linear-gradient(90deg, #c05050, #d07070);
+    }
+
+    .cd-card-body {
+        padding: 36px 36px 32px;
+        text-align: center;
+    }
+
+    /* Ícono */
+    .cd-icon-wrap {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: rgba(176,80,80,.08);
+        border: 1px solid rgba(176,80,80,.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    .cd-icon-wrap i {
+        font-size: 1.6rem;
+        color: #b05050;
+    }
+
+    /* Título */
+    .cd-title {
+        font-family: var(--ff-display);
+        font-size: 1.4rem;
+        font-weight: 400;
+        color: var(--dark);
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    /* Nombre del curso destacado */
+    .cd-course-name {
+        display: inline-block;
+        font-family: var(--ff-display);
+        font-size: 1rem;
+        font-weight: 600;
+        font-style: italic;
+        color: var(--primary);
+        background: rgba(160,136,72,.07);
+        border: 1px solid rgba(160,136,72,.2);
+        border-radius: 6px;
+        padding: 6px 14px;
+        margin: 8px 0 14px;
+        max-width: 100%;
+        word-break: break-word;
+    }
+
+    /* Advertencia */
+    .cd-warning {
+        font-size: .8rem;
+        font-weight: 300;
+        color: rgba(32,24,8,.5);
+        line-height: 1.55;
+        margin-bottom: 28px;
+    }
+    .cd-warning strong {
+        color: #a04040;
+        font-weight: 500;
+    }
+
+    /* Botones */
+    .cd-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    .cd-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 22px;
+        border-radius: 99px;
+        font-size: .82rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: 1px solid;
+        cursor: pointer;
+        transition: background .18s, box-shadow .18s, color .18s, border-color .18s;
+        white-space: nowrap;
+    }
+    .cd-btn i { font-size: .78rem; }
+
+    .cd-btn-cancel {
+        background: transparent;
+        color: var(--dark);
+        border-color: var(--sand);
+    }
+    .cd-btn-cancel:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .cd-btn-delete {
+        background: #b05050;
+        color: #fff;
+        border-color: #b05050;
+    }
+    .cd-btn-delete:hover {
+        background: #8f3838;
+        border-color: #8f3838;
+        box-shadow: 0 4px 14px rgba(176,80,80,.3);
+        color: #fff;
+    }
+
+    @media (max-width: 520px) {
+        .cd-card-body { padding: 28px 22px 24px; }
+        .cd-actions { flex-direction: column; }
+        .cd-btn { justify-content: center; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cd-wrap">
+    <div class="cd-card">
+
+        <div class="cd-danger-stripe"></div>
+
+        <div class="cd-card-body">
+
+            <div class="cd-icon-wrap">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+
+            <h2 class="cd-title">¿Eliminar este curso?</h2>
+
+            <span class="cd-course-name">{{ object.titulo }}</span>
+
+            <p class="cd-warning">
+                Esta acción es <strong>permanente e irreversible</strong>.<br>
+                Se eliminarán también todas las lecciones y recursos asociados.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="cd-actions">
+                    <a href="{% url 'panel:curso_list' %}" class="cd-btn cd-btn-cancel">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="cd-btn cd-btn-delete">
+                        <i class="fas fa-trash-alt"></i> Eliminar definitivamente
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

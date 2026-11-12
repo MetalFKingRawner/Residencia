@@ -234,7 +234,7 @@
                                         <td><span class="score-value">{{ resultado.politico|floatformat:1 }}</span></td>
                                         <td><span class="score-value">{{ resultado.religioso|floatformat:1 }}</span></td>
                                         <td class="text-center">
-                                            <a href="{% url 'reporte_valores' resultado.id %}" 
+                                            <a href="{% url 'tests:reporte_valores' resultado.id %}" 
                                                class="btn-table-action btn-action-success" 
                                                target="_blank"
                                                title="Ver reporte completo">
@@ -318,7 +318,7 @@
                                             <span class="efficiency-badge">{{ resultado.eficiencia|floatformat:1 }}%</span>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{% url 'resultados_domino' resultado.id %}" 
+                                            <a href="{% url 'tests:resultados_domino' resultado.id %}" 
                                                class="btn-table-action btn-action-info" 
                                                target="_blank"
                                                title="Ver resultados completos">

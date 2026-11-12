@@ -1,0 +1,291 @@
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Dashboard analítico{% endblock %}
+{% block titulo_pagina %}<span>Reportes</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Reutiliza clases de dashboard.html (db-stats, db-stat, db-panel) */
+    .ra-stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .ra-stat {
+        background: var(--white);
+        border: 1px solid #ebe6db;
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        position: relative; overflow: hidden;
+        box-shadow: var(--shadow-card);
+    }
+    .ra-stat::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .ra-stat-gold::before { background: var(--primary); }
+    .ra-stat-sage::before { background: var(--accent); }
+    .ra-stat-sand::before { background: var(--sand); }
+    .ra-stat-warm::before { background: #c09060; }
+    .ra-stat-blue::before { background: #7a95b8; }
+
+    .ra-stat-label {
+        font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+        color: #aaa; font-weight: 500; margin-bottom: 6px;
+    }
+    .ra-stat-value {
+        font-family: var(--ff-display);
+        font-size: 1.9rem; font-weight: 600; color: var(--dark); line-height: 1;
+    }
+
+    /* Filtros de fecha */
+    .ra-filtros {
+        display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 24px;
+        background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        padding: 16px 20px;
+    }
+    .ra-filtros label {
+        display: block; font-size: .7rem; color: #999; margin-bottom: 4px;
+        text-transform: uppercase; letter-spacing: .06em;
+    }
+    .ra-filtros input[type="date"] {
+        border: 1px solid var(--sand); border-radius: 8px; padding: 7px 10px;
+        font-family: var(--ff-body); font-size: .82rem; color: var(--ink);
+        background: var(--cream);
+    }
+    .ra-filtros button {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 8px 20px; border-radius: 99px; border: none;
+        background: var(--primary); color: #fff; font-size: .8rem; cursor: pointer;
+        white-space: nowrap;
+    }
+    .ra-filtros button:hover { background: var(--dark); }
+
+    /* Agrupa Filtrar + Exportar PDF para que siempre queden a la par */
+    .ra-filtros-campo { display: flex; flex-direction: column; }
+    .ra-filtros-acciones {
+        display: flex; align-items: center; gap: 10px;
+    }
+    .ra-btn-pdf {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 8px 20px; border-radius: 99px; border: none;
+        background: #b05050; color: #fff; font-size: .8rem;
+        text-decoration: none; line-height: 1; white-space: nowrap;
+        transition: background .15s ease;
+    }
+    .ra-btn-pdf:hover { background: #8a3d3d; color: #fff; }
+
+    /* Grid de gráficas */
+    .ra-charts {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .ra-charts-bottom { margin-bottom: 24px; }
+
+    .ra-panel {
+        background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        box-shadow: var(--shadow-card); padding: 18px 22px;
+    }
+    .ra-panel-title {
+        font-family: var(--ff-display); font-size: 1.05rem; font-weight: 600;
+        color: var(--dark); margin-bottom: 14px;
+    }
+    .ra-panel-title span { font-style: italic; color: var(--primary); }
+    .ra-chart-wrap { position: relative; height: 280px; }
+
+    /* Últimos movimientos: mismo HTML/lógica, solo estética */
+    .ra-panel-mov .db-activity-list {
+        list-style: none; margin: 0; padding: 0;
+        max-height: 360px; overflow-y: auto;
+    }
+    .ra-panel-mov .db-activity-item {
+        display: flex; align-items: flex-start; gap: 14px;
+        padding: 12px 8px;
+        border-bottom: 1px solid #f1ede2;
+        transition: background .12s ease;
+    }
+    .ra-panel-mov .db-activity-item:last-child { border-bottom: none; }
+    .ra-panel-mov .db-activity-item:hover { background: #faf8f2; border-radius: 8px; }
+    .ra-panel-mov .db-activity-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        margin-top: 5px; flex-shrink: 0;
+    }
+    .ra-panel-mov .db-activity-dot-gold { background: var(--primary); box-shadow: 0 0 0 4px rgba(160,136,72,.15); }
+    .ra-panel-mov .db-activity-dot-sage { background: var(--accent); box-shadow: 0 0 0 4px rgba(112,152,136,.15); }
+    .ra-panel-mov .db-activity-dot-sand { background: var(--sand); box-shadow: 0 0 0 4px rgba(216,200,152,.2); }
+    .ra-panel-mov .db-activity-text { flex: 1; min-width: 0; }
+    .ra-panel-mov .db-activity-text p {
+        margin: 0 0 3px; font-size: .86rem; color: var(--ink); line-height: 1.35;
+    }
+    .ra-panel-mov .db-activity-text time {
+        font-size: .72rem; color: #b3ab98; letter-spacing: .02em;
+    }
+
+    @media (max-width: 1100px) {
+        .ra-stats { grid-template-columns: repeat(2, 1fr); }
+        .ra-charts { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+        .ra-filtros {
+            flex-direction: column; align-items: stretch;
+            padding: 14px 16px; gap: 10px;
+        }
+        .ra-filtros-campo,
+        .ra-filtros input[type="date"] { width: 100%; }
+        .ra-filtros-acciones {
+            flex-direction: column; align-items: stretch; width: 100%;
+        }
+        .ra-filtros-acciones button,
+        .ra-btn-pdf { width: 100%; }
+
+        .ra-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .ra-stat { padding: 14px; }
+        .ra-stat-value { font-size: 1.5rem; }
+
+        .ra-panel { padding: 16px; }
+        .ra-chart-wrap { height: 220px; }
+        .ra-panel-mov .db-activity-item { padding: 10px 4px; gap: 10px; }
+    }
+
+    @media (max-width: 380px) {
+        .ra-stats { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'panel/reportes/_subnav.html' %}
+
+<!-- Filtros -->
+<form method="get" class="ra-filtros">
+    <div class="ra-filtros-campo">
+        <label>Desde</label>
+        <input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}">
+    </div>
+    <div class="ra-filtros-campo">
+        <label>Hasta</label>
+        <input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
+    </div>
+    <div class="ra-filtros-acciones">
+        <button type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+        <a href="{% url 'panel:reporte_dashboard_pdf' %}?desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}"
+           class="ra-btn-pdf">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </a>
+    </div>
+</form>
+
+<!-- KPIs -->
+<div class="ra-stats">
+    <div class="ra-stat ra-stat-gold">
+        <div class="ra-stat-label">Pruebas aplicadas</div>
+        <div class="ra-stat-value">{{ total_pruebas }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sage">
+        <div class="ra-stat-label">Cursos publicados</div>
+        <div class="ra-stat-value">{{ total_cursos_publicados }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sand">
+        <div class="ra-stat-label">Inscripciones</div>
+        <div class="ra-stat-value">{{ total_inscripciones }}</div>
+    </div>
+    <div class="ra-stat ra-stat-warm">
+        <div class="ra-stat-label">Usuarios registrados</div>
+        <div class="ra-stat-value">{{ total_usuarios }}</div>
+    </div>
+    <div class="ra-stat ra-stat-blue">
+        <div class="ra-stat-label">Tasa de finalización</div>
+        <div class="ra-stat-value">{{ tasa_finalizacion }}%</div>
+    </div>
+</div>
+
+<!-- Gráficas principales -->
+<div class="ra-charts">
+    <div class="ra-panel">
+        <div class="ra-panel-title">Evolución <span>mensual</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartEvolucion"></canvas></div>
+    </div>
+    <div class="ra-panel">
+        <div class="ra-panel-title">Pruebas por <span>tipo</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartDistribucion"></canvas></div>
+    </div>
+</div>
+
+<!-- Top cursos -->
+<div class="ra-panel ra-charts-bottom">
+    <div class="ra-panel-title">Top 5 <span>cursos</span> con más inscripciones</div>
+    <div class="ra-chart-wrap" style="height:220px;"><canvas id="chartTopCursos"></canvas></div>
+</div>
+
+<!-- Últimos movimientos -->
+<div class="ra-panel ra-panel-mov">
+    <div class="ra-panel-title">Últimos <span>movimientos</span></div>
+    <ul class="db-activity-list">
+        {% for m in movimientos %}
+        <li class="db-activity-item">
+            <span class="db-activity-dot {% if m.tipo == 'inscripcion' %}db-activity-dot-sand{% elif m.tipo == 'prueba_allport' %}db-activity-dot-gold{% else %}db-activity-dot-sage{% endif %}"></span>
+            <div class="db-activity-text">
+                <p>{{ m.descripcion }}</p>
+                <time>{{ m.fecha|date:"d/m/Y H:i" }}</time>
+            </div>
+        </li>
+        {% empty %}
+        <li class="db-activity-item"><div class="db-activity-text"><p>Sin movimientos en el rango seleccionado.</p></div></li>
+        {% endfor %}
+    </ul>
+</div>
+
+{{ evolucion_mensual|json_script:"data-evolucion" }}
+{{ distribucion_pruebas|json_script:"data-distribucion" }}
+{{ top_cursos_data|json_script:"data-top-cursos" }}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+(function() {
+    const evolucion = JSON.parse(document.getElementById('data-evolucion').textContent);
+    const distribucion = JSON.parse(document.getElementById('data-distribucion').textContent);
+    const topCursos = JSON.parse(document.getElementById('data-top-cursos').textContent);
+
+    const dorado = '#a08848', salvia = '#709888', arena = '#d8c898';
+
+    new Chart(document.getElementById('chartEvolucion'), {
+        type: 'line',
+        data: {
+            labels: evolucion.labels,
+            datasets: [
+                { label: 'Pruebas', data: evolucion.pruebas, borderColor: dorado, backgroundColor: 'transparent', tension: .3 },
+                { label: 'Inscripciones', data: evolucion.inscripciones, borderColor: salvia, backgroundColor: 'transparent', tension: .3 },
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartDistribucion'), {
+        type: 'pie',
+        data: {
+            labels: distribucion.labels,
+            datasets: [{ data: distribucion.data, backgroundColor: [dorado, salvia] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartTopCursos'), {
+        type: 'bar',
+        data: {
+            labels: topCursos.labels,
+            datasets: [{ label: 'Inscripciones', data: topCursos.data, backgroundColor: arena }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+    });
+})();
+</script>
+{% endblock %}

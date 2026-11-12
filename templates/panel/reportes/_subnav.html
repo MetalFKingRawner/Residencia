@@ -1,0 +1,36 @@
+<div class="ra-subnav">
+    <a href="{% url 'panel:reporte_dashboard' %}" class="{% if request.resolver_match.url_name == 'reporte_dashboard' %}active{% endif %}">
+        <i class="fas fa-chart-pie"></i> Dashboard
+    </a>
+    <a href="{% url 'panel:reporte_pruebas' %}" class="{% if request.resolver_match.url_name == 'reporte_pruebas' %}active{% endif %}">
+        <i class="fas fa-brain"></i> Pruebas
+    </a>
+    <a href="{% url 'panel:reporte_cursos' %}" class="{% if request.resolver_match.url_name == 'reporte_cursos' %}active{% endif %}">
+        <i class="fas fa-graduation-cap"></i> Cursos
+    </a>
+    <a href="{% url 'panel:reporte_usuarios' %}" class="{% if request.resolver_match.url_name == 'reporte_usuarios' %}active{% endif %}">
+        <i class="fas fa-users"></i> Usuarios
+    </a>
+    <a href="{% url 'panel:reporte_comparativos' %}" class="{% if request.resolver_match.url_name == 'reporte_comparativos' %}active{% endif %}">
+        <i class="fas fa-balance-scale"></i> Comparativos
+    </a>
+</div>
+
+<style>
+    .ra-subnav {
+        display: flex; gap: 6px; margin-bottom: 22px;
+        border-bottom: 1px solid #ebe6db;
+    }
+    .ra-subnav a {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 10px 16px;
+        font-size: .8rem; color: rgba(32,24,8,.5);
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        transition: color .18s, border-color .18s;
+    }
+    .ra-subnav a:hover { color: var(--primary); }
+    .ra-subnav a.active {
+        color: var(--primary); border-color: var(--primary); font-weight: 500;
+    }
+</style>

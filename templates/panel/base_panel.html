@@ -1,0 +1,537 @@
+<!-- templates/panel/base_panel.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin — {% block titulo %}{% endblock %} · Centro DHAE</title>
+
+    <!-- Google Fonts: mismas familias que home.html -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <style>
+        /* ── Reset & tokens (heredados de home.html) ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        :root {
+            --cream:    #faf7f0;
+            --warm:     #f0e8d4;
+            --sand:     #d8c898;
+            --primary:  #a08848;
+            --dark:     #685820;
+            --ink:      #201808;
+            --accent:   #709888;
+            --accent2:  #b8d0c8;
+            --white:    #ffffff;
+
+            /* Panel-specific tokens */
+            --sidebar-bg:     #1a1208;      /* ink un poco más profundo */
+            --sidebar-w:      240px;
+            --sidebar-w-sm:   64px;
+            --topbar-h:       64px;
+            --radius:         10px;
+            --shadow-card:    0 2px 12px rgba(32,24,8,.08);
+            --shadow-hover:   0 6px 24px rgba(32,24,8,.14);
+            --ff-display:     'Cormorant Garamond', Georgia, serif;
+            --ff-body:        'DM Sans', sans-serif;
+        }
+
+        body {
+            font-family: var(--ff-body);
+            font-weight: 300;
+            background: var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════════
+           SIDEBAR
+        ══════════════════════════════ */
+        .p-sidebar {
+            position: fixed; top: 0; left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(160,136,72,.18);
+            display: flex; flex-direction: column;
+            z-index: 200;
+            transition: transform .3s ease, width .3s ease;
+            overflow: hidden;
+        }
+
+        /* Marca en el sidebar */
+        .p-sidebar-brand {
+            display: flex; align-items: center; gap: 10px;
+            padding: 20px 20px 18px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .p-sidebar-brand-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: var(--primary);
+            display: grid; place-items: center; flex-shrink: 0;
+        }
+        .p-sidebar-brand-icon svg { width: 18px; height: 18px; fill: #fff; }
+        .p-sidebar-brand-text {
+            display: flex; flex-direction: column; line-height: 1.2; overflow: hidden;
+        }
+        .p-sidebar-brand-text strong {
+            font-family: var(--ff-display);
+            font-size: .95rem; font-weight: 600; color: var(--warm);
+            white-space: nowrap;
+        }
+        .p-sidebar-brand-text span {
+            font-size: .62rem; color: var(--primary);
+            font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Sección label */
+        .p-nav-section {
+            font-size: .6rem; letter-spacing: .14em; text-transform: uppercase;
+            color: rgba(255,255,255,.25); font-weight: 500;
+            padding: 20px 20px 6px;
+        }
+
+        /* Nav links */
+        .p-nav { flex: 1; overflow-y: auto; padding: 8px 12px 12px; }
+        .p-nav::-webkit-scrollbar { width: 4px; }
+        .p-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+
+        .p-nav-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: 8px;
+            text-decoration: none;
+            color: rgba(255,255,255,.55);
+            font-size: .82rem; font-weight: 400;
+            white-space: nowrap;
+            transition: background .18s, color .18s;
+            position: relative;
+            margin-bottom: 2px;
+        }
+        .p-nav-link i {
+            width: 18px; text-align: center; font-size: .88rem;
+            flex-shrink: 0;
+        }
+        .p-nav-link .p-nav-label { overflow: hidden; text-overflow: ellipsis; }
+        .p-nav-link:hover {
+            background: rgba(255,255,255,.06);
+            color: rgba(255,255,255,.85);
+        }
+        .p-nav-link.active {
+            background: rgba(160,136,72,.18);
+            color: var(--sand);
+            font-weight: 500;
+        }
+        /* Barra dorada izquierda en activo — firma visual */
+        .p-nav-link.active::before {
+            content: '';
+            position: absolute; left: 0; top: 20%; bottom: 20%;
+            width: 3px; border-radius: 0 3px 3px 0;
+            background: var(--primary);
+        }
+
+        /* Badge de conteo */
+        .p-nav-badge {
+            margin-left: auto; flex-shrink: 0;
+            font-size: .65rem; font-weight: 500;
+            background: rgba(160,136,72,.28);
+            color: var(--sand);
+            padding: 2px 7px; border-radius: 99px;
+        }
+
+        /* Divider */
+        .p-nav-divider {
+            height: 1px; background: rgba(255,255,255,.06);
+            margin: 10px 0;
+        }
+
+        /* Perfil del usuario al fondo del sidebar */
+        .p-sidebar-user {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            display: flex; align-items: center; gap: 10px;
+            flex-shrink: 0;
+        }
+        .p-sidebar-user-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: grid; place-items: center;
+            font-size: .75rem; color: #fff; font-weight: 500;
+            flex-shrink: 0;
+        }
+        .p-sidebar-user-info {
+            flex: 1; overflow: hidden;
+        }
+        .p-sidebar-user-info strong {
+            display: block; font-size: .78rem; font-weight: 500;
+            color: var(--warm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .p-sidebar-user-info span {
+            font-size: .66rem; color: rgba(255,255,255,.35);
+        }
+        .p-sidebar-user-logout {
+            color: rgba(255,255,255,.3); font-size: .78rem;
+            text-decoration: none; padding: 4px;
+            border-radius: 6px;
+            transition: color .18s, background .18s;
+        }
+        .p-sidebar-user-logout:hover {
+            color: #e8a0a0; background: rgba(255,100,100,.1);
+        }
+
+        /* ══════════════════════════════
+           TOPBAR
+        ══════════════════════════════ */
+        .p-topbar {
+            position: fixed;
+            top: 0; left: var(--sidebar-w); right: 0;
+            height: var(--topbar-h);
+            background: rgba(250,247,240,.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--sand);
+            display: flex; align-items: center;
+            padding: 0 28px;
+            z-index: 100;
+            gap: 16px;
+        }
+        .p-topbar-toggle {
+            display: none;
+            align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 8px;
+            border: 1px solid var(--sand);
+            background: transparent; cursor: pointer;
+            color: var(--ink); font-size: .9rem;
+            flex-shrink: 0;
+        }
+        .p-topbar-title {
+            flex: 1;
+            font-family: var(--ff-display);
+            font-size: 1.1rem; font-weight: 400;
+            color: var(--ink);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .p-topbar-title em { font-style: italic; color: var(--primary); }
+        .p-topbar-actions {
+            display: flex; align-items: center; gap: 12px;
+            flex-shrink: 0;
+        }
+        .p-topbar-badge {
+            display: flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 99px;
+            background: rgba(160,136,72,.1);
+            border: 1px solid rgba(160,136,72,.25);
+            font-size: .75rem; color: var(--dark);
+        }
+        .p-topbar-badge .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent); flex-shrink: 0;
+        }
+        .p-back-link {
+            display: flex; align-items: center; gap: 5px;
+            font-size: .76rem; color: rgba(32,24,8,.45);
+            text-decoration: none;
+            transition: color .18s;
+        }
+        .p-back-link:hover { color: var(--primary); }
+
+        /* ══════════════════════════════
+           MAIN / CONTENT
+        ══════════════════════════════ */
+        .p-main {
+            margin-left: var(--sidebar-w);
+            padding-top: var(--topbar-h);
+            min-height: 100vh;
+        }
+        .p-content {
+            padding: 28px 32px;
+            max-width: 1280px;
+        }
+
+        /* ══════════════════════════════
+           MENSAJES / ALERTAS
+        ══════════════════════════════ */
+        .p-messages { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .p-alert {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px; border-radius: var(--radius);
+            font-size: .82rem; font-weight: 400;
+            border: 1px solid;
+        }
+        .p-alert i { flex-shrink: 0; font-size: .85rem; }
+        .p-alert span { flex: 1; }
+        .p-alert-close {
+            background: none; border: none; cursor: pointer;
+            color: inherit; opacity: .5; padding: 2px 4px;
+            border-radius: 4px; transition: opacity .18s;
+        }
+        .p-alert-close:hover { opacity: 1; }
+        .p-alert-success {
+            background: rgba(112,152,136,.08);
+            color: #3a6e5e;
+            border-color: rgba(112,152,136,.3);
+        }
+        .p-alert-error, .p-alert-danger {
+            background: rgba(176,80,80,.07);
+            color: #8a3030;
+            border-color: rgba(176,80,80,.25);
+        }
+        .p-alert-warning {
+            background: rgba(200,160,60,.08);
+            color: #7a5a10;
+            border-color: rgba(200,160,60,.3);
+        }
+        .p-alert-info {
+            background: rgba(100,140,180,.07);
+            color: #2a5070;
+            border-color: rgba(100,140,180,.25);
+        }
+
+        /* ══════════════════════════════
+           OVERLAY (móvil)
+        ══════════════════════════════ */
+        .p-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.5);
+            z-index: 190;
+            backdrop-filter: blur(2px);
+        }
+
+        /* ══════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════ */
+
+        /* Tablet (≤ 1024px): sidebar colapsado en íconos */
+        @media (max-width: 1024px) {
+            .p-sidebar {
+                width: var(--sidebar-w-sm);
+            }
+            .p-sidebar-brand-text,
+            .p-nav-label,
+            .p-nav-section,
+            .p-nav-badge,
+            .p-sidebar-user-info,
+            .p-sidebar-user-logout { display: none !important; }
+            .p-sidebar-brand { justify-content: center; padding: 20px 0; }
+            .p-sidebar-brand-icon { margin: 0 auto; }
+            .p-nav-link { justify-content: center; padding: 10px; }
+            .p-nav-link i { width: auto; margin: 0; font-size: 1rem; }
+            .p-nav-link.active::before { top: 0; bottom: 0; left: 0; }
+            .p-sidebar-user { justify-content: center; }
+            .p-topbar { left: var(--sidebar-w-sm); }
+            .p-main { margin-left: var(--sidebar-w-sm); }
+        }
+
+        /* Móvil (≤ 768px): sidebar fuera de pantalla, drawer desde arriba */
+        @media (max-width: 768px) {
+            .p-sidebar {
+                width: var(--sidebar-w);
+                transform: translateX(-100%);
+            }
+            .p-sidebar.open {
+                transform: translateX(0);
+            }
+            .p-sidebar-brand-text,
+            .p-nav-label,
+            .p-nav-section,
+            .p-nav-badge,
+            .p-sidebar-user-info,
+            .p-sidebar-user-logout { display: flex !important; }
+            .p-sidebar-brand { justify-content: flex-start; padding: 20px; }
+            .p-nav-link { justify-content: flex-start; padding: 9px 12px; }
+            .p-nav-link i { width: 18px; font-size: .88rem; margin: 0; }
+            .p-sidebar-user { justify-content: flex-start; }
+
+            .p-topbar { left: 0; }
+            .p-topbar-toggle { display: flex; }
+            .p-main { margin-left: 0; }
+            .p-content { padding: 20px 16px; }
+            .p-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity .3s; }
+            .p-overlay.active { opacity: 1; pointer-events: all; }
+        }
+
+        /* Utilidades generales */
+        .p-block { display: block; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- ══ OVERLAY (móvil) ══ -->
+    <div class="p-overlay" id="pOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="p-sidebar" id="pSidebar">
+        <!-- Marca -->
+        <a class="p-sidebar-brand" href="/">
+            <div class="p-sidebar-brand-icon" style="background: transparent;">
+                <img src="{% static 'img/logo_dhae.jpg' %}" alt="Centro DHAE" 
+                style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+            </div>
+            <div class="p-sidebar-brand-text">
+                <strong>Centro DHAE</strong>
+                {# Etiqueta de rol dinámica #}
+                {% if es_sistema %}
+                    <span>Panel Sistema</span>
+                {% elif es_directivo %}
+                    <span>Panel Directivo</span>
+                {% else %}
+                    <span>Panel Instructor</span>
+                {% endif %}
+            </div>
+        </a>
+
+        <!-- Navegación -->
+        <nav class="p-nav">
+            <div class="p-nav-section">Principal</div>
+
+            <a class="p-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+               href="{% url 'panel:dashboard' %}">
+                <i class="fas fa-th-large"></i>
+                <span class="p-nav-label">Dashboard</span>
+            </a>
+
+            <div class="p-nav-section">Contenido</div>
+
+            {# Cursos: visible para staff e instructores #}
+            <a class="p-nav-link {% if 'cursos' in request.path %}active{% endif %}"
+               href="{% url 'panel:curso_list' %}">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="p-nav-label">Cursos</span>
+            </a>
+
+            {# Lecciones y Recursos: solo referencial (se accede desde el curso) #}
+            <a class="p-nav-link {% if 'lecciones' in request.path %}active{% endif %}" href="#">
+                <i class="fas fa-book-open"></i>
+                <span class="p-nav-label">Lecciones</span>
+            </a>
+
+            <a class="p-nav-link {% if 'recursos' in request.path %}active{% endif %}" href="#">
+                <i class="fas fa-paperclip"></i>
+                <span class="p-nav-label">Recursos</span>
+            </a>
+
+            {# Sección Gestión: visible para Administrador del Sistema o Directivo/Coordinador #}
+            {% if es_admin %}
+            <div class="p-nav-section">Gestión</div>
+
+            <a class="p-nav-link {% if 'usuarios' in request.path %}active{% endif %}"
+                href="{% url 'panel:usuario_list' %}">
+                <i class="fas fa-users"></i>
+                <span class="p-nav-label">Usuarios</span>
+            </a>
+
+            <a class="p-nav-link {% if 'inscripciones' in request.path %}active{% endif %}" 
+                href="{% url 'panel:inscripcion_list' %}">
+                <i class="fas fa-file-alt"></i>
+                <span class="p-nav-label">Inscripciones</span>
+            </a>
+
+            <a class="p-nav-link {% if 'reportes' in request.path %}active{% endif %}" 
+                href="{% url 'panel:reporte_dashboard' %}">
+                <i class="fas fa-chart-bar"></i>
+                <span class="p-nav-label">Reportes</span>
+            </a>
+
+            {% endif %}
+
+            <div class="p-nav-divider"></div>
+
+            <a class="p-nav-link" href="/">
+                <i class="fas fa-arrow-left"></i>
+                <span class="p-nav-label">Volver al sitio</span>
+            </a>
+        </nav>
+
+        <!-- Usuario -->
+        <div class="p-sidebar-user">
+            <div class="p-sidebar-user-avatar">
+                {{ request.user.full_name|slice:":1"|upper|default:"U" }}
+            </div>
+            <div class="p-sidebar-user-info">
+                <strong>{{ request.user.full_name|default:request.user.username }}</strong>
+                {# Etiqueta de rol dinámica #}
+                {% if es_sistema %}
+                    <span>Administrador del Sistema</span>
+                {% elif es_directivo %}
+                    <span>Directivo / Coordinador</span>
+                {% else %}
+                    <span>Instructor</span>
+                {% endif %}
+            </div>
+            <a href="{% url 'logout' %}" class="p-sidebar-user-logout" title="Cerrar sesión">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <div class="p-main" id="pMain">
+
+        <!-- Topbar -->
+        <header class="p-topbar">
+            <button class="p-topbar-toggle" onclick="toggleSidebar()" aria-label="Menú">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <h1 class="p-topbar-title">
+                {% block titulo_pagina %}<span>Panel</span>{% endblock %}
+            </h1>
+
+            <div class="p-topbar-actions">
+                <div class="p-topbar-badge">
+                    <span class="dot"></span>
+                    <span>{{ request.user.full_name|default:request.user.username }}</span>
+                </div>
+                <a href="/" class="p-back-link">
+                    <i class="fas fa-external-link-alt" style="font-size:.7rem"></i>
+                    Sitio
+                </a>
+            </div>
+        </header>
+
+        <!-- Contenido -->
+        <main class="p-content">
+
+            <!-- Mensajes de Django -->
+            {% if messages %}
+            <div class="p-messages">
+                {% for message in messages %}
+                <div class="p-alert p-alert-{{ message.tags }}" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                    <button class="p-alert-close" onclick="this.parentElement.remove()" aria-label="Cerrar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('pSidebar');
+            const overlay = document.getElementById('pOverlay');
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.classList.toggle('active', isOpen);
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

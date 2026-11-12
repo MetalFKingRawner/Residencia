@@ -1,0 +1,370 @@
+<!-- templates/panel/curso_list.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Lista de Cursos{% endblock %}
+{% block titulo_pagina %}<span>Cursos</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ── Page header ── */
+    .cl-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+    .cl-header-text h2 {
+        font-family: var(--ff-display);
+        font-size: 1.7rem;
+        font-weight: 400;
+        color: var(--dark);
+        line-height: 1.15;
+    }
+    .cl-header-text h2 em {
+        font-style: italic;
+        color: var(--primary);
+    }
+    .cl-header-text p {
+        margin-top: 4px;
+        font-size: .8rem;
+        color: rgba(32,24,8,.45);
+        font-weight: 300;
+    }
+
+    /* ── Botón primario ── */
+    .cl-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 99px;
+        background: var(--primary);
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background .18s, box-shadow .18s;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .cl-btn-primary:hover {
+        background: var(--dark);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(160,136,72,.35);
+    }
+    .cl-btn-primary i { font-size: .8rem; }
+
+    /* ── Grid de cards ── */
+    .cl-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+        gap: 20px;
+    }
+
+    /* ── Card ── */
+    .cl-card {
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow .22s, transform .22s;
+    }
+    .cl-card:hover {
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    /* Imagen / placeholder */
+    .cl-card-thumb {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+        background: var(--warm);
+        flex-shrink: 0;
+    }
+    .cl-card-thumb img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform .4s ease;
+    }
+    .cl-card:hover .cl-card-thumb img {
+        transform: scale(1.04);
+    }
+    .cl-card-thumb-placeholder {
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cl-card-thumb-placeholder i {
+        font-size: 2.2rem;
+        color: var(--sand);
+    }
+
+    /* Badge de estado flotante sobre la imagen */
+    .cl-status-badge {
+        position: absolute;
+        top: 10px; left: 10px;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-size: .65rem;
+        font-weight: 500;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+    }
+    .cl-status-badge.publicado {
+        background: rgba(112,152,136,.15);
+        color: var(--accent);
+        border: 1px solid rgba(112,152,136,.4);
+    }
+    .cl-status-badge.borrador {
+        background: rgba(32,24,8,.06);
+        color: rgba(32,24,8,.45);
+        border: 1px solid rgba(32,24,8,.12);
+    }
+
+    /* Cuerpo de la card */
+    .cl-card-body {
+        padding: 18px 20px 14px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .cl-card-title {
+        font-family: var(--ff-display);
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .cl-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .75rem;
+        color: rgba(32,24,8,.45);
+        font-weight: 300;
+    }
+    .cl-card-meta i {
+        color: var(--primary);
+        font-size: .72rem;
+        width: 14px;
+    }
+
+    /* Stats row */
+    .cl-card-stats {
+        display: flex;
+        gap: 14px;
+        margin-top: 4px;
+    }
+    .cl-stat {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .73rem;
+        color: rgba(32,24,8,.5);
+        font-weight: 400;
+    }
+    .cl-stat i {
+        color: var(--accent);
+        font-size: .68rem;
+        width: 12px;
+    }
+
+    /* Footer de la card */
+    .cl-card-footer {
+        padding: 12px 20px 16px;
+        border-top: 1px solid rgba(216,200,152,.3);
+        display: flex;
+        gap: 8px;
+    }
+    .cl-btn-outline {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 0;
+        border-radius: 8px;
+        font-size: .76rem;
+        font-weight: 400;
+        text-decoration: none;
+        transition: background .16s, color .16s, border-color .16s;
+        border: 1px solid;
+    }
+    .cl-btn-outline.edit {
+        color: var(--primary);
+        border-color: rgba(160,136,72,.35);
+        background: transparent;
+    }
+    .cl-btn-outline.edit:hover {
+        background: rgba(160,136,72,.08);
+        border-color: var(--primary);
+        color: var(--dark);
+    }
+    .cl-btn-outline.lecciones {
+        color: var(--accent);
+        border-color: rgba(112,152,136,.3);
+        background: transparent;
+    }
+    .cl-btn-outline.lecciones:hover {
+        background: rgba(112,152,136,.08);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+    .cl-btn-outline.delete {
+        color: #b05050;
+        border-color: rgba(176,80,80,.25);
+        background: transparent;
+        flex: 0 0 38px;
+    }
+    .cl-btn-outline.delete:hover {
+        background: rgba(176,80,80,.07);
+        border-color: #b05050;
+    }
+
+    /* ── Estado vacío ── */
+    .cl-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 64px 24px;
+        background: var(--white);
+        border: 1px dashed var(--sand);
+        border-radius: var(--radius);
+        color: rgba(32,24,8,.4);
+    }
+    .cl-empty i {
+        font-size: 2.4rem;
+        color: var(--sand);
+        margin-bottom: 16px;
+        display: block;
+    }
+    .cl-empty p {
+        font-size: .88rem;
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    /* Línea decorativa dorada */
+    .cl-divider {
+        width: 40px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        border-radius: 99px;
+        margin: 4px 0 2px;
+    }
+
+    @media (max-width: 640px) {
+        .cl-header { flex-direction: column; align-items: flex-start; }
+        .cl-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="cl-header">
+    <div class="cl-header-text">
+        <h2>Todos los <em>cursos</em></h2>
+        <div class="cl-divider"></div>
+        <p>Gestiona el catálogo de cursos de la plataforma</p>
+    </div>
+    
+    {% if es_admin %}
+    <a href="{% url 'panel:curso_create' %}" class="cl-btn-primary">
+        <i class="fas fa-plus"></i> Nuevo curso
+    </a>
+    {% endif %}
+</div>
+
+<!-- Grid -->
+<div class="cl-grid">
+    {% for curso in cursos %}
+    <article class="cl-card">
+
+        <!-- Thumbnail -->
+        <div class="cl-card-thumb">
+            {% if curso.imagen %}
+                <img src="{{ curso.imagen.url }}" alt="{{ curso.titulo }}">
+            {% else %}
+                <div class="cl-card-thumb-placeholder">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            {% endif %}
+
+            <span class="cl-status-badge {% if curso.publicado %}publicado{% else %}borrador{% endif %}">
+                {% if curso.publicado %}Publicado{% else %}Borrador{% endif %}
+            </span>
+        </div>
+
+        <!-- Cuerpo -->
+        <div class="cl-card-body">
+            <h3 class="cl-card-title">{{ curso.titulo }}</h3>
+
+            <div class="cl-card-meta">
+                <i class="fas fa-user-tie"></i>
+                {{ curso.instructor.username|default:"Sin asignar" }}
+            </div>
+
+            <div class="cl-card-stats">
+                <span class="cl-stat">
+                    <i class="fas fa-book-open"></i>
+                    {{ curso.lecciones.count }} lección{{ curso.lecciones.count|pluralize:"es" }}
+                </span>
+                <span class="cl-stat">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ curso.creado_en|date:"d/m/Y" }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="cl-card-footer">
+            {% if es_admin %}
+            <a href="{% url 'panel:curso_update' curso.pk %}" class="cl-btn-outline edit">
+                <i class="fas fa-pen"></i> Editar
+            </a>
+            {% endif %}
+            
+            <a href="{% url 'panel:leccion_list' curso.pk %}" class="cl-btn-outline lecciones" title="Ver lecciones">
+                <i class="fas fa-book-open"></i> Lecciones
+            </a>
+            
+            {% if es_admin %}
+            <a href="{% url 'panel:curso_delete' curso.pk %}" class="cl-btn-outline delete" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+            {% endif %}
+        </div>
+
+    </article>
+    {% empty %}
+    <div class="cl-empty">
+        <i class="fas fa-graduation-cap"></i>
+        <p>Aún no hay cursos registrados en la plataforma.</p>
+        
+        {% if es_admin %}
+        <a href="{% url 'panel:curso_create' %}" class="cl-btn-primary" style="margin: 0 auto; width: fit-content;">
+            <i class="fas fa-plus"></i> Crear el primero
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

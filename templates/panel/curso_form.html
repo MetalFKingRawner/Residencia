@@ -1,0 +1,888 @@
+<!-- templates/panel/curso_form.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}{{ object|yesno:"Editar,Nuevo" }} curso{% endblock %}
+{% block titulo_pagina %}
+    {% if object %}<span>Editar</span> curso{% else %}<span>Nuevo</span> curso{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}  {# Necesario para CKEditor #}
+<style>
+    /* ══════════════════════════════
+       LAYOUT PRINCIPAL
+    ══════════════════════════════ */
+    .cf-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 20px;
+        align-items: start;
+    }
+    .cf-col-main { min-width: 0; }
+    .cf-col-side { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ══════════════════════════════
+       CARD BASE
+    ══════════════════════════════ */
+    .cf-card {
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .cf-card:last-child { margin-bottom: 0; }
+
+    .cf-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 22px;
+        border-bottom: 1px solid rgba(216,200,152,.3);
+        background: rgba(250,247,240,.6);
+    }
+    .cf-card-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .cf-card-header-icon {
+        width: 30px; height: 30px;
+        border-radius: 7px;
+        background: rgba(160,136,72,.1);
+        border: 1px solid rgba(160,136,72,.2);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .cf-card-header-icon i {
+        font-size: .75rem;
+        color: var(--primary);
+    }
+    .cf-card-title {
+        font-family: var(--ff-display);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+    .cf-card-body {
+        padding: 22px;
+    }
+
+    /* ══════════════════════════════
+       CAMPOS DEL FORMULARIO
+    ══════════════════════════════ */
+    .cf-field {
+        margin-bottom: 20px;
+    }
+    .cf-field:last-child { margin-bottom: 0; }
+
+    .cf-label {
+        display: block;
+        font-size: .75rem;
+        font-weight: 500;
+        color: var(--dark);
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        margin-bottom: 7px;
+    }
+    .cf-label .cf-required {
+        color: #b05050;
+        margin-left: 2px;
+    }
+
+    /* Inputs y selects nativos */
+    .cf-field input[type="text"],
+    .cf-field input[type="number"],
+    .cf-field input[type="email"],
+    .cf-field input[type="url"],
+    .cf-field select,
+    .cf-field textarea {
+        width: 100%;
+        padding: 9px 13px;
+        border: 1px solid rgba(216,200,152,.6);
+        border-radius: 8px;
+        background: var(--cream);
+        color: var(--ink);
+        font-family: var(--ff-body);
+        font-size: .85rem;
+        font-weight: 300;
+        transition: border-color .18s, box-shadow .18s;
+        outline: none;
+    }
+    .cf-field input[type="text"]:focus,
+    .cf-field input[type="number"]:focus,
+    .cf-field select:focus,
+    .cf-field textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(160,136,72,.12);
+        background: var(--white);
+    }
+    .cf-field select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a08848' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 13px center;
+        padding-right: 36px;
+    }
+    .cf-field textarea { resize: vertical; min-height: 90px; }
+
+    /* CKEditor: necesita que el wrapper herede el estilo */
+    .cf-field .django-ckeditor-widget,
+    .cf-field .cke_chrome {
+        width: 100% !important;
+        border: 1px solid rgba(216,200,152,.6) !important;
+        border-radius: 8px !important;
+        overflow: hidden;
+    }
+    .cf-field .cke_top {
+        background: var(--warm) !important;
+        border-bottom: 1px solid rgba(216,200,152,.5) !important;
+    }
+
+    /* Input file (imagen) */
+    .cf-file-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .cf-file-preview {
+        width: 100%;
+        aspect-ratio: 16/9;
+        border-radius: 8px;
+        border: 1px dashed var(--sand);
+        background: var(--warm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .cf-file-preview img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .cf-file-preview-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        color: var(--sand);
+        text-align: center;
+        padding: 12px;
+    }
+    .cf-file-preview-placeholder i { font-size: 1.6rem; }
+    .cf-file-preview-placeholder span { font-size: .72rem; font-weight: 300; }
+
+    .cf-file-input-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 16px;
+        border-radius: 99px;
+        border: 1px solid var(--sand);
+        background: transparent;
+        color: var(--dark);
+        font-size: .78rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: background .18s, border-color .18s;
+        width: fit-content;
+    }
+    .cf-file-input-label:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .cf-file-input-label i { font-size: .75rem; }
+    #id_imagen { display: none; } /* ocultamos el input nativo */
+
+    /* Toggle publicado */
+    .cf-toggle-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: var(--cream);
+        border: 1px solid rgba(216,200,152,.5);
+        gap: 12px;
+    }
+    .cf-toggle-info { flex: 1; }
+    .cf-toggle-info strong {
+        display: block;
+        font-size: .82rem;
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 2px;
+    }
+    .cf-toggle-info span {
+        font-size: .72rem;
+        font-weight: 300;
+        color: rgba(32,24,8,.45);
+    }
+    /* Toggle switch */
+    .cf-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .cf-switch input { opacity: 0; width: 0; height: 0; }
+    .cf-switch-slider {
+        position: absolute; inset: 0;
+        background: rgba(32,24,8,.12);
+        border-radius: 99px;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    .cf-switch-slider::before {
+        content: '';
+        position: absolute;
+        width: 16px; height: 16px;
+        left: 3px; top: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform .2s;
+        box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    }
+    .cf-switch input:checked + .cf-switch-slider {
+        background: var(--accent);
+    }
+    .cf-switch input:checked + .cf-switch-slider::before {
+        transform: translateX(18px);
+    }
+
+    /* Errores */
+    .cf-field-errors {
+        margin-top: 5px;
+        font-size: .73rem;
+        color: #b05050;
+        display: flex;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .cf-field-errors i { margin-top: 2px; flex-shrink: 0; }
+
+    /* ══════════════════════════════
+       FORMSET DE LECCIONES
+    ══════════════════════════════ */
+    .cf-formset-empty {
+        text-align: center;
+        padding: 32px 16px;
+        color: rgba(32,24,8,.35);
+        font-size: .82rem;
+        font-weight: 300;
+    }
+    .cf-formset-empty i {
+        display: block;
+        font-size: 1.6rem;
+        color: var(--sand);
+        margin-bottom: 8px;
+    }
+
+    .cf-leccion-row {
+        display: grid;
+        grid-template-columns: 48px 1fr auto auto;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: var(--cream);
+        border: 1px solid rgba(216,200,152,.35);
+        margin-bottom: 8px;
+        transition: border-color .18s, background .18s;
+    }
+    .cf-leccion-row:last-child { margin-bottom: 0; }
+    .cf-leccion-row:hover {
+        border-color: rgba(160,136,72,.4);
+        background: rgba(250,247,240,.8);
+    }
+    .cf-leccion-row.is-deleted {
+        opacity: .4;
+        pointer-events: none;
+        background: rgba(176,80,80,.04);
+        border-color: rgba(176,80,80,.2);
+    }
+
+    /* Número de orden */
+    .cf-leccion-orden {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px; height: 36px;
+        border: 1px solid rgba(216,200,152,.6);
+        border-radius: 7px;
+        background: var(--white);
+        color: var(--primary);
+        font-family: var(--ff-display);
+        font-size: 1rem;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+    /* El input de orden va oculto, el número visual lo muestra el badge */
+    .cf-leccion-row input[id$="-orden"] { display: none; }
+
+    /* Título de la lección */
+    .cf-leccion-titulo {
+        width: 100%;
+        padding: 8px 11px;
+        border: 1px solid rgba(216,200,152,.5);
+        border-radius: 7px;
+        background: var(--white);
+        color: var(--ink);
+        font-family: var(--ff-body);
+        font-size: .84rem;
+        font-weight: 300;
+        outline: none;
+        transition: border-color .18s, box-shadow .18s;
+    }
+    .cf-leccion-titulo:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(160,136,72,.1);
+    }
+    .cf-leccion-titulo::placeholder { color: rgba(32,24,8,.3); }
+
+    /* Toggle de vista previa */
+    .cf-preview-toggle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        cursor: pointer;
+    }
+    .cf-preview-toggle span {
+        font-size: .58rem;
+        font-weight: 500;
+        color: rgba(32,24,8,.4);
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    /* Botón eliminar fila */
+    .cf-leccion-del {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgba(176,80,80,.5);
+        font-size: .85rem;
+        padding: 6px;
+        border-radius: 6px;
+        transition: color .18s, background .18s;
+        flex-shrink: 0;
+    }
+    .cf-leccion-del:hover {
+        color: #b05050;
+        background: rgba(176,80,80,.08);
+    }
+
+    /* Ocultar todos los campos Django del formset que no son el título */
+    #leccion-forms p { display: none !important; }
+    #leccion-forms .cf-leccion-row p { display: none !important; }
+
+    /* ══════════════════════════════
+       BTN AÑADIR LECCIÓN
+    ══════════════════════════════ */
+    .cf-btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 16px;
+        border-radius: 99px;
+        border: 1px dashed rgba(112,152,136,.5);
+        background: transparent;
+        color: var(--accent);
+        font-size: .78rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: background .18s, border-color .18s;
+    }
+    .cf-btn-add:hover {
+        background: rgba(112,152,136,.07);
+        border-color: var(--accent);
+    }
+    .cf-btn-add i { font-size: .72rem; }
+
+    /* ══════════════════════════════
+       BARRA DE ACCIONES FINAL
+    ══════════════════════════════ */
+    .cf-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 22px;
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        margin-top: 4px;
+        flex-wrap: wrap;
+    }
+    .cf-actions-hint {
+        font-size: .75rem;
+        font-weight: 300;
+        color: rgba(32,24,8,.4);
+    }
+    .cf-actions-hint i { margin-right: 4px; color: var(--accent); }
+    .cf-actions-right { display: flex; gap: 10px; }
+
+    .cf-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 22px;
+        border-radius: 99px;
+        font-size: .82rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: 1px solid;
+        cursor: pointer;
+        transition: background .18s, box-shadow .18s, color .18s, border-color .18s;
+        white-space: nowrap;
+        font-family: var(--ff-body);
+    }
+    .cf-btn i { font-size: .78rem; }
+    .cf-btn-cancel {
+        background: transparent;
+        color: var(--dark);
+        border-color: var(--sand);
+    }
+    .cf-btn-cancel:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .cf-btn-save {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+    .cf-btn-save:hover {
+        background: var(--dark);
+        border-color: var(--dark);
+        box-shadow: 0 4px 14px rgba(160,136,72,.35);
+    }
+
+    /* Campos ocultos del formset que Django necesita */
+    .cf-hidden-management { display: none; }
+
+    @media (max-width: 860px) {
+        .cf-layout {
+            grid-template-columns: 1fr;
+        }
+        .cf-col-side {
+            display: contents; /* Los hijos fluyen dentro del main-col */
+        }
+    }
+    @media (max-width: 520px) {
+        .cf-leccion-row {
+            grid-template-columns: 36px 1fr;
+            grid-template-rows: auto auto;
+        }
+        .cf-preview-toggle,
+        .cf-leccion-del { grid-row: 2; }
+        .cf-leccion-del { justify-self: end; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" id="curso-form" novalidate>
+    {% csrf_token %}
+
+    <div class="cf-layout">
+
+        <!-- ══ COLUMNA PRINCIPAL ══ -->
+        <div class="cf-col-main">
+
+            <!-- Card: Datos generales -->
+            <div class="cf-card">
+                <div class="cf-card-header">
+                    <div class="cf-card-header-left">
+                        <div class="cf-card-header-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <span class="cf-card-title">Datos generales</span>
+                    </div>
+                </div>
+                <div class="cf-card-body">
+
+                    <!-- Título -->
+                    <div class="cf-field">
+                        <label class="cf-label" for="{{ form.titulo.id_for_label }}">
+                            Título <span class="cf-required">*</span>
+                        </label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}
+                        <div class="cf-field-errors">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.titulo.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Instructor -->
+                    <div class="cf-field">
+                        <label class="cf-label" for="{{ form.instructor.id_for_label }}">
+                            Instructor <span class="cf-required">*</span>
+                        </label>
+                        {{ form.instructor }}
+                        {% if form.instructor.errors %}
+                        <div class="cf-field-errors">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.instructor.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Descripción (CKEditor) -->
+                    <div class="cf-field">
+                        <label class="cf-label" for="{{ form.descripcion.id_for_label }}">
+                            Descripción
+                        </label>
+                        {{ form.descripcion }}
+                        {% if form.descripcion.errors %}
+                        <div class="cf-field-errors">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.descripcion.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Card: Lecciones (formset) -->
+            <div class="cf-card">
+                <div class="cf-card-header">
+                    <div class="cf-card-header-left">
+                        <div class="cf-card-header-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <span class="cf-card-title">Lecciones del curso</span>
+                    </div>
+                    <button type="button" class="cf-btn-add" id="add-leccion">
+                        <i class="fas fa-plus"></i> Añadir lección
+                    </button>
+                </div>
+                <div class="cf-card-body">
+
+                    <!-- Management form oculto (obligatorio para Django formsets) -->
+                    <div class="cf-hidden-management">
+                        {{ formset.management_form }}
+                    </div>
+
+                    <!-- Filas de lecciones -->
+                    <div id="leccion-forms">
+                        {% for leccion_form in formset %}
+                        <div class="cf-leccion-row" id="leccion-{{ forloop.counter0 }}">
+
+                            {# Campos ocultos del formset que Django necesita #}
+                            {{ leccion_form.id }}
+                            {% if leccion_form.DELETE %}
+                            <div style="display:none">{{ leccion_form.DELETE }}</div>
+                            {% endif %}
+                            {# Orden oculto — lo sincronizamos por JS #}
+                            <div style="display:none">{{ leccion_form.orden }}</div>
+
+                            <!-- Badge visual de orden -->
+                            <div class="cf-leccion-orden cf-orden-badge">{{ forloop.counter }}</div>
+
+                            <!-- Título -->
+                            <input
+                                type="text"
+                                class="cf-leccion-titulo"
+                                name="{{ leccion_form.titulo.html_name }}"
+                                id="{{ leccion_form.titulo.auto_id }}"
+                                value="{{ leccion_form.titulo.value|default:'' }}"
+                                placeholder="Nombre de la lección…"
+                            >
+
+                            <!-- Toggle vista previa -->
+                            <label class="cf-preview-toggle" title="Vista previa gratuita">
+                                <div class="cf-switch" style="width:36px;height:20px">
+                                    <input
+                                        type="checkbox"
+                                        name="{{ leccion_form.vista_previa_gratis.html_name }}"
+                                        id="{{ leccion_form.vista_previa_gratis.auto_id }}"
+                                        {% if leccion_form.vista_previa_gratis.value %}checked{% endif %}
+                                    >
+                                    <span class="cf-switch-slider"></span>
+                                </div>
+                                <span>Gratis</span>
+                            </label>
+
+                            <!-- Eliminar fila -->
+                            <button type="button" class="cf-leccion-del" title="Eliminar lección">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                        </div>
+                        {% empty %}
+                        <div class="cf-formset-empty" id="leccion-empty">
+                            <i class="fas fa-book-open"></i>
+                            Todavía no hay lecciones. Añade la primera arriba.
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /cf-col-main -->
+
+        <!-- ══ COLUMNA LATERAL ══ -->
+        <div class="cf-col-side">
+
+            <!-- Card: Imagen de portada -->
+            <div class="cf-card">
+                <div class="cf-card-header">
+                    <div class="cf-card-header-left">
+                        <div class="cf-card-header-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <span class="cf-card-title">Portada</span>
+                    </div>
+                </div>
+                <div class="cf-card-body">
+                    <div class="cf-file-wrap">
+                        <div class="cf-file-preview" id="img-preview">
+                            {% if object.imagen %}
+                                <img src="{{ object.imagen.url }}" alt="Portada actual" id="img-preview-el">
+                            {% else %}
+                                <div class="cf-file-preview-placeholder" id="img-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <span>Sin imagen aún</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {# Input nativo oculto — el label de abajo lo activa #}
+                        <input type="file" name="imagen" id="id_imagen"
+                               accept="image/*" style="display:none">
+
+                        <label class="cf-file-input-label" for="id_imagen">
+                            <i class="fas fa-upload"></i>
+                            {% if object.imagen %}Cambiar imagen{% else %}Subir imagen{% endif %}
+                        </label>
+
+                        {% if form.imagen.errors %}
+                        <div class="cf-field-errors">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ form.imagen.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Estado de publicación -->
+            <div class="cf-card">
+                <div class="cf-card-header">
+                    <div class="cf-card-header-left">
+                        <div class="cf-card-header-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <span class="cf-card-title">Publicación</span>
+                    </div>
+                </div>
+                <div class="cf-card-body">
+                    <div class="cf-toggle-wrap">
+                        <div class="cf-toggle-info">
+                            <strong>Publicar curso</strong>
+                            <span>Visible para los estudiantes</span>
+                        </div>
+                        <label class="cf-switch">
+                            {{ form.publicado }}
+                            <span class="cf-switch-slider"></span>
+                        </label>
+                    </div>
+                    {% if form.publicado.errors %}
+                    <div class="cf-field-errors" style="margin-top:8px">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.publicado.errors.as_text }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div><!-- /cf-col-side -->
+
+    </div><!-- /cf-layout -->
+
+    <!-- ══ BARRA DE ACCIONES ══ -->
+    <div class="cf-actions-bar">
+        <p class="cf-actions-hint">
+            <i class="fas fa-info-circle"></i>
+            Los campos marcados con <strong style="color:#b05050">*</strong> son obligatorios.
+        </p>
+        <div class="cf-actions-right">
+            <a href="{% url 'panel:curso_list' %}" class="cf-btn cf-btn-cancel">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="cf-btn cf-btn-save">
+                <i class="fas fa-save"></i>
+                {% if object %}Guardar cambios{% else %}Crear curso{% endif %}
+            </button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
+
+{% block extra_js %}
+
+{# Constrain images in ALL CKEditor instances (existing + new) #}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof CKEDITOR === 'undefined') return;
+    CKEDITOR.on('instanceReady', function (evt) {
+        var head = evt.editor.document.getHead();
+        var style = new CKEDITOR.dom.element('style');
+        style.setText(
+            'img { max-width: 100% !important; height: auto !important; display: block; }' +
+            'body { overflow-x: hidden; }'   /* ← evita el scroll horizontal en responsive */
+        );
+        head.append(style);
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ─────────────────────────────────────
+       PREVIEW DE IMAGEN
+    ───────────────────────────────────── */
+    const imgInput = document.getElementById('id_imagen');
+    const imgPreview = document.getElementById('img-preview');
+
+    if (imgInput) {
+        imgInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imgPreview.innerHTML = `<img src="${e.target.result}" alt="Vista previa" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /* ─────────────────────────────────────
+       FORMSET DE LECCIONES
+    ───────────────────────────────────── */
+    const formsetContainer = document.getElementById('leccion-forms');
+    const addButton        = document.getElementById('add-leccion');
+    const totalForms       = document.getElementById('id_lecciones-TOTAL_FORMS');
+    const emptyState       = document.getElementById('leccion-empty');
+
+    /** Actualiza los badges de número de orden visibles */
+    function refreshOrderBadges() {
+        const visibleRows = formsetContainer.querySelectorAll('.cf-leccion-row:not(.is-deleted)');
+        visibleRows.forEach(function (row, idx) {
+            const badge = row.querySelector('.cf-orden-badge');
+            if (badge) badge.textContent = idx + 1;
+
+            // Sincronizar el valor del input oculto "orden" con Django
+            const ordenInput = row.querySelector('input[id$="-orden"]');
+            if (ordenInput) ordenInput.value = idx + 1;
+        });
+    }
+
+    /** Muestra u oculta el estado vacío */
+    function toggleEmpty() {
+        const visibleRows = formsetContainer.querySelectorAll('.cf-leccion-row:not(.is-deleted)');
+        if (emptyState) {
+            emptyState.style.display = visibleRows.length === 0 ? 'block' : 'none';
+        }
+    }
+
+    /** Añadir nueva fila de lección */
+    function addLeccionRow() {
+        const currentCount = parseInt(totalForms.value);
+        const prefix       = 'lecciones'; // debe coincidir con el prefix del formset en la vista
+
+        // Construimos la fila manualmente (sin clonar para no arrastrar valores)
+        const row = document.createElement('div');
+        row.className = 'cf-leccion-row';
+        row.id = `leccion-${currentCount}`;
+        row.innerHTML = `
+            <input type="hidden" name="${prefix}-${currentCount}-id" id="id_${prefix}-${currentCount}-id">
+            <div style="display:none">
+                <input type="checkbox" name="${prefix}-${currentCount}-DELETE"
+                       id="id_${prefix}-${currentCount}-DELETE">
+            </div>
+            <div style="display:none">
+                <input type="number" name="${prefix}-${currentCount}-orden"
+                       id="id_${prefix}-${currentCount}-orden" value="${currentCount + 1}">
+            </div>
+            <div class="cf-leccion-orden cf-orden-badge">${currentCount + 1}</div>
+            <input
+                type="text"
+                class="cf-leccion-titulo"
+                name="${prefix}-${currentCount}-titulo"
+                id="id_${prefix}-${currentCount}-titulo"
+                placeholder="Nombre de la lección…"
+                autocomplete="off"
+            >
+            <label class="cf-preview-toggle" title="Vista previa gratuita">
+                <div class="cf-switch" style="width:36px;height:20px">
+                    <input type="checkbox"
+                           name="${prefix}-${currentCount}-vista_previa_gratis"
+                           id="id_${prefix}-${currentCount}-vista_previa_gratis">
+                    <span class="cf-switch-slider"></span>
+                </div>
+                <span>Gratis</span>
+            </label>
+            <button type="button" class="cf-leccion-del" title="Eliminar lección">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        // Ocultar el estado vacío si existía
+        if (emptyState) emptyState.style.display = 'none';
+
+        formsetContainer.appendChild(row);
+        totalForms.value = currentCount + 1;
+
+        // Enfocar el input de título de la nueva fila
+        row.querySelector('.cf-leccion-titulo').focus();
+        refreshOrderBadges();
+    }
+
+    /** Eliminar / marcar para borrar una fila */
+    function deleteLeccionRow(row) {
+        const deleteInput = row.querySelector('input[id$="-DELETE"]');
+        if (deleteInput) {
+            // Lección existente: marcar para DELETE y desvanecer
+            deleteInput.checked = true;
+            row.classList.add('is-deleted');
+        } else {
+            // Lección nueva: remover del DOM y decrementar
+            row.remove();
+            totalForms.value = parseInt(totalForms.value) - 1;
+        }
+        refreshOrderBadges();
+        toggleEmpty();
+    }
+
+    /* Eventos */
+    if (addButton) {
+        addButton.addEventListener('click', addLeccionRow);
+    }
+
+    formsetContainer.addEventListener('click', function (e) {
+        const delBtn = e.target.closest('.cf-leccion-del');
+        if (delBtn) {
+            deleteLeccionRow(delBtn.closest('.cf-leccion-row'));
+        }
+    });
+
+    /* Init */
+    refreshOrderBadges();
+    toggleEmpty();
+
+});
+</script>
+{% endblock %}

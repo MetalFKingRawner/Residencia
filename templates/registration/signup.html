@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends base_template|default:"base.html" %}
 {% load static %}
 
 {% block title %}Registro - PsyMetrics{% endblock %}
@@ -7,130 +7,171 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <form class="auth-form" method="POST">
-                {% csrf_token %}
-                
-                <p class="auth-heading">Crear Nueva Cuenta</p>
+            
+            {% if base_template == 'base.html' and not CONFIG.pruebas_activas %}
+                <div class="auth-form text-center py-5">
+                    <i class="fas fa-lock fa-4x text-danger mb-3"></i>
+                    <h3 class="text-white">Plataforma en Mantenimiento</h3>
+                    <p class="text-muted mt-3">El registro público de evaluaciones métricas no está disponible en este momento.</p>
+                    <a href="{% url 'home' %}" class="btn-auth-primary mt-4">Volver al Inicio</a>
+                </div>
+            {% elif base_template == 'base_cursos.html' and not CONFIG.registro_abierto %}
+                <div class="auth-form text-center py-5">
+                    <i class="fas fa-user-shield fa-4x text-warning mb-3"></i>
+                    <h3 class="text-white">Inscripciones Cerradas</h3>
+                    <p class="text-muted mt-3">El registro autónomo para la plataforma de cursos está deshabilitado. Las cuentas son gestionadas de forma interna tras validar tu inscripción.</p>
+                    <a href="{% url 'core_login' %}?next={% url 'courses_list' %}" class="btn-auth-primary mt-4">Ir al Login de Alumnos</a>
+                </div>
+            {% else %}
+                <form class="auth-form" method="POST">
+                    {% csrf_token %}
+                    
+                    <p class="auth-heading">Crear Nueva Cuenta</p>
 
-                <!-- Mostrar Errores Generales -->
-                {% if form.errors %}
-                <div class="alert alert-danger">
-                    {% for field, errors in form.errors.items %}
-                        {% for error in errors %}
-                            <p class="mb-1">{{ error }}</p>
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <p class="mb-1"><strong>{{ field|capfirst }}:</strong> {{ error }}</p>
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                </div>
-                {% endif %}
+                    </div>
+                    {% endif %}
 
-                <!-- Username -->
-                <div class="auth-field">
-                    <i class="fas fa-user input-icon"></i>
-                    <input type="text" name="username" 
-                           class="auth-input {% if form.username.errors %}is-invalid{% endif %}"
-                           placeholder="Nombre de usuario"
-                           value="{{ form.username.value|default:'' }}"
-                           required>
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" name="username" 
+                               class="auth-input {% if form.username.errors %}is-invalid{% endif %}"
+                               placeholder="Nombre de usuario"
+                               value="{{ form.username.value|default:'' }}"
+                               required>
+                    </div>
 
-                <!-- Email -->
-                <div class="auth-field">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" name="email" 
-                           class="auth-input {% if form.email.errors %}is-invalid{% endif %}"
-                           placeholder="Correo electrónico"
-                           value="{{ form.email.value|default:'' }}"
-                           required>
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" 
+                               class="auth-input {% if form.email.errors %}is-invalid{% endif %}"
+                               placeholder="Correo electrónico"
+                               value="{{ form.email.value|default:'' }}"
+                               required>
+                    </div>
 
-                <!-- Nombre Completo -->
-                <div class="auth-field">
-                    <i class="fas fa-id-card input-icon"></i>
-                    <input type="text" name="full_name" 
-                           class="auth-input {% if form.full_name.errors %}is-invalid{% endif %}"
-                           placeholder="Nombre completo"
-                           value="{{ form.full_name.value|default:'' }}"
-                           required>
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password1" 
+                               class="auth-input {% if form.password1.errors %}is-invalid{% endif %}"
+                               placeholder="Contraseña"
+                               autocomplete="new-password"
+                               required>
+                    </div>
 
-                <!-- Contraseña 1 -->
-                <div class="auth-field">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" name="password1" 
-                           class="auth-input {% if form.password1.errors %}is-invalid{% endif %}"
-                           placeholder="Contraseña"
-                           required>
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password2" 
+                               class="auth-input {% if form.password2.errors %}is-invalid{% endif %}"
+                               placeholder="Confirmar contraseña"
+                               autocomplete="new-password"
+                               required>
+                    </div>
 
-                <!-- Contraseña 2 -->
-                <div class="auth-field">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" name="password2" 
-                           class="auth-input {% if form.password2.errors %}is-invalid{% endif %}"
-                           placeholder="Confirmar contraseña"
-                           required>
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" name="full_name" 
+                               class="auth-input {% if form.full_name.errors %}is-invalid{% endif %}"
+                               placeholder="Nombre completo (Ej: Juan Pérez López)"
+                               value="{{ form.full_name.value|default:'' }}"
+                               required>
+                    </div>
 
-                <!-- Fecha de Nacimiento -->
-                <div class="auth-field">
-                    <i class="fas fa-calendar-alt input-icon"></i>
-                    <input type="date" name="date_of_birth" 
-                           class="auth-input {% if form.date_of_birth.errors %}is-invalid{% endif %}"
-                           value="{{ form.date_of_birth.value|default:'' }}">
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-calendar-alt input-icon"></i>
+                        <input type="date" name="date_of_birth" 
+                               class="auth-input {% if form.date_of_birth.errors %}is-invalid{% endif %}"
+                               value="{{ form.date_of_birth.value|default:'' }}">
+                    </div>
 
-                <!-- Género -->
-                <div class="auth-field">
-                    <i class="fas fa-venus-mars input-icon"></i>
-                    <select name="gender" 
-                            class="auth-input {% if form.gender.errors %}is-invalid{% endif %}"
-                            required
-                            aria-label="Selecciona tu género">
-                        <option value="" disabled selected>Selecciona tu género</option>
-                        <option value="N">Prefiero no decir</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                        <option value="O">Otro</option>
-                    </select>
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-venus-mars input-icon"></i>
+                        <select name="gender" class="auth-input {% if form.gender.errors %}is-invalid{% endif %}" style="background-color: transparent; border: none; color: inherit; width: 100%; outline: none;">
+                            <option value="" disabled selected style="color: black;">Selecciona tu género</option>
+                            <option value="M" {% if form.gender.value == 'M' %}selected{% endif %} style="color: black;">Masculino</option>
+                            <option value="F" {% if form.gender.value == 'F' %}selected{% endif %} style="color: black;">Femenino</option>
+                            <option value="O" {% if form.gender.value == 'O' %}selected{% endif %} style="color: black;">Otro</option>
+                            <option value="N" {% if form.gender.value == 'N' %}selected{% endif %} style="color: black;">Prefiero no decir</option>
+                        </select>
+                    </div>
 
-                <!-- Institución -->
-                <div class="auth-field">
-                    <i class="fas fa-university input-icon"></i>
-                    <input type="text" name="institution" 
-                           class="auth-input {% if form.institution.errors %}is-invalid{% endif %}"
-                           placeholder="Institución/Empresa"
-                           value="{{ form.institution.value|default:'' }}">
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-university input-icon"></i>
+                        <input type="text" name="institution" 
+                               class="auth-input {% if form.institution.errors %}is-invalid{% endif %}"
+                               placeholder="Institución o Empresa"
+                               value="{{ form.institution.value|default:'' }}">
+                    </div>
 
-                <!-- Nivel de Estudios -->
-                <div class="auth-field">
-                    <i class="fas fa-graduation-cap input-icon"></i>
-                    <input type="text" name="education_level" 
-                           class="auth-input {% if form.education_level.errors %}is-invalid{% endif %}"
-                           placeholder="Nivel de estudios"
-                           value="{{ form.education_level.value|default:'' }}">
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-graduation-cap input-icon"></i>
+                        <input type="text" name="education_level" 
+                               class="auth-input {% if form.education_level.errors %}is-invalid{% endif %}"
+                               placeholder="Nivel de estudios"
+                               value="{{ form.education_level.value|default:'' }}">
+                    </div>
 
-                <!-- Ocupación -->
-                <div class="auth-field">
-                    <i class="fas fa-briefcase input-icon"></i>
-                    <input type="text" name="occupation" 
-                           class="auth-input {% if form.occupation.errors %}is-invalid{% endif %}"
-                           placeholder="Ocupación"
-                           value="{{ form.occupation.value|default:'' }}">
-                </div>
+                    <div class="auth-field">
+                        <i class="fas fa-briefcase input-icon"></i>
+                        <input type="text" name="occupation" 
+                               class="auth-input {% if form.occupation.errors %}is-invalid{% endif %}"
+                               placeholder="Ocupación"
+                               value="{{ form.occupation.value|default:'' }}">
+                    </div>
 
-                <div class="auth-buttons mt-4">
-                    <button type="submit" class="btn-auth-primary">
-                        <i class="fas fa-user-plus me-2"></i>Registrarse
-                    </button>
-                    <a href="{% url 'core_login' %}" class="btn-auth-secondary">
-                        <i class="fas fa-sign-in-alt me-2"></i>¿Ya tienes cuenta?
-                    </a>
-                </div>
-            </form>
+                    <div class="auth-buttons mt-4">
+                        <button type="submit" class="btn-auth-primary">
+                            <i class="fas fa-user-plus me-2"></i>Registrarse
+                        </button>
+                        <a href="{% url 'core_login' %}?next={% if base_template == 'base_cursos.html' %}{% url 'courses_list' %}{% else %}{% url 'home' %}{% endif %}" class="btn-auth-secondary">
+                            <i class="fas fa-sign-in-alt me-2"></i>¿Ya tienes cuenta?
+                        </a>
+                    </div>
+                </form>
+            {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector('.auth-form');
+    if (!form) return;
+
+    // Nombre de la "caja" donde guardaremos los datos en el navegador
+    const storageKey = 'psymetrics_signup_form';
+
+    // 1. Recuperar datos guardados
+    const savedData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    
+    // Seleccionamos todos los campos EXCEPTO las contraseñas y el token de seguridad
+    const inputs = form.querySelectorAll('input:not([type="password"]):not([name="csrfmiddlewaretoken"]), select');
+    
+    inputs.forEach(input => {
+        // Si el campo está vacío y tenemos algo guardado, lo rellenamos
+        if (!input.value && savedData[input.name]) {
+            input.value = savedData[input.name];
+        }
+
+        // 2. Guardar datos cada vez que el usuario escribe o cambia una opción
+        input.addEventListener('input', function() {
+            const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            currentData[this.name] = this.value;
+            localStorage.setItem(storageKey, JSON.stringify(currentData));
+        });
+    });
+
+    // 3. Limpiar los datos si el formulario se envía correctamente
+    form.addEventListener('submit', function() {
+        localStorage.removeItem(storageKey);
+    });
+});
+</script>
+
 {% endblock %}

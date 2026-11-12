@@ -1,0 +1,2179 @@
+<!-- templates/panel/inscripcion_list.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Inscripciones{% endblock %}
+{% block titulo_pagina %}<span>Inscripciones</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ── Page header ── */
+    .il-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+    .il-header-text h2 {
+        font-family: var(--ff-display);
+        font-size: 1.7rem;
+        font-weight: 400;
+        color: var(--dark);
+        line-height: 1.15;
+    }
+    .il-header-text h2 em {
+        font-style: italic;
+        color: var(--primary);
+    }
+    .il-header-text p {
+        margin-top: 4px;
+        font-size: .8rem;
+        color: rgba(32,24,8,.45);
+        font-weight: 300;
+    }
+    .il-divider {
+        width: 40px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        border-radius: 99px;
+        margin: 4px 0 2px;
+    }
+
+    /* ── Header right: botón + badge total ── */
+    .il-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+    .il-total-badge {
+        padding: 5px 14px;
+        border-radius: 99px;
+        background: rgba(112,152,136,.1);
+        border: 1px solid rgba(112,152,136,.3);
+        font-size: .75rem;
+        font-weight: 500;
+        color: var(--accent);
+        white-space: nowrap;
+    }
+    .il-total-badge strong {
+        font-weight: 600;
+    }
+
+    /* ── Botón primario (igual que curso_list) ── */
+    .il-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 20px;
+        border-radius: 99px;
+        background: var(--primary);
+        color: #fff;
+        font-size: .82rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background .18s, box-shadow .18s;
+        white-space: nowrap;
+    }
+    .il-btn-primary:hover {
+        background: var(--dark);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(160,136,72,.35);
+    }
+    .il-btn-primary i { font-size: .8rem; }
+
+    /* ── Filtros ── */
+    .il-filters {
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .il-filters-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 13px 20px;
+        border-bottom: 1px solid rgba(216,200,152,.3);
+        font-size: .78rem;
+        font-weight: 500;
+        color: rgba(32,24,8,.55);
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        cursor: pointer;
+        user-select: none;
+    }
+    .il-filters-head i.icon-filter { color: var(--primary); font-size: .8rem; }
+    .il-filters-head i.icon-toggle {
+        margin-left: auto;
+        font-size: .7rem;
+        color: rgba(32,24,8,.3);
+        transition: transform .2s;
+    }
+    .il-filters-head.collapsed i.icon-toggle { transform: rotate(-90deg); }
+
+    .il-filters-body {
+        padding: 18px 20px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr auto;
+        gap: 14px;
+        align-items: end;
+    }
+
+    .il-field label {
+        display: block;
+        font-size: .73rem;
+        font-weight: 500;
+        color: rgba(32,24,8,.5);
+        margin-bottom: 5px;
+        letter-spacing: .02em;
+    }
+    .il-field input,
+    .il-field select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid rgba(216,200,152,.55);
+        border-radius: 8px;
+        background: var(--cream);
+        font-family: var(--ff-body);
+        font-size: .82rem;
+        font-weight: 300;
+        color: var(--ink);
+        outline: none;
+        transition: border-color .18s, box-shadow .18s;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .il-field input:focus,
+    .il-field select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(160,136,72,.1);
+    }
+    .il-field input::placeholder { color: rgba(32,24,8,.3); }
+
+    /* select arrow custom */
+    .il-field-select-wrap { position: relative; }
+    .il-field-select-wrap::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: .6rem;
+        color: rgba(32,24,8,.35);
+        position: absolute;
+        right: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    .il-btn-filter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        background: var(--primary);
+        color: #fff;
+        font-size: .8rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: background .18s;
+        white-space: nowrap;
+        height: 38px;
+    }
+    .il-btn-filter:hover { background: var(--dark); }
+
+    /* ── Tabla ── */
+    .il-table-wrap {
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+    }
+
+    .il-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .82rem;
+    }
+    .il-table thead tr {
+        background: var(--warm);
+        border-bottom: 1px solid rgba(216,200,152,.6);
+    }
+    .il-table thead th {
+        padding: 12px 16px;
+        text-align: left;
+        font-family: var(--ff-body);
+        font-size: .68rem;
+        font-weight: 500;
+        color: rgba(32,24,8,.5);
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .il-table tbody tr {
+        border-bottom: 1px solid rgba(216,200,152,.22);
+        transition: background .15s;
+    }
+    .il-table tbody tr:last-child { border-bottom: none; }
+    .il-table tbody tr:hover { background: rgba(250,247,240,.7); }
+
+    .il-table td {
+        padding: 14px 16px;
+        vertical-align: middle;
+        color: var(--ink);
+        font-weight: 300;
+    }
+
+    /* Columna estudiante */
+    .il-student {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .il-student-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        display: grid;
+        place-items: center;
+        font-size: .78rem;
+        color: #fff;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+    .il-student-name {
+        font-weight: 500;
+        color: var(--ink);
+        font-size: .83rem;
+        line-height: 1.3;
+    }
+    .il-student-email {
+        font-size: .72rem;
+        color: rgba(32,24,8,.4);
+        font-weight: 300;
+    }
+
+    /* Columna curso */
+    .il-course-name {
+        font-weight: 400;
+        color: var(--ink);
+        max-width: 180px;
+        line-height: 1.35;
+    }
+
+    /* Barra de progreso */
+    .il-progress-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .il-progress-bar-track {
+        width: 90px;
+        height: 6px;
+        border-radius: 99px;
+        background: rgba(216,200,152,.4);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .il-progress-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        transition: width .4s ease;
+    }
+    .il-progress-bar-fill.complete {
+        background: var(--accent);
+    }
+    .il-progress-pct {
+        font-size: .73rem;
+        font-weight: 500;
+        color: rgba(32,24,8,.5);
+        white-space: nowrap;
+    }
+
+    /* Badges de estado */
+    .il-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-size: .68rem;
+        font-weight: 500;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    .il-badge-success {
+        background: rgba(112,152,136,.12);
+        color: var(--accent);
+        border: 1px solid rgba(112,152,136,.35);
+    }
+    .il-badge-warning {
+        background: rgba(160,136,72,.1);
+        color: var(--primary);
+        border: 1px solid rgba(160,136,72,.3);
+    }
+    .il-badge i { font-size: .6rem; }
+
+    /* Certificado */
+    .il-cert-yes {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .78rem;
+        color: var(--accent);
+        font-weight: 400;
+    }
+    .il-cert-no {
+        font-size: .78rem;
+        color: rgba(32,24,8,.3);
+        font-weight: 300;
+    }
+
+    /* Fecha */
+    .il-date {
+        font-size: .78rem;
+        color: rgba(32,24,8,.45);
+        font-weight: 300;
+        white-space: nowrap;
+    }
+
+    /* Acciones */
+    .il-actions {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .il-btn-action {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .75rem;
+        text-decoration: none;
+        border: 1px solid;
+        transition: background .16s, color .16s, border-color .16s;
+    }
+    .il-btn-action.view {
+        color: var(--accent);
+        border-color: rgba(112,152,136,.3);
+        background: transparent;
+    }
+    .il-btn-action.view:hover {
+        background: rgba(112,152,136,.1);
+        border-color: var(--accent);
+    }
+    .il-btn-action.edit {
+        color: var(--primary);
+        border-color: rgba(160,136,72,.3);
+        background: transparent;
+    }
+    .il-btn-action.edit:hover {
+        background: rgba(160,136,72,.08);
+        border-color: var(--primary);
+    }
+    .il-btn-action.delete {
+        color: #b05050;
+        border-color: rgba(176,80,80,.22);
+        background: transparent;
+    }
+    .il-btn-action.delete:hover {
+        background: rgba(176,80,80,.07);
+        border-color: #b05050;
+    }
+
+    /* ── Estado vacío ── */
+    .il-empty {
+        padding: 64px 24px;
+        text-align: center;
+        color: rgba(32,24,8,.4);
+    }
+    .il-empty i {
+        font-size: 2.4rem;
+        color: var(--sand);
+        margin-bottom: 16px;
+        display: block;
+    }
+    .il-empty p {
+        font-size: .88rem;
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    /* ── Paginación ── */
+    .il-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        padding: 16px 20px;
+        border-top: 1px solid rgba(216,200,152,.3);
+    }
+    .il-page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 7px;
+        font-size: .78rem;
+        font-weight: 400;
+        text-decoration: none;
+        color: rgba(32,24,8,.5);
+        border: 1px solid rgba(216,200,152,.4);
+        background: var(--white);
+        transition: all .16s;
+    }
+    .il-page-link:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(160,136,72,.05);
+    }
+    .il-page-link.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+        font-weight: 500;
+    }
+    .il-page-link.disabled {
+        opacity: .35;
+        pointer-events: none;
+    }
+
+    /* ── Modal de confirmación ── */
+    .il-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(26,18,8,.55);
+        backdrop-filter: blur(3px);
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .22s ease;
+    }
+    .il-modal-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+    .il-modal-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        border: 1px solid rgba(200,80,80,.18);
+        box-shadow: 0 20px 60px rgba(26,18,8,.22);
+        width: 100%;
+        max-width: 460px;
+        overflow: hidden;
+        transform: translateY(10px) scale(.98);
+        transition: transform .22s ease;
+    }
+    .il-modal-overlay.active .il-modal-card {
+        transform: translateY(0) scale(1);
+    }
+
+    .il-modal-danger-bar {
+        height: 4px;
+        background: linear-gradient(90deg, #c85050, #e07070);
+    }
+
+    .il-modal-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 30px 28px 20px;
+        border-bottom: 1px solid rgba(216,200,152,.25);
+    }
+    .il-modal-icon {
+        width: 54px; height: 54px;
+        border-radius: 50%;
+        background: rgba(200,80,80,.07);
+        border: 1px solid rgba(200,80,80,.18);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #c85050;
+        margin-bottom: 14px;
+    }
+    .il-modal-title {
+        font-family: var(--ff-display);
+        font-size: 1.4rem;
+        font-weight: 400;
+        color: var(--dark);
+        margin-bottom: 6px;
+    }
+    .il-modal-title em {
+        font-style: italic;
+        color: #c85050;
+    }
+    .il-modal-subtitle {
+        font-size: .78rem;
+        color: rgba(32,24,8,.45);
+        font-weight: 300;
+    }
+
+    .il-modal-target {
+        margin: 18px 28px 0;
+        padding: 14px 16px;
+        background: var(--cream);
+        border: 1px solid var(--sand);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .il-modal-target-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: .83rem;
+        color: var(--dark);
+        font-weight: 400;
+    }
+    .il-modal-target-row i {
+        color: var(--primary);
+        font-size: .8rem;
+        width: 14px;
+        flex-shrink: 0;
+    }
+
+    .il-modal-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin: 14px 28px 20px;
+        padding: 11px 14px;
+        background: rgba(200,80,80,.04);
+        border: 1px solid rgba(200,80,80,.14);
+        border-radius: 8px;
+        font-size: .75rem;
+        color: #8a3030;
+        line-height: 1.55;
+    }
+    .il-modal-warning i {
+        font-size: .78rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: #c85050;
+    }
+
+    .il-modal-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 16px 28px 22px;
+        border-top: 1px solid rgba(216,200,152,.25);
+        background: var(--cream);
+    }
+    .il-modal-actions form { margin: 0; }
+
+    .il-modal-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 20px;
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 500;
+        font-family: var(--ff-body);
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+        transition: background .18s, box-shadow .18s, transform .12s;
+    }
+    .il-modal-btn:hover { transform: translateY(-1px); }
+
+    .il-modal-btn-cancel {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        color: var(--dark);
+    }
+    .il-modal-btn-cancel:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .il-modal-btn-delete {
+        background: #c85050;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(200,80,80,.22);
+    }
+    .il-modal-btn-delete:hover {
+        background: #a03838;
+        box-shadow: 0 4px 16px rgba(200,80,80,.32);
+        color: #fff;
+    }
+
+    /* ── Modal de detalle ── */
+    .il-modal-info-bar {
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    .il-modal-info-card {
+        border-color: rgba(160,136,72,.18);
+    }
+    .il-modal-info-icon {
+        background: rgba(112,152,136,.08);
+        border-color: rgba(112,152,136,.22);
+        color: var(--accent);
+    }
+    .il-modal-info-title em {
+        color: var(--primary);
+    }
+
+    /* Grid de datos del detalle */
+    .il-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 18px 28px 0;
+    }
+    .il-detail-item {
+        background: var(--cream);
+        border: 1px solid var(--sand);
+        border-radius: 8px;
+        padding: 12px 14px;
+    }
+    .il-detail-item.full-width {
+        grid-column: 1 / -1;
+    }
+    .il-detail-label {
+        font-size: .67rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: rgba(32,24,8,.4);
+        margin-bottom: 5px;
+    }
+    .il-detail-value {
+        font-size: .83rem;
+        font-weight: 400;
+        color: var(--dark);
+        line-height: 1.35;
+    }
+    .il-detail-value .il-detail-sub {
+        font-size: .72rem;
+        color: rgba(32,24,8,.4);
+        font-weight: 300;
+        display: block;
+        margin-top: 1px;
+    }
+
+    /* Barra de progreso dentro del modal */
+    .il-detail-progress-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 99px;
+        background: rgba(216,200,152,.4);
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    .il-detail-progress-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        transition: width .4s ease;
+    }
+    .il-detail-progress-fill.complete {
+        background: var(--accent);
+    }
+
+    /* Botón primario del modal de detalle */
+    .il-modal-btn-primary {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(160,136,72,.22);
+        text-decoration: none;
+    }
+    .il-modal-btn-primary:hover {
+        background: var(--dark);
+        box-shadow: 0 4px 16px rgba(160,136,72,.32);
+        color: #fff;
+    }
+
+    /* ── Modal de formulario (crear / editar) ── */
+    .il-modal-form-card {
+        max-width: 540px;
+        border-color: rgba(160,136,72,.18);
+    }
+    .il-modal-form-bar {
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    .il-modal-form-icon {
+        background: rgba(160,136,72,.08);
+        border-color: rgba(160,136,72,.22);
+        color: var(--primary);
+    }
+    .il-modal-form-title em { color: var(--primary); }
+
+    /* Cuerpo del form dentro del modal */
+    .il-modal-form-body {
+        padding: 20px 28px 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .il-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .il-form-group label {
+        font-size: .73rem;
+        font-weight: 500;
+        color: rgba(32,24,8,.5);
+        letter-spacing: .02em;
+        text-transform: uppercase;
+    }
+    .il-form-group label span.req { color: #c85050; margin-left: 2px; }
+    .il-form-control {
+        width: 100%;
+        padding: 9px 13px;
+        border: 1px solid rgba(216,200,152,.55);
+        border-radius: 8px;
+        background: var(--cream);
+        font-family: var(--ff-body);
+        font-size: .83rem;
+        font-weight: 300;
+        color: var(--ink);
+        outline: none;
+        transition: border-color .18s, box-shadow .18s;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .il-form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(160,136,72,.1);
+    }
+    .il-form-control.is-invalid {
+        border-color: #c85050;
+        box-shadow: 0 0 0 3px rgba(200,80,80,.08);
+    }
+    /* Wrapper para selects con flecha custom */
+    .il-form-select-wrap { position: relative; }
+    .il-form-select-wrap::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: .6rem;
+        color: rgba(32,24,8,.35);
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+    /* Fila para los dos checkboxes lado a lado */
+    .il-form-checks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .il-form-check {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 13px;
+        background: var(--cream);
+        border: 1px solid rgba(216,200,152,.5);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: border-color .18s, background .18s;
+    }
+    .il-form-check:has(input:checked) {
+        border-color: var(--primary);
+        background: rgba(160,136,72,.05);
+    }
+    .il-form-check input[type="checkbox"] {
+        accent-color: var(--primary);
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .il-form-check-label {
+        font-size: .8rem;
+        font-weight: 400;
+        color: var(--ink);
+        cursor: pointer;
+        user-select: none;
+    }
+    /* Mensajes de error por campo */
+    .il-field-error {
+        font-size: .72rem;
+        color: #c85050;
+        font-weight: 400;
+        padding: 3px 2px 0;
+        display: none;
+    }
+    .il-field-error.visible { display: block; }
+    /* Error general del form */
+    .il-form-alert {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: rgba(200,80,80,.06);
+        border: 1px solid rgba(200,80,80,.2);
+        border-radius: 8px;
+        font-size: .78rem;
+        color: #8a3030;
+        margin-bottom: 4px;
+    }
+    .il-form-alert.visible { display: flex; }
+    .il-form-alert i { color: #c85050; flex-shrink: 0; }
+    /* Estado de carga del botón guardar */
+    .il-modal-btn-save {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(160,136,72,.22);
+        min-width: 130px;
+        justify-content: center;
+    }
+    .il-modal-btn-save:hover:not(:disabled) {
+        background: var(--dark);
+        box-shadow: 0 4px 16px rgba(160,136,72,.32);
+        color: #fff;
+    }
+    .il-modal-btn-save:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* ── Buscador ligero de estudiante (dentro del modal de inscripción) ── */
+    .il-estudiante-search-wrap { position: relative; }
+    .il-estudiante-search-icon {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: .75rem;
+        color: rgba(32,24,8,.35);
+        pointer-events: none;
+    }
+    .il-estudiante-search-input { padding-left: 34px !important; }
+    .il-estudiante-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        max-height: 220px;
+        overflow-y: auto;
+        background: var(--white);
+        border: 1px solid rgba(216,200,152,.55);
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(32,24,8,.12);
+        z-index: 20;
+        display: none;
+    }
+    .il-estudiante-dropdown.visible { display: block; }
+    .il-estudiante-dropdown-item {
+        padding: 9px 13px;
+        cursor: pointer;
+        font-size: .8rem;
+        color: var(--ink);
+        border-bottom: 1px solid rgba(216,200,152,.25);
+        transition: background .12s;
+    }
+    .il-estudiante-dropdown-item:last-child { border-bottom: none; }
+    .il-estudiante-dropdown-item:hover,
+    .il-estudiante-dropdown-item.activa {
+        background: rgba(160,136,72,.08);
+    }
+    .il-estudiante-dropdown-item .nombre { font-weight: 500; }
+    .il-estudiante-dropdown-item .detalle {
+        font-size: .72rem;
+        color: rgba(32,24,8,.45);
+        margin-top: 1px;
+    }
+    .il-estudiante-dropdown-empty,
+    .il-estudiante-dropdown-loading {
+        padding: 12px 13px;
+        font-size: .78rem;
+        color: rgba(32,24,8,.45);
+        text-align: center;
+    }
+    /* Chip del estudiante ya seleccionado */
+    .il-estudiante-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: rgba(112,152,136,.08);
+        border: 1px solid rgba(112,152,136,.3);
+        border-radius: 8px;
+        font-size: .8rem;
+        color: var(--dark);
+    }
+    .il-estudiante-chip i.fa-user-check { color: var(--accent); }
+    .il-estudiante-chip span { flex: 1; }
+    .il-estudiante-chip-clear {
+        border: none;
+        background: none;
+        color: rgba(32,24,8,.4);
+        cursor: pointer;
+        padding: 3px 5px;
+        font-size: .75rem;
+    }
+    .il-estudiante-chip-clear:hover { color: #c85050; }
+
+    /* Botón "crear cuenta nueva" bajo el campo estudiante */
+    .il-btn-crear-rapido {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        border: none;
+        background: none;
+        color: var(--primary);
+        font-size: .76rem;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 2px 0;
+    }
+    .il-btn-crear-rapido:hover { color: var(--dark); text-decoration: underline; }
+
+    /* Paneles dentro del modal (swap sin cerrar overlay) */
+    .il-modal-form-panel { animation: ilFadeIn .18s ease; }
+    @keyframes ilFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .il-panel-crear-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: .78rem;
+        color: rgba(32,24,8,.6);
+        background: var(--cream);
+        border: 1px solid rgba(216,200,152,.4);
+        border-radius: 8px;
+        padding: 10px 13px;
+        margin-bottom: 14px;
+        line-height: 1.4;
+    }
+    .il-panel-crear-info i { margin-top: 2px; color: var(--primary); flex-shrink: 0; }
+    .il-panel-credenciales-info i { color: var(--accent); }
+
+    /* Panel de credenciales generadas */
+    .il-credencial-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 13px;
+        background: var(--cream);
+        border: 1px solid rgba(216,200,152,.5);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    .il-credencial-label {
+        font-size: .72rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+        color: rgba(32,24,8,.45);
+        width: 90px;
+        flex-shrink: 0;
+    }
+    .il-credencial-valor {
+        flex: 1;
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        font-size: .88rem;
+        font-weight: 600;
+        color: var(--dark);
+        word-break: break-all;
+    }
+    .il-credencial-copy {
+        border: 1px solid rgba(216,200,152,.55);
+        background: var(--white);
+        color: var(--primary);
+        border-radius: 6px;
+        padding: 7px 9px;
+        cursor: pointer;
+        font-size: .8rem;
+        transition: background .15s, color .15s;
+        flex-shrink: 0;
+    }
+    .il-credencial-copy:hover { background: var(--primary); color: #fff; }
+    .il-credencial-copy.copiado { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .il-credencial-copy-ambos {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        margin-top: 4px;
+        padding: 10px;
+        border: 1px dashed rgba(160,136,72,.4);
+        background: none;
+        color: var(--primary);
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .il-credencial-copy-ambos:hover { background: rgba(160,136,72,.06); }
+    .il-credencial-copy-ambos.copiado { color: var(--accent); border-color: var(--accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .il-filters-body {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 640px) {
+        .il-header { flex-direction: column; align-items: flex-start; }
+        .il-filters-body { grid-template-columns: 1fr; }
+        .il-table thead { display: none; }
+        .il-table tbody tr { display: block; padding: 12px 0; }
+        .il-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 16px;
+            font-size: .8rem;
+        }
+        .il-table td::before {
+            content: attr(data-label);
+            font-size: .68rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: rgba(32,24,8,.4);
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header -->
+<div class="il-header">
+    <div class="il-header-text">
+        <h2>Todas las <em>inscripciones</em></h2>
+        <div class="il-divider"></div>
+        <p>Gestiona los estudiantes inscritos en la plataforma</p>
+    </div>
+    <div class="il-header-actions">
+        <span class="il-total-badge">
+            <strong>{{ page_obj.paginator.count }}</strong> inscripción{{ page_obj.paginator.count|pluralize:"es" }}
+        </span>
+        
+        {% if es_admin %}
+        <button type="button" class="il-btn-primary" onclick="abrirModalForm()">
+            <i class="fas fa-plus"></i> Nueva inscripción
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="il-filters">
+    <div class="il-filters-head" onclick="toggleFiltros(this)">
+        <i class="fas fa-sliders-h icon-filter"></i>
+        Filtros de búsqueda
+        <i class="fas fa-chevron-down icon-toggle"></i>
+    </div>
+    <div class="il-filters-body" id="filtrosBody">
+        <form method="get" style="display: contents;">
+            <div class="il-field">
+                <label for="busqueda">Buscar</label>
+                <input type="text" name="busqueda" id="busqueda"
+                       placeholder="Usuario o curso…" value="{{ busqueda }}">
+            </div>
+
+            <div class="il-field">
+                <label for="curso">Curso</label>
+                <div class="il-field-select-wrap">
+                    <select name="curso" id="curso">
+                        <option value="">Todos los cursos</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}"
+                                {% if curso_seleccionado|add:0 == curso.id %}selected{% endif %}>
+                                {{ curso.titulo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- <div class="il-field">
+                <label for="usuario">Estudiante</label>
+                <div class="il-field-select-wrap">
+                    <select name="usuario" id="usuario">
+                        <option value="">Todos los estudiantes</option>
+                        {% for usuario in usuarios %}
+                            <option value="{{ usuario.id }}"
+                                {% if usuario_seleccionado|add:0 == usuario.id %}selected{% endif %}>
+                                {{ usuario.username }} — {{ usuario.email }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div> -->
+
+            <div class="il-field">
+                <label for="estado">Estado</label>
+                <div class="il-field-select-wrap">
+                    <select name="estado" id="estado">
+                        <option value="">Todos los estados</option>
+                        <option value="completado"   {% if estado_seleccionado == 'completado'   %}selected{% endif %}>Completado</option>
+                        <option value="en_progreso"  {% if estado_seleccionado == 'en_progreso'  %}selected{% endif %}>En progreso</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="il-field">
+                <label>&nbsp;</label>
+                <button type="submit" class="il-btn-filter">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="il-table-wrap">
+    <table class="il-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Estudiante</th>
+                <th>Curso</th>
+                <th>Progreso</th>
+                <th>Estado</th>
+                <th>Certificado</th>
+                <th>Inscrito el</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscripcion in inscripciones %}
+            <tr>
+                <td data-label="#">
+                    <span style="font-size:.75rem; color:rgba(32,24,8,.35); font-weight:400;">
+                        {{ forloop.counter }}
+                    </span>
+                </td>
+
+                <td data-label="Estudiante">
+                    <div class="il-student">
+                        <div class="il-student-avatar">
+                            {{ inscripcion.estudiante.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div class="il-student-name">{{ inscripcion.estudiante.username }}</div>
+                            <div class="il-student-email">{{ inscripcion.estudiante.email }}</div>
+                        </div>
+                    </div>
+                </td>
+
+                <td data-label="Curso">
+                    <span class="il-course-name">{{ inscripcion.curso.titulo }}</span>
+                </td>
+
+                <td data-label="Progreso">
+                    <div class="il-progress-wrap">
+                        <div class="il-progress-bar-track">
+                            <div class="il-progress-bar-fill {% if inscripcion.progreso == 100 %}complete{% endif %}"
+                                 style="width: {{ inscripcion.progreso }}%;">
+                            </div>
+                        </div>
+                        <span class="il-progress-pct">{{ inscripcion.progreso }}%</span>
+                    </div>
+                </td>
+
+                <td data-label="Estado">
+                    {% if inscripcion.completado %}
+                        <span class="il-badge il-badge-success">
+                            <i class="fas fa-check-circle"></i> Completado
+                        </span>
+                    {% else %}
+                        <span class="il-badge il-badge-warning">
+                            <i class="fas fa-clock"></i> En progreso
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td data-label="Certificado">
+                    {% if inscripcion.certificado_generado %}
+                        <span class="il-cert-yes">
+                            <i class="fas fa-certificate"></i> Emitido
+                        </span>
+                    {% else %}
+                        <span class="il-cert-no">—</span>
+                    {% endif %}
+                </td>
+
+                <td data-label="Inscrito el">
+                    <span class="il-date">{{ inscripcion.inscrito_en|date:"d/m/Y" }}</span>
+                </td>
+
+                <td data-label="Acciones">
+                    <div class="il-actions">
+                        <button type="button" class="il-btn-action view" title="Ver detalles" onclick="abrirModalDetalle( 
+                            '{{ inscripcion.estudiante.username|escapejs }}', '{{ inscripcion.estudiante.email|escapejs }}', 
+                            '{{ inscripcion.curso.titulo|escapejs }}', {{ inscripcion.progreso }}, 
+                            {{ inscripcion.completado|yesno:'true,false' }}, {{ inscripcion.certificado_generado|yesno:'true,false' }}, 
+                            '{{ inscripcion.inscrito_en|date:"d/m/Y H:i" }}', {{ inscripcion.pk }}, 
+                            '{{ inscripcion.estudiante.pk }}', '{{ inscripcion.curso.pk }}' )">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        
+                        {% if es_admin %}
+                        <button type="button" class="il-btn-action edit" title="Editar" onclick="abrirModalFormEditar(
+                            {{ inscripcion.pk }}, '{{ inscripcion.estudiante.pk }}', '{{ inscripcion.curso.pk }}', 
+                            {{ inscripcion.progreso }}, {{ inscripcion.completado|yesno:'true,false' }}, 
+                            {{ inscripcion.certificado_generado|yesno:'true,false' }}, 
+                            '{{ inscripcion.estudiante.full_name|escapejs }} — {{ inscripcion.estudiante.username|escapejs }}' )">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button type="button" class="il-btn-action delete" title="Eliminar" onclick="abrirModalEliminar(
+                            '{{ inscripcion.estudiante.username|escapejs }}', '{{ inscripcion.curso.titulo|escapejs }}', 
+                            '{% url 'panel:inscripcion_delete' inscripcion.pk %}' )">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">
+                    <div class="il-empty">
+                        <i class="fas fa-file-alt"></i>
+                        <p>No hay inscripciones que coincidan con los filtros aplicados.</p>
+                        <button type="button" class="il-btn-primary"
+                                style="margin: 0 auto; width: fit-content;"
+                                onclick="abrirModalForm()">
+                            <i class="fas fa-plus"></i> Registrar primera inscripción
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="il-pagination">
+        {% if page_obj.has_previous %}
+            <a class="il-page-link"
+               href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                <i class="fas fa-chevron-left" style="font-size:.65rem;"></i>
+            </a>
+        {% else %}
+            <span class="il-page-link disabled">
+                <i class="fas fa-chevron-left" style="font-size:.65rem;"></i>
+            </span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            <a class="il-page-link {% if page_obj.number == num %}active{% endif %}"
+               href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                {{ num }}
+            </a>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="il-page-link"
+               href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                <i class="fas fa-chevron-right" style="font-size:.65rem;"></i>
+            </a>
+        {% else %}
+            <span class="il-page-link disabled">
+                <i class="fas fa-chevron-right" style="font-size:.65rem;"></i>
+            </span>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- ══ Modal: crear / editar inscripción ══ -->
+<div class="il-modal-overlay" id="modalForm" onclick="cerrarModalForm(event)">
+    <div class="il-modal-card il-modal-form-card" role="dialog" aria-modal="true" aria-labelledby="modalFormTitle">
+
+        <div class="il-modal-form-bar"></div>
+
+        <!-- Encabezado -->
+        <div class="il-modal-head">
+            <div class="il-modal-icon il-modal-form-icon">
+                <i class="fas fa-pen-to-square" id="modalFormIcon"></i>
+            </div>
+            <h2 class="il-modal-title il-modal-form-title" id="modalFormTitle">
+                <em id="modalFormTitleVerb">Nueva</em> inscripción
+            </h2>
+            <p class="il-modal-subtitle" id="modalFormSubtitle">Completa los datos para registrar la inscripción</p>
+        </div>
+
+        <!-- ══════════════ PANEL 1: Datos de la inscripción ══════════════ -->
+        <div class="il-modal-form-panel" id="panelInscripcion">
+
+            <!-- Cuerpo del formulario -->
+            <div class="il-modal-form-body">
+
+                <!-- Alerta de error general -->
+                <div class="il-form-alert" id="formAlertGeneral" role="alert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="formAlertGeneralMsg">Revisa los errores indicados y vuelve a intentarlo.</span>
+                </div>
+
+                <!-- Estudiante (buscador) -->
+                <div class="il-form-group">
+                    <label for="formEstudianteQuery">Estudiante <span class="req">*</span></label>
+                    <div class="il-estudiante-search-wrap">
+                        <i class="fas fa-magnifying-glass il-estudiante-search-icon"></i>
+                        <input
+                            type="text"
+                            class="il-form-control il-estudiante-search-input"
+                            id="formEstudianteQuery"
+                            placeholder="Escribe un nombre, usuario o correo…"
+                            autocomplete="off"
+                        >
+                        <!-- input oculto: este es el que realmente se envía -->
+                        <input type="hidden" id="formEstudiante" name="estudiante" value="">
+
+                        <div class="il-estudiante-dropdown" id="estudianteDropdown"></div>
+                    </div>
+
+                    <!-- Chip del estudiante seleccionado -->
+                    <div class="il-estudiante-chip" id="estudianteChip" style="display:none;">
+                        <i class="fas fa-user-check"></i>
+                        <span id="estudianteChipTexto"></span>
+                        <button type="button" class="il-estudiante-chip-clear" onclick="_limpiarEstudianteSeleccionado()" title="Quitar selección">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <span class="il-field-error" id="errEstudiante"></span>
+
+                    <button type="button" class="il-btn-crear-rapido" onclick="abrirPanelCrearEstudiante()">
+                        <i class="fas fa-user-plus"></i> ¿No existe? Crear cuenta nueva
+                    </button>
+                </div>
+
+                <!-- Curso -->
+                <div class="il-form-group">
+                    <label for="formCurso">Curso <span class="req">*</span></label>
+                    <div class="il-form-select-wrap">
+                        <select class="il-form-control" id="formCurso" name="curso">
+                            <option value="">— Selecciona un curso —</option>
+                            {% for curso in cursos %}
+                                <option value="{{ curso.id }}">{{ curso.titulo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <span class="il-field-error" id="errCurso"></span>
+                </div>
+
+                <!-- Progreso -->
+                <div class="il-form-group">
+                    <label for="formProgreso">Progreso (%) <span class="req">*</span></label>
+                    <input type="number" class="il-form-control" id="formProgreso"
+                           name="progreso" min="0" max="100" value="0" placeholder="0 – 100">
+                    <span class="il-field-error" id="errProgreso"></span>
+                </div>
+
+                <!-- Checkboxes -->
+                <div class="il-form-checks">
+                    <label class="il-form-check">
+                        <input type="checkbox" id="formCompletado" name="completado">
+                        <span class="il-form-check-label"><i class="fas fa-check-circle" style="color:var(--accent);margin-right:4px;"></i>Completado</span>
+                    </label>
+                    <label class="il-form-check">
+                        <input type="checkbox" id="formCertificado" name="certificado_generado">
+                        <span class="il-form-check-label"><i class="fas fa-certificate" style="color:#1e78c8;margin-right:4px;"></i>Certificado</span>
+                    </label>
+                </div>
+
+            </div><!-- /.il-modal-form-body -->
+
+            <!-- Acciones -->
+            <div class="il-modal-actions" style="margin-top: 20px;">
+                <button type="button" class="il-modal-btn il-modal-btn-cancel" onclick="cerrarModalForm()">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </button>
+                <button type="button" class="il-modal-btn il-modal-btn-save" id="btnGuardarForm" onclick="submitFormInscripcion()">
+                    <i class="fas fa-floppy-disk" id="btnGuardarIcon"></i>
+                    <span id="btnGuardarLabel">Guardar</span>
+                </button>
+            </div>
+
+        </div><!-- /#panelInscripcion -->
+
+        <!-- ══════════════ PANEL 2: Crear estudiante rápido ══════════════ -->
+        <div class="il-modal-form-panel" id="panelCrearEstudiante" style="display:none;">
+
+            <div class="il-modal-form-body">
+
+                <p class="il-panel-crear-info">
+                    <i class="fas fa-circle-info"></i>
+                    Se creará una cuenta mínima. El usuario y la contraseña se generan
+                    automáticamente para que los compartas con el estudiante.
+                </p>
+
+                <!-- Alerta de error general (panel 2) -->
+                <div class="il-form-alert" id="crearAlertGeneral" role="alert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="crearAlertGeneralMsg">Revisa los errores indicados.</span>
+                </div>
+
+                <div class="il-form-group">
+                    <label for="crearFullName">Nombre completo <span class="req">*</span></label>
+                    <input type="text" class="il-form-control" id="crearFullName"
+                           placeholder="Ej: Juan Pérez López">
+                    <span class="il-field-error" id="errCrearFullName"></span>
+                </div>
+
+                <div class="il-form-group">
+                    <label for="crearEmail">Correo electrónico <span class="req">*</span></label>
+                    <input type="email" class="il-form-control" id="crearEmail"
+                           placeholder="Ej: juan@ejemplo.com">
+                    <span class="il-field-error" id="errCrearEmail"></span>
+                </div>
+
+            </div>
+
+            <div class="il-modal-actions" style="margin-top: 20px;">
+                <button type="button" class="il-modal-btn il-modal-btn-cancel" onclick="cerrarPanelCrearEstudiante()">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <button type="button" class="il-modal-btn il-modal-btn-save" id="btnCrearEstudiante" onclick="submitCrearEstudiante()">
+                    <i class="fas fa-user-plus" id="btnCrearEstudianteIcon"></i>
+                    <span id="btnCrearEstudianteLabel">Crear cuenta</span>
+                </button>
+            </div>
+
+        </div><!-- /#panelCrearEstudiante -->
+
+        <!-- ══════════════ PANEL 3: Credenciales generadas ══════════════ -->
+        <div class="il-modal-form-panel" id="panelCredenciales" style="display:none;">
+
+            <div class="il-modal-form-body">
+
+                <p class="il-panel-crear-info il-panel-credenciales-info">
+                    <i class="fas fa-circle-check" style="color:var(--accent);"></i>
+                    Cuenta creada. Copia estos datos ahora — la contraseña no
+                    se podrá ver de nuevo después de cerrar este aviso.
+                </p>
+
+                <div class="il-credencial-row">
+                    <div class="il-credencial-label">Usuario</div>
+                    <div class="il-credencial-valor" id="credUsername">—</div>
+                    <button type="button" class="il-credencial-copy" onclick="_copiarCredencial('credUsername', this)" title="Copiar usuario">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+
+                <div class="il-credencial-row">
+                    <div class="il-credencial-label">Contraseña</div>
+                    <div class="il-credencial-valor" id="credPassword">—</div>
+                    <button type="button" class="il-credencial-copy" onclick="_copiarCredencial('credPassword', this)" title="Copiar contraseña">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+
+                <button type="button" class="il-credencial-copy-ambos" onclick="_copiarAmbasCredenciales(this)">
+                    <i class="fas fa-clone"></i> Copiar usuario y contraseña juntos
+                </button>
+
+            </div>
+
+            <div class="il-modal-actions" style="margin-top: 20px;">
+                <button type="button" class="il-modal-btn il-modal-btn-save" style="width:100%;" onclick="continuarDespuesDeCredenciales()">
+                    <i class="fas fa-check"></i> Listo, continuar con la inscripción
+                </button>
+            </div>
+
+        </div><!-- /#panelCredenciales -->
+
+    </div>
+</div>
+
+<!-- ══ Modal: ver detalles ══ -->
+<div class="il-modal-overlay" id="modalDetalle" onclick="cerrarModalDetalle(event)">
+    <div class="il-modal-card il-modal-info-card" role="dialog" aria-modal="true" aria-labelledby="modalDetalleTitle">
+
+        <div class="il-modal-info-bar"></div>
+
+        <!-- Encabezado -->
+        <div class="il-modal-head">
+            <div class="il-modal-icon il-modal-info-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h2 class="il-modal-title il-modal-info-title" id="modalDetalleTitle">
+                Detalle de <em>inscripción</em>
+            </h2>
+            <p class="il-modal-subtitle" id="modalDetalleSubtitle"></p>
+        </div>
+
+        <!-- Grid de datos -->
+        <div class="il-detail-grid">
+            <div class="il-detail-item">
+                <div class="il-detail-label"><i class="fas fa-user" style="margin-right:4px;"></i> Estudiante</div>
+                <div class="il-detail-value">
+                    <span id="modalDetalleEstudiante"></span>
+                    <span class="il-detail-sub" id="modalDetalleEmail"></span>
+                </div>
+            </div>
+            <div class="il-detail-item">
+                <div class="il-detail-label"><i class="fas fa-book-open" style="margin-right:4px;"></i> Curso</div>
+                <div class="il-detail-value" id="modalDetalleCurso"></div>
+            </div>
+            <div class="il-detail-item">
+                <div class="il-detail-label"><i class="fas fa-tasks" style="margin-right:4px;"></i> Estado</div>
+                <div class="il-detail-value" id="modalDetalleEstado"></div>
+            </div>
+            <div class="il-detail-item">
+                <div class="il-detail-label"><i class="fas fa-calendar-alt" style="margin-right:4px;"></i> Inscrito el</div>
+                <div class="il-detail-value" id="modalDetalleInscritoEn"></div>
+            </div>
+            <div class="il-detail-item full-width">
+                <div class="il-detail-label">
+                    <i class="fas fa-chart-line" style="margin-right:4px;"></i>
+                    Progreso — <span id="modalDetalleProgresoPct"></span>
+                </div>
+                <div class="il-detail-progress-track">
+                    <div class="il-detail-progress-fill" id="modalDetalleProgressBar" style="width:0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="il-modal-actions" style="margin-top:20px;">
+            <button type="button" class="il-modal-btn il-modal-btn-cancel" onclick="cerrarModalDetalle()">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+            <button type="button" id="modalDetalleEditBtn" class="il-modal-btn il-modal-btn-primary"
+                    onclick="abrirModalFormDesdeDetalle()">
+                <i class="fas fa-pen"></i> Editar inscripción
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══ Modal: confirmar eliminación ══ -->
+<div class="il-modal-overlay" id="modalEliminar" onclick="cerrarModalEliminar(event)">
+    <div class="il-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+        <div class="il-modal-danger-bar"></div>
+
+        <!-- Icono + título -->
+        <div class="il-modal-head">
+            <div class="il-modal-icon">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h2 class="il-modal-title" id="modalTitle">
+                ¿Eliminar esta <em>inscripción</em>?
+            </h2>
+            <p class="il-modal-subtitle">
+                Esta acción es permanente y no se puede deshacer.
+            </p>
+        </div>
+
+        <!-- Datos de la inscripción a eliminar -->
+        <div class="il-modal-target">
+            <div class="il-modal-target-row">
+                <i class="fas fa-user"></i>
+                <span id="modalEstudiante"></span>
+            </div>
+            <div class="il-modal-target-row">
+                <i class="fas fa-book-open"></i>
+                <span id="modalCurso"></span>
+            </div>
+        </div>
+
+        <!-- Aviso -->
+        <div class="il-modal-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Se perderá todo el progreso registrado del estudiante en este curso.</span>
+        </div>
+
+        <!-- Acciones -->
+        <div class="il-modal-actions">
+            <button type="button" class="il-modal-btn il-modal-btn-cancel" onclick="cerrarModalEliminar()">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </button>
+            <form id="modalFormEliminar" method="post">
+                {% csrf_token %}
+                <button type="submit" class="il-modal-btn il-modal-btn-delete">
+                    <i class="fas fa-trash-alt"></i> Sí, eliminar
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ─────────────────────────────────────────────
+    // Filtros colapsables
+    // ─────────────────────────────────────────────
+    function toggleFiltros(header) {
+        const body = document.getElementById('filtrosBody');
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'grid';
+        header.classList.toggle('collapsed', isOpen);
+    }
+
+    // ─────────────────────────────────────────────
+    // Modal de detalle (sin cambios funcionales)
+    // ─────────────────────────────────────────────
+
+    // Estado interno para "editar desde detalle"
+    let _detalleData = null;
+
+    function abrirModalDetalle(estudiante, email, curso, progreso, completado, certificado, inscritoEn,
+                               pk, estudiantePk, cursoPk) {
+        // Guardar datos para poder abrir el form de edición desde aquí
+        _detalleData = { pk, estudiantePk, cursoPk, progreso, completado, certificado, estudiante, email };
+
+        document.getElementById('modalDetalleSubtitle').textContent   = curso;
+        document.getElementById('modalDetalleEstudiante').textContent = estudiante;
+        document.getElementById('modalDetalleEmail').textContent      = email;
+        document.getElementById('modalDetalleCurso').textContent      = curso;
+        document.getElementById('modalDetalleInscritoEn').textContent = inscritoEn;
+        document.getElementById('modalDetalleProgresoPct').textContent = progreso + '%';
+
+        const bar = document.getElementById('modalDetalleProgressBar');
+        bar.style.width = progreso + '%';
+        bar.classList.toggle('complete', progreso === 100);
+
+        let estadoHtml = completado
+            ? '<span class="il-badge il-badge-success"><i class="fas fa-check-circle"></i> Completado</span>'
+            : '<span class="il-badge il-badge-warning"><i class="fas fa-clock"></i> En progreso</span>';
+        if (certificado) {
+            estadoHtml += ' <span class="il-badge" style="background:rgba(30,120,200,.08);color:#1e78c8;border:1px solid rgba(30,120,200,.25);margin-left:4px;"><i class="fas fa-certificate"></i> Certificado</span>';
+        }
+        document.getElementById('modalDetalleEstado').innerHTML = estadoHtml;
+
+        document.getElementById('modalDetalle').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalDetalle(event) {
+        if (event && event.target !== document.getElementById('modalDetalle')) return;
+        document.getElementById('modalDetalle').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function abrirModalFormDesdeDetalle() {
+        cerrarModalDetalle();               // cierra el de detalle primero
+        if (!_detalleData) return;
+        setTimeout(() => {                  // pequeño delay para que la transición sea suave
+            abrirModalFormEditar(
+                _detalleData.pk,
+                _detalleData.estudiantePk,
+                _detalleData.cursoPk,
+                _detalleData.progreso,
+                _detalleData.completado,
+                _detalleData.certificado,
+                `${_detalleData.estudiante} (${_detalleData.email})`
+            );
+        }, 180);
+    }
+
+    // ─────────────────────────────────────────────
+    // Modal de eliminación (sin cambios)
+    // ─────────────────────────────────────────────
+    function abrirModalEliminar(url, estudiante, curso) {
+        document.getElementById('modalEstudiante').textContent = estudiante;
+        document.getElementById('modalCurso').textContent      = curso;
+        document.getElementById('modalFormEliminar').action    = url;
+        document.getElementById('modalEliminar').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalEliminar(event) {
+        if (event && event.target !== document.getElementById('modalEliminar')) return;
+        document.getElementById('modalEliminar').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // ─────────────────────────────────────────────
+    // Modal de formulario (crear / editar)
+    // ─────────────────────────────────────────────
+    let _formPk = null;        // null = crear inscripción, número = editar
+    let _estudianteSeleccionado = null;   // { id, username, full_name, email }
+
+    function _limpiarFormModal() {
+        ['formEstudiante', 'formCurso', 'formProgreso', 'formCompletado', 'formCertificado'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el.type === 'checkbox') el.checked = false;
+            else el.value = (id === 'formProgreso') ? '0' : '';
+        });
+        document.getElementById('formEstudianteQuery').value = '';
+        _limpiarEstudianteSeleccionado();
+
+        // Limpiar errores previos
+        document.querySelectorAll('.il-field-error').forEach(el => {
+            el.textContent = '';
+            el.classList.remove('visible');
+        });
+        document.querySelectorAll('.il-form-control').forEach(el => el.classList.remove('is-invalid'));
+        document.getElementById('formAlertGeneral').classList.remove('visible');
+        _setBtnGuardarLoading(false);
+    }
+
+    function _mostrarPanel(idPanel) {
+        ['panelInscripcion', 'panelCrearEstudiante', 'panelCredenciales'].forEach(id => {
+            document.getElementById(id).style.display = (id === idPanel) ? '' : 'none';
+        });
+    }
+
+    function abrirModalForm() {
+        // Modo CREAR inscripción
+        _formPk = null;
+        _limpiarFormModal();
+        _mostrarPanel('panelInscripcion');
+        document.getElementById('modalFormTitleVerb').textContent = 'Nueva';
+        document.getElementById('modalFormSubtitle').textContent  = 'Completa los datos para registrar la inscripción';
+        document.getElementById('modalFormIcon').className        = 'fas fa-plus';
+        document.getElementById('btnGuardarLabel').textContent    = 'Guardar';
+        document.getElementById('modalForm').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('formEstudianteQuery').focus();
+    }
+
+    function abrirModalFormEditar(pk, estudiantePk, cursoPk, progreso, completado, certificado, estudianteTexto) {
+        // Modo EDITAR — precargar valores.
+        // estudianteTexto: string a mostrar en el chip (ej. "juan_perez — juan@ejemplo.com"),
+        // pásalo desde el botón de editar en la tabla junto con los demás data-*.
+        _formPk = pk;
+        _limpiarFormModal();
+        _mostrarPanel('panelInscripcion');
+
+        document.getElementById('formEstudiante').value = String(estudiantePk);
+        if (estudianteTexto) {
+            document.getElementById('estudianteChipTexto').textContent = estudianteTexto;
+            document.getElementById('estudianteChip').style.display = 'flex';
+            document.getElementById('formEstudianteQuery').style.display = 'none';
+        }
+
+        document.getElementById('formCurso').value                = String(cursoPk);
+        document.getElementById('formProgreso').value             = progreso;
+        document.getElementById('formCompletado').checked         = completado;
+        document.getElementById('formCertificado').checked        = certificado;
+        document.getElementById('modalFormTitleVerb').textContent = 'Editar';
+        document.getElementById('modalFormSubtitle').textContent  = 'Modifica los datos de la inscripción';
+        document.getElementById('modalFormIcon').className        = 'fas fa-pen';
+        document.getElementById('btnGuardarLabel').textContent    = 'Guardar cambios';
+        document.getElementById('modalForm').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalForm(event) {
+        if (event && event.target !== document.getElementById('modalForm')) return;
+        document.getElementById('modalForm').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function _setBtnGuardarLoading(loading) {
+        const btn  = document.getElementById('btnGuardarForm');
+        const icon = document.getElementById('btnGuardarIcon');
+        const lbl  = document.getElementById('btnGuardarLabel');
+        btn.disabled = loading;
+        if (loading) {
+            icon.className = 'fas fa-circle-notch fa-spin';
+            lbl.textContent = 'Guardando…';
+        } else {
+            icon.className = 'fas fa-floppy-disk';
+            lbl.textContent = (_formPk ? 'Guardar cambios' : 'Guardar');
+        }
+    }
+
+    function _mostrarErroresCampos(errors) {
+        // errors = { campo: ["mensaje", ...], __all__: [...] }
+        const camposMap = {
+            estudiante:            'errEstudiante',
+            curso:                 'errCurso',
+            progreso:              'errProgreso',
+            completado:            null,
+            certificado_generado:  null,
+        };
+        let hayErroresCampo = false;
+
+        for (const [campo, msgs] of Object.entries(errors)) {
+            if (campo === '__all__' || campo === 'non_field_errors') {
+                const alertMsg = document.getElementById('formAlertGeneralMsg');
+                alertMsg.textContent = msgs.join(' ');
+                document.getElementById('formAlertGeneral').classList.add('visible');
+                continue;
+            }
+            const errId = camposMap[campo];
+            if (errId) {
+                const errEl   = document.getElementById(errId);
+                const inputId = 'form' + campo.charAt(0).toUpperCase() + campo.slice(1);
+                const input   = document.getElementById(inputId);
+                if (errEl) { errEl.textContent = msgs.join(' '); errEl.classList.add('visible'); }
+                if (input) input.classList.add('is-invalid');
+                hayErroresCampo = true;
+            }
+        }
+
+        if (hayErroresCampo && !document.getElementById('formAlertGeneral').classList.contains('visible')) {
+            document.getElementById('formAlertGeneralMsg').textContent = 'Revisa los errores indicados y vuelve a intentarlo.';
+            document.getElementById('formAlertGeneral').classList.add('visible');
+        }
+    }
+
+    async function submitFormInscripcion() {
+        _setBtnGuardarLoading(true);
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const body = new URLSearchParams({
+            csrfmiddlewaretoken: csrfToken,
+            estudiante:          document.getElementById('formEstudiante').value,
+            curso:               document.getElementById('formCurso').value,
+            progreso:            document.getElementById('formProgreso').value,
+            completado:          document.getElementById('formCompletado').checked  ? 'on' : '',
+            certificado_generado: document.getElementById('formCertificado').checked ? 'on' : '',
+        });
+
+        const url = _formPk
+            ? `{% url 'panel:inscripcion_update' 0 %}`.replace('/0/', `/${_formPk}/`)
+            : `{% url 'panel:inscripcion_create' %}`;
+
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: body.toString(),
+            });
+
+            const data = await resp.json();
+
+            if (data.success) {
+                document.getElementById('modalForm').classList.remove('active');
+                document.body.style.overflow = '';
+                window.location.reload();
+            } else {
+                _setBtnGuardarLoading(false);
+                _mostrarErroresCampos(data.errors || {});
+            }
+        } catch (err) {
+            _setBtnGuardarLoading(false);
+            document.getElementById('formAlertGeneralMsg').textContent = 'Error de red. Inténtalo de nuevo.';
+            document.getElementById('formAlertGeneral').classList.add('visible');
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Buscador ligero de estudiante (autocomplete)
+    // ─────────────────────────────────────────────
+    let _buscarEstudianteTimeout = null;
+    let _buscarEstudianteAbortCtrl = null;
+    let _resultadosActuales = [];
+    let _indiceActivo = -1;
+
+    function _seleccionarEstudiante(estudiante) {
+        _estudianteSeleccionado = estudiante;
+        document.getElementById('formEstudiante').value = String(estudiante.id);
+        document.getElementById('estudianteChipTexto').textContent =
+            `${estudiante.full_name} — ${estudiante.username} (${estudiante.email})`;
+        document.getElementById('estudianteChip').style.display = 'flex';
+        document.getElementById('formEstudianteQuery').style.display = 'none';
+        _cerrarDropdownEstudiante();
+
+        document.getElementById('errEstudiante').textContent = '';
+        document.getElementById('errEstudiante').classList.remove('visible');
+    }
+
+    function _limpiarEstudianteSeleccionado() {
+        _estudianteSeleccionado = null;
+        document.getElementById('formEstudiante').value = '';
+        document.getElementById('estudianteChip').style.display = 'none';
+        const input = document.getElementById('formEstudianteQuery');
+        input.style.display = '';
+        input.value = '';
+        input.focus();
+    }
+
+    function _cerrarDropdownEstudiante() {
+        const dd = document.getElementById('estudianteDropdown');
+        dd.classList.remove('visible');
+        dd.innerHTML = '';
+        _resultadosActuales = [];
+        _indiceActivo = -1;
+    }
+
+    function _renderDropdownEstudiante(items) {
+        const dd = document.getElementById('estudianteDropdown');
+        _resultadosActuales = items;
+        _indiceActivo = -1;
+
+        if (items.length === 0) {
+            dd.innerHTML = '<div class="il-estudiante-dropdown-empty">Sin resultados. Puedes crear una cuenta nueva abajo.</div>';
+        } else {
+            dd.innerHTML = items.map((it, idx) => `
+                <div class="il-estudiante-dropdown-item" data-idx="${idx}"
+                     onclick='_seleccionarEstudiante(${JSON.stringify(it).replace(/'/g, "&#39;")})'>
+                    <div class="nombre">${_escapeHtml(it.full_name)}</div>
+                    <div class="detalle">${_escapeHtml(it.username)} · ${_escapeHtml(it.email)}</div>
+                </div>
+            `).join('');
+        }
+        dd.classList.add('visible');
+    }
+
+    function _escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    async function _buscarEstudiantes(query) {
+        if (_buscarEstudianteAbortCtrl) _buscarEstudianteAbortCtrl.abort();
+        _buscarEstudianteAbortCtrl = new AbortController();
+
+        const dd = document.getElementById('estudianteDropdown');
+        dd.innerHTML = '<div class="il-estudiante-dropdown-loading"><i class="fas fa-circle-notch fa-spin"></i> Buscando…</div>';
+        dd.classList.add('visible');
+
+        try {
+            const resp = await fetch(`{% url 'panel:estudiante_search' %}?q=${encodeURIComponent(query)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                signal: _buscarEstudianteAbortCtrl.signal,
+            });
+            const data = await resp.json();
+            _renderDropdownEstudiante(data.results || []);
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                dd.innerHTML = '<div class="il-estudiante-dropdown-empty">Error al buscar. Intenta de nuevo.</div>';
+            }
+        }
+    }
+
+    document.getElementById('formEstudianteQuery').addEventListener('input', function () {
+        const query = this.value.trim();
+        clearTimeout(_buscarEstudianteTimeout);
+
+        if (query.length < 2) {
+            _cerrarDropdownEstudiante();
+            return;
+        }
+        _buscarEstudianteTimeout = setTimeout(() => _buscarEstudiantes(query), 300);
+    });
+
+    document.getElementById('formEstudianteQuery').addEventListener('keydown', function (e) {
+        if (!_resultadosActuales.length) return;
+        const dd = document.getElementById('estudianteDropdown');
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            _indiceActivo = Math.min(_indiceActivo + 1, _resultadosActuales.length - 1);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            _indiceActivo = Math.max(_indiceActivo - 1, 0);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (_indiceActivo >= 0) _seleccionarEstudiante(_resultadosActuales[_indiceActivo]);
+            return;
+        } else {
+            return;
+        }
+
+        dd.querySelectorAll('.il-estudiante-dropdown-item').forEach((el, idx) => {
+            el.classList.toggle('activa', idx === _indiceActivo);
+        });
+    });
+
+    // Cerrar el dropdown si se hace clic afuera
+    document.addEventListener('click', function (e) {
+        const wrap = document.querySelector('.il-estudiante-search-wrap');
+        if (wrap && !wrap.contains(e.target)) _cerrarDropdownEstudiante();
+    });
+
+    // ─────────────────────────────────────────────
+    // Panel: crear estudiante rápido
+    // ─────────────────────────────────────────────
+    function abrirPanelCrearEstudiante() {
+        document.getElementById('crearFullName').value = '';
+        document.getElementById('crearEmail').value = '';
+        document.getElementById('crearAlertGeneral').classList.remove('visible');
+        ['errCrearFullName', 'errCrearEmail'].forEach(id => {
+            document.getElementById(id).textContent = '';
+            document.getElementById(id).classList.remove('visible');
+        });
+        _mostrarPanel('panelCrearEstudiante');
+        document.getElementById('crearFullName').focus();
+    }
+
+    function cerrarPanelCrearEstudiante() {
+        _mostrarPanel('panelInscripcion');
+    }
+
+    function _setBtnCrearEstudianteLoading(loading) {
+        const btn  = document.getElementById('btnCrearEstudiante');
+        const icon = document.getElementById('btnCrearEstudianteIcon');
+        const lbl  = document.getElementById('btnCrearEstudianteLabel');
+        btn.disabled = loading;
+        icon.className = loading ? 'fas fa-circle-notch fa-spin' : 'fas fa-user-plus';
+        lbl.textContent = loading ? 'Creando…' : 'Crear cuenta';
+    }
+
+    let _credencialesPendientes = null;   // { username, password } a mostrar en panel 3
+
+    async function submitCrearEstudiante() {
+        _setBtnCrearEstudianteLoading(true);
+        document.getElementById('crearAlertGeneral').classList.remove('visible');
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const body = new URLSearchParams({
+            csrfmiddlewaretoken: csrfToken,
+            full_name: document.getElementById('crearFullName').value,
+            email:     document.getElementById('crearEmail').value,
+        });
+
+        try {
+            const resp = await fetch(`{% url 'panel:estudiante_crear_rapido' %}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: body.toString(),
+            });
+            const data = await resp.json();
+
+            if (data.success) {
+                _credencialesPendientes = data.credenciales;
+                _seleccionarEstudiante(data.estudiante);   // ya queda listo en el panel 1 para cuando volvamos
+
+                document.getElementById('credUsername').textContent = data.credenciales.username;
+                document.getElementById('credPassword').textContent = data.credenciales.password;
+                document.querySelectorAll('.il-credencial-copy, .il-credencial-copy-ambos').forEach(btn => {
+                    btn.classList.remove('copiado');
+                });
+                _mostrarPanel('panelCredenciales');
+            } else {
+                const errors = data.errors || {};
+                let hayErrorCampo = false;
+                if (errors.full_name) {
+                    document.getElementById('errCrearFullName').textContent = errors.full_name.join(' ');
+                    document.getElementById('errCrearFullName').classList.add('visible');
+                    hayErrorCampo = true;
+                }
+                if (errors.email) {
+                    document.getElementById('errCrearEmail').textContent = errors.email.join(' ');
+                    document.getElementById('errCrearEmail').classList.add('visible');
+                    hayErrorCampo = true;
+                }
+                const generalMsg = errors.__all__ ? errors.__all__.join(' ')
+                    : (hayErrorCampo ? 'Revisa los errores indicados.' : 'No se pudo crear la cuenta.');
+                document.getElementById('crearAlertGeneralMsg').textContent = generalMsg;
+                document.getElementById('crearAlertGeneral').classList.add('visible');
+            }
+        } catch (err) {
+            document.getElementById('crearAlertGeneralMsg').textContent = 'Error de red. Inténtalo de nuevo.';
+            document.getElementById('crearAlertGeneral').classList.add('visible');
+        } finally {
+            _setBtnCrearEstudianteLoading(false);
+        }
+    }
+
+    function continuarDespuesDeCredenciales() {
+        _credencialesPendientes = null;
+        _mostrarPanel('panelInscripcion');
+    }
+
+    // ─────────────────────────────────────────────
+    // Copiar credenciales al portapapeles
+    // ─────────────────────────────────────────────
+    async function _copiarTexto(texto) {
+        try {
+            await navigator.clipboard.writeText(texto);
+            return true;
+        } catch (err) {
+            // Fallback para navegadores/contextos sin permiso de Clipboard API
+            const textarea = document.createElement('textarea');
+            textarea.value = texto;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return true;
+            } catch {
+                document.body.removeChild(textarea);
+                return false;
+            }
+        }
+    }
+
+    function _marcarCopiado(btn) {
+        const iconoOriginal = btn.innerHTML;
+        btn.classList.add('copiado');
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+            btn.classList.remove('copiado');
+            btn.innerHTML = iconoOriginal;
+        }, 1500);
+    }
+
+    async function _copiarCredencial(elId, btn) {
+        const texto = document.getElementById(elId).textContent;
+        if (await _copiarTexto(texto)) _marcarCopiado(btn);
+    }
+
+    async function _copiarAmbasCredenciales(btn) {
+        const usuario = document.getElementById('credUsername').textContent;
+        const password = document.getElementById('credPassword').textContent;
+        const texto = `Usuario: ${usuario}\nContraseña: ${password}`;
+        if (await _copiarTexto(texto)) {
+            btn.classList.add('copiado');
+            const lbl = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+            setTimeout(() => { btn.classList.remove('copiado'); btn.innerHTML = lbl; }, 1500);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Escape cierra cualquier modal abierto
+    // ─────────────────────────────────────────────
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        cerrarModalDetalle();
+        cerrarModalEliminar();
+        cerrarModalForm();
+    });
+</script>
+{% endblock %}

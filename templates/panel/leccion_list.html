@@ -1,0 +1,426 @@
+<!-- templates/panel/leccion_list.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Lecciones del curso{% endblock %}
+
+{% block titulo_pagina %}<span>{{ titulo_pagina }}</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ── Breadcrumb ── */
+    .ll-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .75rem;
+        color: rgba(32,24,8,.45);
+        margin-bottom: 24px;
+    }
+    .ll-breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color .18s;
+    }
+    .ll-breadcrumb a:hover { color: var(--dark); }
+    .ll-breadcrumb i { font-size: .6rem; opacity: .5; }
+
+    /* ── Header de la página ── */
+    .ll-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+    .ll-header-left h2 {
+        font-family: var(--ff-display);
+        font-size: 1.65rem;
+        font-weight: 400;
+        color: var(--dark);
+        line-height: 1.2;
+    }
+    .ll-header-left h2 span {
+        font-style: italic;
+        color: var(--primary);
+    }
+    .ll-header-left p {
+        font-size: .78rem;
+        color: rgba(32,24,8,.45);
+        margin-top: 4px;
+    }
+
+    /* ── Botones de acción (header) ── */
+    .ll-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background .18s, box-shadow .18s, transform .12s;
+    }
+    .ll-btn:hover { transform: translateY(-1px); }
+
+    .ll-btn-outline {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        color: var(--dark);
+    }
+    .ll-btn-outline:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .ll-btn-primary {
+        background: var(--primary);
+        color: var(--white);
+        box-shadow: 0 2px 8px rgba(160,136,72,.25);
+    }
+    .ll-btn-primary:hover {
+        background: var(--dark);
+        box-shadow: 0 4px 16px rgba(104,88,32,.3);
+        color: var(--white);
+    }
+
+    /* ── Card contenedor ── */
+    .ll-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        border: 1px solid rgba(216,200,152,.35);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+    }
+
+    /* ── Stat chips (contador de lecciones) ── */
+    .ll-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 24px;
+        border-bottom: 1px solid rgba(216,200,152,.3);
+        background: var(--cream);
+    }
+    .ll-meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .73rem;
+        font-weight: 500;
+        color: var(--dark);
+        background: var(--warm);
+        border: 1px solid var(--sand);
+        padding: 4px 12px;
+        border-radius: 99px;
+    }
+    .ll-meta-chip i { color: var(--primary); font-size: .72rem; }
+
+    /* ── Tabla ── */
+    .ll-table-wrap { overflow-x: auto; }
+
+    .ll-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .ll-table thead tr {
+        background: var(--cream);
+        border-bottom: 2px solid rgba(216,200,152,.5);
+    }
+    .ll-table thead th {
+        padding: 12px 20px;
+        font-size: .67rem;
+        font-weight: 500;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: rgba(32,24,8,.45);
+        text-align: left;
+        white-space: nowrap;
+    }
+    .ll-table thead th:last-child { text-align: right; }
+
+    .ll-table tbody tr {
+        border-bottom: 1px solid rgba(216,200,152,.25);
+        transition: background .15s;
+    }
+    .ll-table tbody tr:last-child { border-bottom: none; }
+    .ll-table tbody tr:hover { background: rgba(250,247,240,.7); }
+
+    .ll-table tbody td {
+        padding: 15px 20px;
+        font-size: .83rem;
+        color: var(--ink);
+        vertical-align: middle;
+    }
+    .ll-table tbody td:last-child { text-align: right; }
+
+    /* Número de fila */
+    .ll-num {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: var(--warm);
+        border: 1px solid var(--sand);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .72rem;
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    /* Título de lección */
+    .ll-titulo {
+        font-weight: 400;
+        color: var(--ink);
+    }
+
+    /* Orden pill */
+    .ll-orden {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: .72rem;
+        font-weight: 500;
+        color: var(--primary);
+        background: rgba(160,136,72,.08);
+        padding: 3px 10px;
+        border-radius: 99px;
+        border: 1px solid rgba(160,136,72,.2);
+    }
+
+    /* Badges */
+    .ll-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border-radius: 99px;
+        font-size: .7rem;
+        font-weight: 500;
+    }
+    .ll-badge-yes {
+        background: rgba(112,152,136,.12);
+        color: #3a7060;
+        border: 1px solid rgba(112,152,136,.3);
+    }
+    .ll-badge-no {
+        background: rgba(32,24,8,.05);
+        color: rgba(32,24,8,.4);
+        border: 1px solid rgba(32,24,8,.1);
+    }
+
+    /* Botones de acción en tabla */
+    .ll-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .ll-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 7px;
+        font-size: .72rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+
+    .ll-action-edit {
+        background: rgba(160,136,72,.08);
+        color: var(--primary);
+        border-color: rgba(160,136,72,.2);
+    }
+    .ll-action-edit:hover {
+        background: var(--primary);
+        color: var(--white);
+        border-color: var(--primary);
+    }
+
+    .ll-action-delete {
+        background: rgba(200,80,80,.06);
+        color: #a04040;
+        border-color: rgba(200,80,80,.18);
+    }
+    .ll-action-delete:hover {
+        background: #c85050;
+        color: var(--white);
+        border-color: #c85050;
+    }
+
+    .ll-action-res {
+        background: rgba(112,152,136,.08);
+        color: #3a7060;
+        border-color: rgba(112,152,136,.2);
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    /* Estado vacío */
+    .ll-empty {
+        padding: 60px 24px;
+        text-align: center;
+    }
+    .ll-empty-icon {
+        width: 52px; height: 52px;
+        border-radius: 50%;
+        background: var(--warm);
+        border: 1px solid var(--sand);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: var(--primary);
+        margin-bottom: 14px;
+    }
+    .ll-empty h3 {
+        font-family: var(--ff-display);
+        font-size: 1.15rem;
+        font-weight: 400;
+        color: var(--dark);
+        margin-bottom: 6px;
+    }
+    .ll-empty p {
+        font-size: .8rem;
+        color: rgba(32,24,8,.45);
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="ll-breadcrumb">
+    <a href="{% url 'panel:curso_list' %}">Cursos</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>{{ curso.titulo }}</span>
+    <i class="fas fa-chevron-right"></i>
+    <span>Lecciones</span>
+</nav>
+
+<!-- Encabezado -->
+<div class="ll-header">
+    <div class="ll-header-left">
+        <h2>Lecciones de <span>{{ curso.titulo }}</span></h2>
+        <p>Gestiona el contenido secuencial del curso</p>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        
+        {# Ocultamos la edición del curso para instructores #}
+        {% if es_admin %}
+        <a href="{% url 'panel:curso_update' curso.pk %}" class="ll-btn ll-btn-outline">
+            <i class="fas fa-edit"></i> Editar curso
+        </a>
+        {% endif %}
+        
+        <a href="{% url 'panel:leccion_create' curso.pk %}" class="ll-btn ll-btn-primary">
+            <i class="fas fa-plus"></i> Añadir lección
+        </a>
+    </div>
+</div>
+
+<!-- Card principal -->
+<div class="ll-card">
+
+    <!-- Meta chips -->
+    <div class="ll-meta">
+        <div class="ll-meta-chip">
+            <i class="fas fa-layer-group"></i>
+            {{ lecciones|length }} lección{{ lecciones|length|pluralize:"es" }}
+        </div>
+        <div class="ll-meta-chip">
+            <i class="fas fa-eye"></i>
+            {% with free_count=lecciones|length %}
+                Vista previa disponible
+            {% endwith %}
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="ll-table-wrap">
+        <table class="ll-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Orden</th>
+                    <th>Vista previa gratuita</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if lecciones %}
+                    {% for leccion in lecciones %}
+                    <tr>
+                        <td>
+                            <span class="ll-num">{{ forloop.counter }}</span>
+                        </td>
+                        <td>
+                            <span class="ll-titulo">{{ leccion.titulo }}</span>
+                        </td>
+                        <td>
+                            <span class="ll-orden">
+                                <i class="fas fa-sort"></i>{{ leccion.orden }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if leccion.vista_previa_gratis %}
+                                <span class="ll-badge ll-badge-yes">
+                                    <i class="fas fa-check"></i> Sí
+                                </span>
+                            {% else %}
+                                <span class="ll-badge ll-badge-no">
+                                    <i class="fas fa-minus"></i> No
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="ll-actions">
+                                <a href="{% url 'panel:leccion_update' leccion.pk %}" class="ll-action-btn ll-action-edit" title="Editar lección">
+                                    <i class="fas fa-pen"></i> Editar
+                                </a>
+                                <a href="{% url 'panel:leccion_delete' leccion.pk %}" class="ll-action-btn ll-action-delete" title="Eliminar lección">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                <button class="ll-action-btn ll-action-res" disabled title="Próximamente">
+                                    <i class="fas fa-paperclip"></i> Recursos
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="ll-empty">
+                                <div class="ll-empty-icon">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                                <h3>Sin lecciones todavía</h3>
+                                <p>Este curso aún no tiene contenido. Comienza añadiendo una nueva lección.</p>
+                                
+                                {# Corregimos la URL para que apunte a leccion_create #}
+                                <a href="{% url 'panel:leccion_create' curso.pk %}" class="ll-btn ll-btn-primary">
+                                    <i class="fas fa-plus"></i> Crear primera lección
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

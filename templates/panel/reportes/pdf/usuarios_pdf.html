@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte - Usuarios</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #201808; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; }
+        .header-institucional { text-align: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #a08848; }
+        .header-institucional img { max-height: 60px; margin-bottom: 8px; }
+        .header-institucional h1 { color: #201808; font-size: 22px; margin: 0 0 4px; }
+        .header-institucional p { color: #8a8070; font-size: 12px; margin: 2px 0; }
+        .card { border: 1px solid #ebe6db; border-radius: 8px; margin-bottom: 18px; }
+        .card-header { background-color: #a08848; color: white; padding: 12px 18px; border-radius: 8px 8px 0 0; }
+        .card-header h2 { margin: 0; font-size: 16px; font-weight: bold; }
+        .card-body { padding: 16px 18px; }
+        table { width: 100%; border-collapse: collapse; }
+        .kpis td { text-align: center; padding: 14px 6px; }
+        .kpi-valor { font-size: 20px; font-weight: bold; color: #a08848; display: block; }
+        .kpi-label { font-size: 11px; color: #8a8070; text-transform: uppercase; }
+        .grafico { text-align: center; margin: 10px 0; }
+        .grafico img { max-width: 100%; height: auto; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header-institucional">
+        {% if logo_base64 %}<img src="data:image/jpeg;base64,{{ logo_base64 }}" alt="Centro DHAE">{% else %}<h1>CENTRO DHAE</h1>{% endif %}
+        <p>Reporte de usuarios — Generado el {{ fecha_generacion|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Indicadores principales</h2></div>
+        <div class="card-body">
+            <table class="kpis">
+                <tr>
+                    <td><span class="kpi-valor">{{ total_usuarios }}</span><span class="kpi-label">Total usuarios</span></td>
+                    <td><span class="kpi-valor">{{ activos }}</span><span class="kpi-label">Activos</span></td>
+                    <td><span class="kpi-valor">{{ inactivos }}</span><span class="kpi-label">Inactivos</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Distribución por rol</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_rol }}" alt="Rol" style="max-width:340px;"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Activos vs inactivos</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_activos }}" alt="Activos" style="max-width:300px;"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Nuevos usuarios por mes</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_nuevos }}" alt="Nuevos usuarios"></div></div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!-- templates/panel/inscripcion_detail.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block titulo_pagina %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-graduate"></i> Detalles de inscripción
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Estudiante:</strong>
+                        <p>{{ inscripcion.estudiante.username }} ({{ inscripcion.estudiante.email }})</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Curso:</strong>
+                        <p>{{ inscripcion.curso.titulo }}</p>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Progreso:</strong>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar {% if inscripcion.progreso == 100 %}bg-success{% else %}bg-primary{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ inscripcion.progreso }}%;" 
+                                 aria-valuenow="{{ inscripcion.progreso }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ inscripcion.progreso }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Estado:</strong>
+                        <p>
+                            {% if inscripcion.completado %}
+                                <span class="badge bg-success">Completado</span>
+                            {% else %}
+                                <span class="badge bg-warning">En progreso</span>
+                            {% endif %}
+                            
+                            {% if inscripcion.certificado_generado %}
+                                <span class="badge bg-info">Certificado generado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Inscrito el:</strong>
+                        <p>{{ inscripcion.inscrito_en|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Lecciones completadas:</strong>
+                        <p>{{ lecciones_completadas|length }} de {{ total_lecciones }}</p>
+                    </div>
+                </div>
+                
+                {% if lecciones_completadas %}
+                    <h6>Lecciones completadas:</h6>
+                    <ul class="list-group">
+                        {% for lc in lecciones_completadas %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ lc.leccion.titulo }}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> {{ lc.completada_en|date:"d/m/Y H:i" }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Este usuario aún no ha completado ninguna lección.
+                    </div>
+                {% endif %}
+                
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{% url 'panel:inscripcion_update' inscripcion.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'panel:inscripcion_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

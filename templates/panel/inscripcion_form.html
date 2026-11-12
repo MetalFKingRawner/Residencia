@@ -1,0 +1,96 @@
+<!-- templates/panel/inscripcion_form.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block titulo_pagina %}{{ titulo_pagina }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    {% if form.instance.pk %}
+                        <i class="fas fa-edit"></i> Editar inscripción
+                    {% else %}
+                        <i class="fas fa-plus"></i> Nueva inscripción
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.estudiante.id_for_label }}" class="form-label">
+                            {{ form.estudiante.label }}
+                        </label>
+                        {{ form.estudiante }}
+                        {% if form.estudiante.errors %}
+                            <div class="text-danger">{{ form.estudiante.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.curso.id_for_label }}" class="form-label">
+                            {{ form.curso.label }}
+                        </label>
+                        {{ form.curso }}
+                        {% if form.curso.errors %}
+                            <div class="text-danger">{{ form.curso.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.progreso.id_for_label }}" class="form-label">
+                            {{ form.progreso.label }}
+                        </label>
+                        {{ form.progreso }}
+                        <div class="form-text">0% = No iniciado, 100% = Completado</div>
+                        {% if form.progreso.errors %}
+                            <div class="text-danger">{{ form.progreso.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        {{ form.completado }}
+                        <label class="form-check-label" for="{{ form.completado.id_for_label }}">
+                            {{ form.completado.label }}
+                        </label>
+                        {% if form.completado.errors %}
+                            <div class="text-danger">{{ form.completado.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        {{ form.certificado_generado }}
+                        <label class="form-check-label" for="{{ form.certificado_generado.id_for_label }}">
+                            {{ form.certificado_generado.label }}
+                        </label>
+                        {% if form.certificado_generado.errors %}
+                            <div class="text-danger">{{ form.certificado_generado.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                        <a href="{% url 'panel:inscripcion_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

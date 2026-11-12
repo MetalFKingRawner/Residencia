@@ -148,9 +148,31 @@
                     <p class="mb-0">La prueba consta de <strong>2 partes</strong> con diferentes sistemas de respuesta</p>
                 </div>
                 
-                <a href="{% url 'tests:primera_parte_valores' %}" class="btn btn-primary btn-lg px-5 py-3">
-                    <i class="fas fa-play me-2"></i>Comenzar Primera Parte
-                </a>
+                <div class="text-center mt-5">
+                {% if not CONFIG.pruebas_activas %}
+                    <div class="alert alert-warning d-inline-block px-4 py-3 shadow-sm">
+                        <i class="fas fa-lock me-2"></i> 
+                        <strong>Acceso Bloqueado:</strong> Las evaluaciones métricas no se encuentran activas en este momento.
+                    </div>
+                    <br>
+                    <a href="{% url 'home' %}" class="btn btn-secondary btn-lg mt-2">
+                        <i class="fas fa-arrow-left me-2"></i> Volver al Inicio
+                    </a>
+                {% else %}
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'tests:primera_parte_valores' %}" class="btn btn-success btn-lg px-5 py-3 fw-bold shadow">
+                            <i class="fas fa-play me-2"></i> Comenzar Primera Parte
+                        </a>
+                    {% else %}
+                        <div class="mb-3 text-muted">
+                            <i class="fas fa-info-circle me-1"></i> Para iniciar esta prueba, es necesario iniciar sesión con tus credenciales.
+                        </div>
+                        <a href="{% url 'core_login' %}?next={% url 'tests:primera_parte_valores' %}" class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow">
+                            <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión para Comenzar
+                        </a>
+                    {% endif %}
+                {% endif %}
+                </div>
                 
                 <!--<div class="mt-3">
                     <small class="text-muted">Tiempo estimado: 20-30 minutos</small>

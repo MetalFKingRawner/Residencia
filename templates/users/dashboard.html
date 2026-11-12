@@ -1,150 +1,476 @@
-{% extends 'base.html' %}
+{% extends 'courses/base_cursos.html' %}
 {% load static %}
 
-{% block title %}Dashboard - PsyMetrics{% endblock %}
+{% block title %}Mi Dashboard - PsyMetrics{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    .pm-dashboard {
+        --pm-radius: 14px;
+        font-family: var(--ff-body);
+        color: var(--ink);
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+    }
+
+    /* Hero */
+    .pm-hero { margin-bottom: 36px; }
+    .pm-eyebrow {
+        font-family: var(--ff-body);
+        font-size: .72rem;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--primary);
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .pm-title {
+        font-family: var(--ff-display);
+        font-size: 2.6rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin: 0 0 6px;
+        line-height: 1.1;
+    }
+    .pm-subtitle {
+        font-size: .95rem;
+        color: var(--dark);
+        margin: 0;
+    }
+
+    /* Stat ribbon */
+    .pm-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 40px;
+    }
+    .pm-stat {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        border-radius: var(--pm-radius);
+        padding: 20px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: border-color .2s, transform .2s;
+    }
+    .pm-stat:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .pm-stat i {
+        font-size: 1.1rem;
+        width: 42px; height: 42px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        background: var(--warm);
+        color: var(--primary);
+        flex-shrink: 0;
+    }
+    .pm-stat--sage i { background: var(--accent2); color: var(--accent); }
+    .pm-stat-body { display: flex; flex-direction: column; }
+    .pm-stat-num {
+        font-family: var(--ff-display);
+        font-size: 2.1rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--ink);
+    }
+    .pm-stat-label {
+        font-size: .78rem;
+        color: var(--dark);
+        margin-top: 4px;
+    }
+
+        /* Cursos en progreso */
+    .pm-courses { margin-bottom: 40px; }
+    .pm-courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+    }
+    .pm-course-card {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        border-radius: var(--pm-radius);
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: border-color .2s, transform .2s;
+    }
+    .pm-course-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .pm-course-title {
+        font-family: var(--ff-display);
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin: 0;
+    }
+    .pm-course-meta {
+        font-size: .78rem;
+        color: var(--dark);
+        display: flex;
+        justify-content: space-between;
+    }
+    .pm-progress-bar {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--warm);
+        overflow: hidden;
+    }
+    .pm-progress-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: 999px;
+        transition: width .3s ease;
+    }
+    .pm-course-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .pm-course-card--completo { border-color: var(--accent); }
+    .pm-course-card--completo .pm-progress-fill { background: var(--accent); }
+
+    /* Empty state (no tests at all) */
+    .pm-empty-full {
+        background: var(--warm);
+        border: 1px dashed var(--sand);
+        border-radius: var(--pm-radius);
+        text-align: center;
+        padding: 56px 24px;
+    }
+    .pm-empty-full i { font-size: 2rem; color: var(--primary); margin-bottom: 14px; }
+    .pm-empty-full h2 {
+        font-family: var(--ff-display);
+        font-size: 1.6rem;
+        color: var(--ink);
+        margin: 0 0 8px;
+    }
+    .pm-empty-full p { color: var(--dark); font-size: .9rem; margin: 0 0 22px; }
+    .pm-empty-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* Buttons */
+    .pm-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: .85rem; font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 999px;
+        text-decoration: none;
+        transition: background .2s, color .2s, border-color .2s;
+        border: 1px solid transparent;
+    }
+    .pm-btn--primary { background: var(--primary); color: var(--white); }
+    .pm-btn--primary:hover { background: var(--dark); color: var(--white); }
+    .pm-btn--outline { border-color: var(--primary); color: var(--primary); }
+    .pm-btn--outline:hover { background: var(--primary); color: var(--white); }
+    .pm-btn--sm { padding: 7px 16px; font-size: .78rem; }
+
+    /* Main grid */
+    .pm-grid {
+        display: grid;
+        grid-template-columns: 1.55fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+    .pm-panel {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        border-radius: var(--pm-radius);
+        overflow: hidden;
+    }
+    .pm-panel-header {
+        padding: 20px 24px 14px;
+        border-bottom: 1px solid var(--warm);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .pm-panel-header h2 {
+        font-family: var(--ff-display);
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin: 0;
+    }
+    .pm-panel-header a {
+        font-size: .78rem;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .pm-panel-header a:hover { color: var(--dark); }
+
+    /* History list */
+    .pm-list { list-style: none; margin: 0; padding: 8px 0; }
+    .pm-list-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 24px;
+        border-left: 3px solid transparent;
+        transition: background .15s;
+    }
+    .pm-list-item:hover { background: var(--cream); }
+    .pm-list-item--valores { border-left-color: var(--primary); }
+    .pm-list-item--domino { border-left-color: var(--accent); }
+    .pm-list-icon {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--warm);
+        color: var(--primary);
+        font-size: .85rem;
+        flex-shrink: 0;
+    }
+    .pm-list-item--domino .pm-list-icon { background: var(--accent2); color: var(--accent); }
+    .pm-list-body { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+    .pm-list-name { font-weight: 500; font-size: .9rem; color: var(--ink); }
+    .pm-list-date { font-size: .75rem; color: var(--dark); margin-top: 2px; }
+    .pm-list-result {
+        font-family: var(--ff-display);
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--primary);
+        white-space: nowrap;
+        margin-right: 6px;
+    }
+    .pm-list-link {
+        font-size: .78rem;
+        color: var(--dark);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .pm-list-link:hover { color: var(--primary); }
+
+    /* Values panel */
+    .pm-values-body { padding: 20px 24px 24px; }
+    .pm-radar-wrap { max-width: 260px; margin: 0 auto 18px; }
+    .pm-values-legend { list-style: none; margin: 0; padding: 0; }
+    .pm-values-legend li {
+        display: flex; justify-content: space-between;
+        font-size: .82rem;
+        padding: 7px 0;
+        border-bottom: 1px solid var(--warm);
+        color: var(--ink);
+    }
+    .pm-values-legend li:last-child { border-bottom: none; }
+    .pm-values-legend b { color: var(--primary); font-family: var(--ff-display); font-size: .95rem; }
+
+    .pm-empty-mini {
+        text-align: center;
+        padding: 32px 20px 36px;
+    }
+    .pm-empty-mini i { font-size: 1.5rem; color: var(--sand); margin-bottom: 10px; }
+    .pm-empty-mini p { font-size: .85rem; color: var(--dark); margin: 0 0 16px; }
+
+    @media (max-width: 860px) {
+        .pm-grid { grid-template-columns: 1fr; }
+        .pm-stats { grid-template-columns: 1fr; }
+        .pm-title { font-size: 2.1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pm-stat { transition: none; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <h1 class="text-center mb-4">Dashboard</h1>
-    
-    <div class="row">
-        <!-- Estadísticas Rápidas -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-primary">
-                <div class="card-body text-center">
-                    <h2 class="display-1">{{ total_tests }}</h2>
-                    <p class="card-text">Pruebas completadas</p>
-                </div>
-            </div>
+<div class="pm-dashboard">
+
+    <div class="pm-hero">
+        <p class="pm-eyebrow">Panel personal</p>
+        <h1 class="pm-title">Hola, {{ user.full_name|default:user.username }}</h1>
+        <p class="pm-subtitle">Este es el resumen de tu trayectoria en Centro DHAE.</p>
+    </div>
+
+        {% if cursos_progreso %}
+    <div class="pm-courses">
+        <div class="pm-panel-header" style="padding:0 0 14px; border:none;">
+            <h2 style="font-family: var(--ff-display); font-size:1.3rem; font-weight:600; color: var(--ink); margin:0;">
+                Mis cursos
+            </h2>
         </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-success">
-                <div class="card-body text-center">
-                    <h2 class="display-1">{{ total_valores }}</h2>
-                    <p class="card-text">Test de Valores</p>
+        <div class="pm-courses-grid">
+            {% for curso in cursos_progreso %}
+            <div class="pm-course-card{% if curso.completado %} pm-course-card--completo{% endif %}">
+                <h3 class="pm-course-title">{{ curso.titulo }}</h3>
+                <div class="pm-progress-bar">
+                    <div class="pm-progress-fill" style="width: {{ curso.progreso }}%;"></div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-info">
-                <div class="card-body text-center">
-                    <h2 class="display-1">{{ total_domino }}</h2>
-                    <p class="card-text">Test de Dominó</p>
+                <div class="pm-course-meta">
+                    <span>{{ curso.progreso }}% completado</span>
+                    <span>{{ curso.lecciones_completadas }}/{{ curso.total_lecciones }} lecciones</span>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Últimas Pruebas -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">Últimas Pruebas</h3>
-                </div>
-                <div class="card-body">
-                    {% if ultimas_pruebas %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Prueba</th>
-                                    <th>Fecha</th>
-                                    <th>Resultado</th>
-                                    <th>Detalles</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for prueba in ultimas_pruebas %}
-                                <tr>
-                                    <td>
-                                        {% if prueba.test.nombre %}
-                                            {{ prueba.test.nombre }}
-                                        {% else %}
-                                            Test de Dominó D-48
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if prueba.fecha_completado %}
-                                            {{ prueba.fecha_completado|date:"d M Y" }}
-                                        {% else %}
-                                            {{ prueba.fecha|date:"d M Y" }}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if prueba.valor_dominante %}
-                                            {{ prueba.valor_dominante }}
-                                        {% else %}
-                                            {{ prueba.puntuacion }} pts
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if prueba.valor_dominante %}
-                                        <a href="{% url 'tests:reporte_valores' prueba.id %}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            Ver <i class="fas fa-chevron-right ms-1"></i>
-                                        </a>
-                                        {% else %}
-                                        <a href="{% url 'tests:resultados_domino' prueba.id %}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            Ver <i class="fas fa-chevron-right ms-1"></i>
-                                        </a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                        <p class="mb-0">No has realizado pruebas aún</p>
-                        <a href="{% url 'inicio_test_valores' %}" class="btn btn-outline-success mt-3">
-                            Realizar Test
+                <div class="pm-course-actions">
+                    {% if curso.completado %}
+                        <a href="{{ curso.certificado_url }}" class="pm-btn pm-btn--primary pm-btn--sm">
+                            <i class="fas fa-award"></i> Descargar certificado
                         </a>
-                    </div>
+                    {% else %}
+                        <a href="{{ curso.continuar_url }}" class="pm-btn pm-btn--outline pm-btn--sm">
+                            <i class="fas fa-play"></i> Continuar
+                        </a>
                     {% endif %}
                 </div>
             </div>
+            {% endfor %}
         </div>
-        
-        <!-- Estadísticas de Valores -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h3 class="card-title mb-0">Promedio Test de Valores</h3>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Teórico</span>
-                            <span class="fw-bold">{{ avg_valores.teorico|floatformat:1 }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Económico</span>
-                            <span class="fw-bold">{{ avg_valores.economico|floatformat:1 }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Estético</span>
-                            <span class="fw-bold">{{ avg_valores.estetico|floatformat:1 }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Social</span>
-                            <span class="fw-bold">{{ avg_valores.social|floatformat:1 }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Político</span>
-                            <span class="fw-bold">{{ avg_valores.politico|floatformat:1 }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Religioso</span>
-                            <span class="fw-bold">{{ avg_valores.religioso|floatformat:1 }}</span>
-                        </li>
-                    </ul>
-                </div>
+    </div>
+    {% endif %}
+
+    <div class="pm-stats">
+        <div class="pm-stat">
+            <i class="fas fa-clipboard-check"></i>
+            <div class="pm-stat-body">
+                <span class="pm-stat-num">{{ total_tests }}</span>
+                <span class="pm-stat-label">Pruebas completadas</span>
+            </div>
+        </div>
+        <div class="pm-stat">
+            <i class="fas fa-compass"></i>
+            <div class="pm-stat-body">
+                <span class="pm-stat-num">{{ total_valores }}</span>
+                <span class="pm-stat-label">Test de Valores</span>
+            </div>
+        </div>
+        <div class="pm-stat pm-stat--sage">
+            <i class="fas fa-brain"></i>
+            <div class="pm-stat-body">
+                <span class="pm-stat-num">{{ total_domino }}</span>
+                <span class="pm-stat-label">Test de Dominó</span>
             </div>
         </div>
     </div>
+
+    {% if total_tests == 0 %}
+        <div class="pm-empty-full">
+            <i class="fas fa-seedling"></i>
+            <h2>Empieza tu primer test</h2>
+            <p>Cuando completes una evaluación, tus resultados y tu progreso aparecerán aquí.</p>
+            <div class="pm-empty-actions">
+                <a href="{% url 'tests:inicio_test_valores' %}" class="pm-btn pm-btn--primary">
+                    <i class="fas fa-compass"></i> Test de Valores
+                </a>
+                <a href="{% url 'tests:inicio_domino' %}" class="pm-btn pm-btn--outline">
+                    <i class="fas fa-brain"></i> Test de Dominó
+                </a>
+            </div>
+        </div>
+    {% else %}
+    <div class="pm-grid">
+
+        <!-- Historial -->
+        <div class="pm-panel pm-history">
+            <div class="pm-panel-header">
+                <h2>Historial reciente</h2>
+            </div>
+            <ul class="pm-list">
+                {% for prueba in ultimas_pruebas %}
+                <li class="pm-list-item pm-list-item--{{ prueba.tipo }}">
+                    <div class="pm-list-icon">
+                        <i class="fas {% if prueba.tipo == 'valores' %}fa-compass{% else %}fa-brain{% endif %}"></i>
+                    </div>
+                    <div class="pm-list-body">
+                        <span class="pm-list-name">{{ prueba.nombre_test }}</span>
+                        <span class="pm-list-date">{{ prueba.fecha_mostrar|date:"d M Y" }}</span>
+                    </div>
+                    <span class="pm-list-result">{{ prueba.resultado_mostrar }}</span>
+                    <a href="{{ prueba.detalle_url }}" class="pm-list-link">Ver <i class="fas fa-chevron-right"></i></a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Perfil de valores -->
+        <div class="pm-panel pm-values">
+            <div class="pm-panel-header">
+                <h2>Tu perfil de valores</h2>
+            </div>
+            <div class="pm-values-body">
+                {% if total_valores > 0 %}
+                    <div class="pm-radar-wrap">
+                        <canvas id="valoresRadar"></canvas>
+                    </div>
+                    <ul class="pm-values-legend">
+                        <li><span>Teórico</span><b>{{ avg_valores.teorico|floatformat:1|default:"0.0" }}</b></li>
+                        <li><span>Económico</span><b>{{ avg_valores.economico|floatformat:1|default:"0.0" }}</b></li>
+                        <li><span>Estético</span><b>{{ avg_valores.estetico|floatformat:1|default:"0.0" }}</b></li>
+                        <li><span>Social</span><b>{{ avg_valores.social|floatformat:1|default:"0.0" }}</b></li>
+                        <li><span>Político</span><b>{{ avg_valores.politico|floatformat:1|default:"0.0" }}</b></li>
+                        <li><span>Religioso</span><b>{{ avg_valores.religioso|floatformat:1|default:"0.0" }}</b></li>
+                    </ul>
+                {% else %}
+                    <div class="pm-empty-mini">
+                        <i class="fas fa-compass"></i>
+                        <p>Aún no tienes resultados del Test de Valores.</p>
+                        <a href="{% url 'tests:inicio_test_valores' %}" class="pm-btn pm-btn--primary pm-btn--sm">
+                            Realizar Test
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+
 </div>
+
+{% if total_valores > 0 %}
+{{ avg_valores|json_script:"avg-valores-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('valoresRadar');
+    if (!ctx) return;
+
+    const avgValores = JSON.parse(document.getElementById('avg-valores-data').textContent);
+
+    const styles = getComputedStyle(document.documentElement);
+    const primary = styles.getPropertyValue('--primary').trim() || '#a08848';
+    const ink = styles.getPropertyValue('--ink').trim() || '#201808';
+    const sand = styles.getPropertyValue('--sand').trim() || '#d8c898';
+
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Teórico', 'Económico', 'Estético', 'Social', 'Político', 'Religioso'],
+            datasets: [{
+                label: 'Promedio',
+                data: [
+                    avgValores.teorico || 0,
+                    avgValores.economico || 0,
+                    avgValores.estetico || 0,
+                    avgValores.social || 0,
+                    avgValores.politico || 0,
+                    avgValores.religioso || 0
+                ],
+                backgroundColor: primary + '33',
+                borderColor: primary,
+                borderWidth: 2,
+                pointBackgroundColor: primary,
+                pointBorderColor: '#fff',
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    angleLines: { color: sand },
+                    grid: { color: sand },
+                    pointLabels: {
+                        color: ink,
+                        font: { family: "'DM Sans', sans-serif", size: 11 }
+                    },
+                    ticks: { display: false, backdropColor: 'transparent' }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

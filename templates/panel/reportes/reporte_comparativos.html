@@ -1,0 +1,151 @@
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Reportes comparativos{% endblock %}
+{% block titulo_pagina %}<span>Comparativos</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    .ra-filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 24px; background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius); padding: 16px 20px; }
+    .ra-filtros label { display: block; font-size: .68rem; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .ra-filtros input { border: 1px solid var(--sand); border-radius: 8px; padding: 7px 10px;
+        font-family: var(--ff-body); font-size: .8rem; color: var(--ink); background: var(--cream); }
+    .ra-filtros button { padding: 8px 20px; border-radius: 99px; border: none; background: var(--primary); color: #fff; font-size: .8rem; cursor: pointer; }
+    .ra-filtros button:hover { background: var(--dark); }
+
+    .ra-panel { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        box-shadow: var(--shadow-card); padding: 18px 22px; margin-bottom: 20px; }
+    .ra-panel-title { font-family: var(--ff-display); font-size: 1.02rem; font-weight: 600; color: var(--dark); margin-bottom: 14px; }
+    .ra-panel-title span { font-style: italic; color: var(--primary); }
+    .ra-chart-wrap { position: relative; height: 260px; }
+
+    .ra-table-wrap { overflow-x: auto; }
+    .ra-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .ra-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--sand);
+        font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: #999; }
+    .ra-table td { padding: 10px 12px; border-bottom: 1px solid #f0ebe0; color: var(--ink); }
+    .ra-variacion { font-weight: 500; }
+    .ra-variacion.positiva { color: var(--accent); }
+    .ra-variacion.negativa { color: #b05050; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'panel/reportes/_subnav.html' %}
+
+<!-- Filtros -->
+<form method="get" class="ra-filtros">
+    <div><label>Desde</label><input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></div>
+    <div><label>Hasta</label><input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></div>
+    <button type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'panel:reporte_comparativos_pdf' %}?{{ request.GET.urlencode }}"
+       style="background:#b05050; text-decoration:none; padding:8px 20px; border-radius:99px; color:#fff; font-size:.8rem; display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+    </a>
+</form>
+
+<!-- 1. Pruebas por género -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Pruebas aplicadas por <span>género</span> (Allport vs Dominó)</div>
+    <div class="ra-chart-wrap"><canvas id="chartGenero"></canvas></div>
+</div>
+
+<!-- 2. Percentil promedio por grupo de edad -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Percentil promedio por <span>grupo de edad</span> (Dominó)</div>
+    <div class="ra-table-wrap">
+        <table class="ra-table">
+            <thead><tr><th>Grupo de edad</th><th>Percentil promedio</th><th>Aplicaciones</th><th>Vs. promedio general</th></tr></thead>
+            <tbody>
+                {% for fila in tabla_edad %}
+                <tr>
+                    <td>{{ fila.grupo_edad }}</td>
+                    <td>{{ fila.promedio_percentil }}</td>
+                    <td>{{ fila.total }}</td>
+                    <td class="ra-variacion {% if fila.variacion >= 0 %}positiva{% else %}negativa{% endif %}">
+                        {% if fila.variacion >= 0 %}+{% endif %}{{ fila.variacion }}%
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center; color:#aaa;">Sin datos en este rango.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 3. Tasa de finalización por institución -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Tasa de finalización por <span>institución</span> (top 10)</div>
+    <div class="ra-table-wrap">
+        <table class="ra-table">
+            <thead><tr><th>Institución</th><th>Inscripciones</th><th>Completadas</th><th>Tasa</th><th>Vs. promedio general</th></tr></thead>
+            <tbody>
+                {% for fila in tabla_institucion %}
+                <tr>
+                    <td>{{ fila.institucion }}</td>
+                    <td>{{ fila.total }}</td>
+                    <td>{{ fila.completadas }}</td>
+                    <td>{{ fila.tasa_finalizacion }}%</td>
+                    <td class="ra-variacion {% if fila.variacion >= 0 %}positiva{% else %}negativa{% endif %}">
+                        {% if fila.variacion >= 0 %}+{% endif %}{{ fila.variacion }} pts
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center; color:#aaa;">Sin datos en este rango.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 4. Progreso promedio por instructor -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Progreso promedio por <span>instructor</span></div>
+    <div class="ra-table-wrap">
+        <table class="ra-table">
+            <thead><tr><th>Instructor</th><th>Estudiantes</th><th>Progreso promedio</th><th>Vs. promedio general</th></tr></thead>
+            <tbody>
+                {% for fila in tabla_instructor %}
+                <tr>
+                    <td>{{ fila.instructor }}</td>
+                    <td>{{ fila.total_estudiantes }}</td>
+                    <td>{{ fila.progreso_promedio }}%</td>
+                    <td class="ra-variacion {% if fila.variacion >= 0 %}positiva{% else %}negativa{% endif %}">
+                        {% if fila.variacion >= 0 %}+{% endif %}{{ fila.variacion }} pts
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center; color:#aaa;">Sin datos en este rango.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ comparativo_genero|json_script:"data-genero" }}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+(function() {
+    const genero = JSON.parse(document.getElementById('data-genero').textContent);
+    const dorado = '#a08848', salvia = '#709888';
+
+    new Chart(document.getElementById('chartGenero'), {
+        type: 'bar',
+        data: {
+            labels: genero.labels,
+            datasets: [
+                { label: 'Allport', data: genero.allport, backgroundColor: dorado },
+                { label: 'Dominó', data: genero.domino, backgroundColor: salvia },
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+})();
+</script>
+{% endblock %}

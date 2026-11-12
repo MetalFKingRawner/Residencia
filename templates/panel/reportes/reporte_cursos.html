@@ -1,0 +1,191 @@
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Reporte de cursos{% endblock %}
+{% block titulo_pagina %}<span>Reporte de cursos</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    .ra-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .ra-stat { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        padding: 18px 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-card); }
+    .ra-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        border-radius: var(--radius) var(--radius) 0 0; }
+    .ra-stat-gold::before { background: var(--primary); }
+    .ra-stat-sage::before { background: var(--accent); }
+    .ra-stat-sand::before { background: var(--sand); }
+    .ra-stat-warm::before { background: #c09060; }
+    .ra-stat-label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: #aaa; font-weight: 500; margin-bottom: 6px; }
+    .ra-stat-value { font-family: var(--ff-display); font-size: 1.7rem; font-weight: 600; color: var(--dark); line-height: 1; }
+
+    .ra-filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 24px; background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius); padding: 16px 20px; }
+    .ra-filtros label { display: block; font-size: .68rem; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .ra-filtros input, .ra-filtros select { border: 1px solid var(--sand); border-radius: 8px; padding: 7px 10px;
+        font-family: var(--ff-body); font-size: .8rem; color: var(--ink); background: var(--cream); }
+    .ra-filtros button { padding: 8px 20px; border-radius: 99px; border: none; background: var(--primary); color: #fff; font-size: .8rem; cursor: pointer; }
+    .ra-filtros button:hover { background: var(--dark); }
+
+    .ra-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .ra-panel { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        box-shadow: var(--shadow-card); padding: 18px 22px; }
+    .ra-panel-title { font-family: var(--ff-display); font-size: 1.02rem; font-weight: 600; color: var(--dark); margin-bottom: 14px; }
+    .ra-panel-title span { font-style: italic; color: var(--primary); }
+    .ra-chart-wrap { position: relative; height: 240px; }
+
+    .ra-table-wrap { overflow-x: auto; }
+    .ra-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .ra-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--sand);
+        font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: #999; }
+    .ra-table td { padding: 10px 12px; border-bottom: 1px solid #f0ebe0; color: var(--ink); }
+    .ra-bar-mini { width: 80px; height: 6px; background: #f0ebe0; border-radius: 99px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .ra-bar-mini span { display: block; height: 100%; background: var(--accent); }
+
+    @media (max-width: 1100px) {
+        .ra-stats { grid-template-columns: repeat(2, 1fr); }
+        .ra-charts { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'panel/reportes/_subnav.html' %}
+
+<!-- Filtros -->
+<form method="get" class="ra-filtros">
+    <div><label>Desde</label><input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></div>
+    <div><label>Hasta</label><input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></div>
+    <div>
+        <label>Curso</label>
+        <select name="curso">
+            <option value="">Todos</option>
+            {% for c in cursos_choices %}
+            <option value="{{ c.id }}" {% if curso_id == c.id %}selected{% endif %}>{{ c.titulo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label>Instructor</label>
+        <select name="instructor">
+            <option value="">Todos</option>
+            {% for i in instructores_choices %}
+            <option value="{{ i.id }}" {% if instructor_id == i.id %}selected{% endif %}>{{ i.full_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label>Estado</label>
+        <select name="estado">
+            <option value="todos" {% if estado == 'todos' %}selected{% endif %}>Todos</option>
+            <option value="publicado" {% if estado == 'publicado' %}selected{% endif %}>Publicado</option>
+            <option value="no_publicado" {% if estado == 'no_publicado' %}selected{% endif %}>No publicado</option>
+        </select>
+    </div>
+    <button type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'panel:reporte_cursos_pdf' %}?{{ request.GET.urlencode }}"
+       style="background:#b05050; text-decoration:none; padding:8px 20px; border-radius:99px; color:#fff; font-size:.8rem; display:inline-flex; align-items:center; gap:6px;">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+    </a>
+</form>
+
+<!-- KPIs -->
+<div class="ra-stats">
+    <div class="ra-stat ra-stat-gold">
+        <div class="ra-stat-label">Total cursos</div>
+        <div class="ra-stat-value">{{ total_cursos }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sage">
+        <div class="ra-stat-label">Total inscripciones</div>
+        <div class="ra-stat-value">{{ total_inscripciones }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sand">
+        <div class="ra-stat-label">Tasa de finalización</div>
+        <div class="ra-stat-value">{{ tasa_finalizacion_global }}%</div>
+    </div>
+    <div class="ra-stat ra-stat-warm">
+        <div class="ra-stat-label">Progreso promedio</div>
+        <div class="ra-stat-value">{{ progreso_promedio_global }}%</div>
+    </div>
+</div>
+
+<!-- Gráficas -->
+<div class="ra-charts">
+    <div class="ra-panel">
+        <div class="ra-panel-title">Top 10 <span>cursos</span> por inscripciones</div>
+        <div class="ra-chart-wrap"><canvas id="chartTopCursos"></canvas></div>
+    </div>
+    <div class="ra-panel">
+        <div class="ra-panel-title">Estado de <span>inscripciones</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartEstado"></canvas></div>
+    </div>
+</div>
+
+<div class="ra-panel" style="margin-bottom:24px;">
+    <div class="ra-panel-title">Evolución mensual de <span>inscripciones</span></div>
+    <div class="ra-chart-wrap"><canvas id="chartEvolucion"></canvas></div>
+</div>
+
+<!-- Tabla por curso -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Detalle por <span>curso</span></div>
+    <div class="ra-table-wrap">
+        <table class="ra-table">
+            <thead>
+                <tr><th>Curso</th><th>Instructor</th><th>Inscripciones</th><th>Completados</th><th>Tasa finalización</th><th>Progreso promedio</th></tr>
+            </thead>
+            <tbody>
+                {% for fila in tabla_cursos %}
+                <tr>
+                    <td>{{ fila.curso.titulo }}</td>
+                    <td>{{ fila.instructor }}</td>
+                    <td>{{ fila.inscripciones }}</td>
+                    <td>{{ fila.completados }}</td>
+                    <td>
+                        <span class="ra-bar-mini"><span style="width:{{ fila.tasa_finalizacion }}%;"></span></span>
+                        {{ fila.tasa_finalizacion }}%
+                    </td>
+                    <td>{{ fila.progreso_promedio }}%</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center; color:#aaa;">Sin cursos en este rango de filtros.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ top_cursos_inscripciones|json_script:"data-top-cursos" }}
+{{ distribucion_estado|json_script:"data-estado" }}
+{{ evolucion_inscripciones|json_script:"data-evolucion" }}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+(function() {
+    const topCursos = JSON.parse(document.getElementById('data-top-cursos').textContent);
+    const estado = JSON.parse(document.getElementById('data-estado').textContent);
+    const evolucion = JSON.parse(document.getElementById('data-evolucion').textContent);
+    const dorado = '#a08848', salvia = '#709888', arena = '#d8c898';
+
+    new Chart(document.getElementById('chartTopCursos'), {
+        type: 'bar',
+        data: { labels: topCursos.labels, datasets: [{ label: 'Inscripciones', data: topCursos.data, backgroundColor: dorado }] },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+    });
+
+    new Chart(document.getElementById('chartEstado'), {
+        type: 'pie',
+        data: { labels: estado.labels, datasets: [{ data: estado.data, backgroundColor: [salvia, arena] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartEvolucion'), {
+        type: 'line',
+        data: { labels: evolucion.labels, datasets: [{ label: 'Inscripciones', data: evolucion.data, borderColor: dorado, backgroundColor: 'transparent', tension: .3 }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+})();
+</script>
+{% endblock %}

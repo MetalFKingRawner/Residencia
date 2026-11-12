@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte - Pruebas psicológicas</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #201808; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; }
+        .header-institucional { text-align: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #a08848; }
+        .header-institucional img { max-height: 60px; margin-bottom: 8px; }
+        .header-institucional h1 { color: #201808; font-size: 22px; margin: 0 0 4px; }
+        .header-institucional p { color: #8a8070; font-size: 12px; margin: 2px 0; }
+        .card { border: 1px solid #ebe6db; border-radius: 8px; margin-bottom: 18px; }
+        .card-header { background-color: #a08848; color: white; padding: 12px 18px; border-radius: 8px 8px 0 0; }
+        .card-header h2 { margin: 0; font-size: 16px; font-weight: bold; }
+        .card-body { padding: 16px 18px; }
+        table { width: 100%; border-collapse: collapse; }
+        .kpis td { text-align: center; padding: 14px 6px; }
+        .kpi-valor { font-size: 20px; font-weight: bold; color: #a08848; display: block; }
+        .kpi-label { font-size: 11px; color: #8a8070; text-transform: uppercase; }
+        .grafico { text-align: center; margin: 10px 0; }
+        .grafico img { max-width: 100%; height: auto; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header-institucional">
+        {% if logo_base64 %}<img src="data:image/jpeg;base64,{{ logo_base64 }}" alt="Centro DHAE" style="height: 80px; width: auto;">{% else %}<h1>CENTRO DHAE</h1>{% endif %}
+        <p>Reporte de pruebas psicológicas — Generado el {{ fecha_generacion|date:"d/m/Y H:i" }}</p>
+        <p>Periodo: {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Indicadores principales</h2></div>
+        <div class="card-body">
+            <table class="kpis">
+                <tr>
+                    <td><span class="kpi-valor">{{ total_general }}</span><span class="kpi-label">Total pruebas</span></td>
+                    <td><span class="kpi-valor">{{ total_allport }}</span><span class="kpi-label">Allport aplicadas</span></td>
+                    <td><span class="kpi-valor">{{ total_domino }}</span><span class="kpi-label">Dominó aplicadas</span></td>
+                    <td><span class="kpi-valor">{{ promedio_percentil_domino|default:"—"|floatformat:1 }}</span><span class="kpi-label">Percentil prom. Dominó</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Distribución por género</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_genero }}" alt="Género" style="max-width:320px;"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Distribución por grupo de edad (Dominó)</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_edad }}" alt="Edad"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Promedios Allport</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_allport }}" alt="Promedios Allport"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Top 10 instituciones</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_institucion }}" alt="Instituciones"></div></div>
+    </div>
+
+</div>
+</body>
+</html>

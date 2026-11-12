@@ -1,0 +1,238 @@
+<!-- templates/panel/leccion_confirm_delete.html -->
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Eliminar lección{% endblock %}
+
+{% block titulo_pagina %}<span>Eliminar lección</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ── Breadcrumb ── */
+    .lcd-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: .75rem;
+        color: rgba(32,24,8,.45);
+        margin-bottom: 32px;
+    }
+    .lcd-breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color .18s;
+    }
+    .lcd-breadcrumb a:hover { color: var(--dark); }
+    .lcd-breadcrumb i { font-size: .6rem; opacity: .5; }
+
+    /* ── Wrapper centrado ── */
+    .lcd-wrap {
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    /* ── Card ── */
+    .lcd-card {
+        background: var(--white);
+        border-radius: var(--radius);
+        border: 1px solid rgba(200,80,80,.2);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+    }
+
+    /* ── Franja superior de peligro ── */
+    .lcd-danger-bar {
+        height: 4px;
+        background: linear-gradient(90deg, #c85050, #e07070);
+    }
+
+    /* ── Icono central ── */
+    .lcd-icon-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 36px 32px 24px;
+        text-align: center;
+        border-bottom: 1px solid rgba(216,200,152,.25);
+    }
+    .lcd-icon {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        background: rgba(200,80,80,.08);
+        border: 1px solid rgba(200,80,80,.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: #c85050;
+        margin-bottom: 18px;
+    }
+    .lcd-icon-wrap h2 {
+        font-family: var(--ff-display);
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: var(--dark);
+        margin-bottom: 8px;
+    }
+    .lcd-icon-wrap h2 em {
+        font-style: italic;
+        color: #c85050;
+    }
+    .lcd-icon-wrap p {
+        font-size: .8rem;
+        color: rgba(32,24,8,.45);
+        line-height: 1.6;
+        max-width: 360px;
+    }
+
+    /* ── Nombre de la lección destacada ── */
+    .lcd-lesson-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 24px 32px;
+        padding: 14px 18px;
+        background: var(--cream);
+        border: 1px solid var(--sand);
+        border-radius: 8px;
+    }
+    .lcd-lesson-name i {
+        color: var(--primary);
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+    .lcd-lesson-name strong {
+        font-size: .88rem;
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    /* ── Aviso de consecuencias ── */
+    .lcd-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 0 32px 24px;
+        padding: 12px 16px;
+        background: rgba(200,80,80,.04);
+        border: 1px solid rgba(200,80,80,.15);
+        border-radius: 8px;
+        font-size: .77rem;
+        color: #8a3030;
+        line-height: 1.55;
+    }
+    .lcd-warning i {
+        font-size: .8rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: #c85050;
+    }
+
+    /* ── Acciones ── */
+    .lcd-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 20px 32px;
+        border-top: 1px solid rgba(216,200,152,.25);
+        background: var(--cream);
+    }
+
+    .lcd-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-size: .8rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background .18s, box-shadow .18s, transform .12s;
+        font-family: var(--ff-body);
+    }
+    .lcd-btn:hover { transform: translateY(-1px); }
+
+    .lcd-btn-cancel {
+        background: var(--white);
+        border: 1px solid var(--sand);
+        color: var(--dark);
+    }
+    .lcd-btn-cancel:hover {
+        background: var(--warm);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .lcd-btn-delete {
+        background: #c85050;
+        color: var(--white);
+        box-shadow: 0 2px 8px rgba(200,80,80,.25);
+    }
+    .lcd-btn-delete:hover {
+        background: #a03838;
+        box-shadow: 0 4px 16px rgba(200,80,80,.35);
+        color: var(--white);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="lcd-breadcrumb">
+    <a href="{% url 'panel:curso_list' %}">Cursos</a>
+    <i class="fas fa-chevron-right"></i>
+    <a href="{% url 'panel:leccion_list' curso.pk %}">{{ curso.titulo }}</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>Eliminar lección</span>
+</nav>
+
+<!-- Card centrada -->
+<div class="lcd-wrap">
+    <div class="lcd-card">
+
+        <!-- Franja de peligro -->
+        <div class="lcd-danger-bar"></div>
+
+        <!-- Icono y título -->
+        <div class="lcd-icon-wrap">
+            <div class="lcd-icon">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h2>¿Eliminar esta <em>lección</em>?</h2>
+            <p>Esta operación es permanente y no se puede deshacer. Revisa bien antes de confirmar.</p>
+        </div>
+
+        <!-- Lección destacada -->
+        <div class="lcd-lesson-name">
+            <i class="fas fa-book-open"></i>
+            <strong>{{ object.titulo }}</strong>
+        </div>
+
+        <!-- Aviso de consecuencias -->
+        <div class="lcd-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Se eliminarán también todos los <strong>recursos asociados</strong> a esta lección. Esta acción no se puede deshacer.</span>
+        </div>
+
+        <!-- Botones -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="lcd-actions">
+                <a href="{% url 'panel:leccion_list' curso.pk %}" class="lcd-btn lcd-btn-cancel">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="lcd-btn lcd-btn-delete">
+                    <i class="fas fa-trash-alt"></i> Sí, eliminar
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

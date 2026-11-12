@@ -1,0 +1,287 @@
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+
+{% block titulo %}Reporte de pruebas{% endblock %}
+{% block titulo_pagina %}<span>Reporte de pruebas</span>{% endblock %}
+
+{% block extra_head %}
+<style>
+    .ra-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .ra-stat { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        padding: 18px 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-card); }
+    .ra-stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        border-radius: var(--radius) var(--radius) 0 0; }
+    .ra-stat-gold::before { background: var(--primary); }
+    .ra-stat-sage::before { background: var(--accent); }
+    .ra-stat-sand::before { background: var(--sand); }
+    .ra-stat-warm::before { background: #c09060; }
+    .ra-stat-label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: #aaa; font-weight: 500; margin-bottom: 6px; }
+    .ra-stat-value { font-family: var(--ff-display); font-size: 1.7rem; font-weight: 600; color: var(--dark); line-height: 1; }
+
+    .ra-filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 24px; background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius); padding: 16px 20px; }
+    .ra-filtros label { display: block; font-size: .68rem; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .ra-filtros input, .ra-filtros select { border: 1px solid var(--sand); border-radius: 8px; padding: 7px 10px;
+        font-family: var(--ff-body); font-size: .8rem; color: var(--ink); background: var(--cream); }
+    .ra-filtros button {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 8px 20px; border-radius: 99px; border: none; background: var(--primary);
+        color: #fff; font-size: .8rem; cursor: pointer; white-space: nowrap;
+    }
+    .ra-filtros button:hover { background: var(--dark); }
+
+    /* Agrupa campos y acciones para un acomodo responsivo consistente */
+    .ra-filtros-campo { display: flex; flex-direction: column; }
+    .ra-filtros-acciones { display: flex; align-items: center; gap: 10px; }
+    .ra-btn-pdf {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 8px 20px; border-radius: 99px; border: none;
+        background: #b05050; color: #fff; font-size: .8rem;
+        text-decoration: none; line-height: 1; white-space: nowrap;
+        transition: background .15s ease;
+    }
+    .ra-btn-pdf:hover { background: #8a3d3d; color: #fff; }
+
+    .ra-charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .ra-panel { background: var(--white); border: 1px solid #ebe6db; border-radius: var(--radius);
+        box-shadow: var(--shadow-card); padding: 18px 22px; }
+    .ra-panel-title { font-family: var(--ff-display); font-size: 1.02rem; font-weight: 600; color: var(--dark); margin-bottom: 14px; }
+    .ra-panel-title span { font-style: italic; color: var(--primary); }
+    .ra-chart-wrap { position: relative; height: 220px; }
+    .ra-chart-wrap-lg { height: 260px; }
+
+    /* Tabla */
+    .ra-table-wrap { overflow-x: auto; }
+    .ra-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .ra-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--sand);
+        font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: #999; }
+    .ra-table td { padding: 10px 12px; border-bottom: 1px solid #f0ebe0; color: var(--ink); }
+    .ra-pill { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: .7rem; }
+    .ra-pill.allport { background: rgba(160,136,72,.12); color: var(--primary); }
+    .ra-pill.domino { background: rgba(112,152,136,.12); color: var(--accent); }
+
+    .ra-pagination { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+    .ra-pagination a, .ra-pagination span { padding: 6px 12px; border-radius: 8px; font-size: .78rem;
+        text-decoration: none; color: var(--dark); border: 1px solid var(--sand); }
+    .ra-pagination .current { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    @media (max-width: 1100px) {
+        .ra-stats { grid-template-columns: repeat(2, 1fr); }
+        .ra-charts { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+        .ra-filtros {
+            flex-direction: column; align-items: stretch;
+            padding: 14px 16px; gap: 10px;
+        }
+        .ra-filtros-campo,
+        .ra-filtros input,
+        .ra-filtros select { width: 100%; }
+        .ra-filtros-acciones {
+            flex-direction: column; align-items: stretch; width: 100%;
+        }
+        .ra-filtros-acciones button,
+        .ra-btn-pdf { width: 100%; }
+
+        .ra-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .ra-stat { padding: 14px; }
+        .ra-stat-value { font-size: 1.4rem; }
+
+        .ra-panel { padding: 16px; }
+        .ra-chart-wrap { height: 200px; }
+        .ra-chart-wrap-lg { height: 200px; }
+
+        .ra-table th, .ra-table td { padding: 8px 10px; font-size: .78rem; }
+        .ra-pagination a, .ra-pagination span { padding: 5px 10px; font-size: .74rem; }
+    }
+
+    @media (max-width: 380px) {
+        .ra-stats { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'panel/reportes/_subnav.html' %}
+
+<!-- Filtros -->
+<form method="get" class="ra-filtros">
+    <div class="ra-filtros-campo">
+        <label>Prueba</label>
+        <select name="tipo_prueba">
+            <option value="ambas" {% if tipo_prueba == 'ambas' %}selected{% endif %}>Ambas</option>
+            <option value="allport" {% if tipo_prueba == 'allport' %}selected{% endif %}>Allport</option>
+            <option value="domino" {% if tipo_prueba == 'domino' %}selected{% endif %}>Dominó</option>
+        </select>
+    </div>
+    <div class="ra-filtros-campo"><label>Desde</label><input type="date" name="desde" value="{{ desde|date:'Y-m-d' }}"></div>
+    <div class="ra-filtros-campo"><label>Hasta</label><input type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></div>
+    <div class="ra-filtros-campo">
+        <label>Género</label>
+        <select name="genero">
+            <option value="">Todos</option>
+            {% for val, label in generos_choices %}
+            <option value="{{ val }}" {% if genero == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="ra-filtros-campo">
+        <label>Institución</label>
+        <select name="institucion">
+            <option value="">Todas</option>
+            {% for inst in instituciones_choices %}
+            <option value="{{ inst }}" {% if institucion == inst %}selected{% endif %}>{{ inst }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="ra-filtros-campo">
+        <label>Grupo de edad</label>
+        <select name="grupo_edad">
+            <option value="">Todos</option>
+            {% for g in grupos_edad_choices %}
+            <option value="{{ g }}" {% if grupo_edad == g %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="ra-filtros-acciones">
+        <button type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+        <a href="{% url 'panel:reporte_pruebas_pdf' %}?{{ request.GET.urlencode }}" class="ra-btn-pdf">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </a>
+    </div>
+</form>
+
+<!-- KPIs -->
+<div class="ra-stats">
+    <div class="ra-stat ra-stat-gold">
+        <div class="ra-stat-label">Total pruebas</div>
+        <div class="ra-stat-value">{{ total_general }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sage">
+        <div class="ra-stat-label">Allport aplicadas</div>
+        <div class="ra-stat-value">{{ total_allport }}</div>
+    </div>
+    <div class="ra-stat ra-stat-sand">
+        <div class="ra-stat-label">Dominó aplicadas</div>
+        <div class="ra-stat-value">{{ total_domino }}</div>
+    </div>
+    <div class="ra-stat ra-stat-warm">
+        <div class="ra-stat-label">Percentil prom. Dominó</div>
+        <div class="ra-stat-value">{{ promedio_percentil_domino|default:"—"|floatformat:1 }}</div>
+    </div>
+</div>
+
+<!-- Gráficas de distribución -->
+<div class="ra-charts">
+    <div class="ra-panel">
+        <div class="ra-panel-title">Por <span>género</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartGenero"></canvas></div>
+    </div>
+    <div class="ra-panel">
+        <div class="ra-panel-title">Por <span>grupo de edad</span> (Dominó)</div>
+        <div class="ra-chart-wrap"><canvas id="chartEdad"></canvas></div>
+    </div>
+    <div class="ra-panel">
+        <div class="ra-panel-title">Promedios <span>Allport</span></div>
+        <div class="ra-chart-wrap"><canvas id="chartAllport"></canvas></div>
+    </div>
+</div>
+
+<div class="ra-panel" style="margin-bottom:24px;">
+    <div class="ra-panel-title">Top 10 <span>instituciones</span></div>
+    <div class="ra-chart-wrap ra-chart-wrap-lg"><canvas id="chartInstitucion"></canvas></div>
+</div>
+
+<!-- Tabla detallada -->
+<div class="ra-panel">
+    <div class="ra-panel-title">Aplicaciones <span>detalladas</span></div>
+    <div class="ra-table-wrap">
+        <table class="ra-table">
+            <thead>
+                <tr><th>Usuario</th><th>Prueba</th><th>Fecha</th><th>Puntaje / Percentil</th><th>Diagnóstico</th></tr>
+            </thead>
+            <tbody>
+                {% for fila in page_obj %}
+                <tr>
+                    <td>{{ fila.usuario }}</td>
+                    <td><span class="ra-pill {% if fila.prueba == 'Allport' %}allport{% else %}domino{% endif %}">{{ fila.prueba }}</span></td>
+                    <td>{{ fila.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>{{ fila.puntaje_percentil }}</td>
+                    <td>{{ fila.diagnostico }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center; color:#aaa;">Sin resultados en este rango de filtros.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="ra-pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">‹</a>
+        {% endif %}
+        <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{{ distribucion_genero|json_script:"data-genero" }}
+{{ distribucion_edad|json_script:"data-edad" }}
+{{ distribucion_institucion|json_script:"data-institucion" }}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+(function() {
+    const genero = JSON.parse(document.getElementById('data-genero').textContent);
+    const edad = JSON.parse(document.getElementById('data-edad').textContent);
+    const institucion = JSON.parse(document.getElementById('data-institucion').textContent);
+    const dorado = '#a08848', salvia = '#709888', arena = '#d8c898', calido = '#c09060';
+
+    new Chart(document.getElementById('chartGenero'), {
+        type: 'pie',
+        data: { labels: genero.labels, datasets: [{ data: genero.data, backgroundColor: [dorado, salvia, arena, calido] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartEdad'), {
+        type: 'bar',
+        data: { labels: edad.labels, datasets: [{ label: 'Aplicaciones', data: edad.data, backgroundColor: salvia }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartAllport'), {
+        type: 'bar',
+        data: {
+            labels: ['Teórico', 'Económico', 'Estético', 'Social', 'Político', 'Religioso'],
+            datasets: [{
+                label: 'Promedio',
+                data: [
+                    {{ promedios_allport.teorico|default:0|floatformat:2 }},
+                    {{ promedios_allport.economico|default:0|floatformat:2 }},
+                    {{ promedios_allport.estetico|default:0|floatformat:2 }},
+                    {{ promedios_allport.social|default:0|floatformat:2 }},
+                    {{ promedios_allport.politico|default:0|floatformat:2 }},
+                    {{ promedios_allport.religioso|default:0|floatformat:2 }}
+                ],
+                backgroundColor: dorado
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('chartInstitucion'), {
+        type: 'bar',
+        data: { labels: institucion.labels, datasets: [{ label: 'Aplicaciones', data: institucion.data, backgroundColor: arena }] },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+    });
+})();
+</script>
+{% endblock %}

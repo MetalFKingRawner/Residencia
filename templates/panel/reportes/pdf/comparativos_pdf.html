@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes comparativos</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #201808; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 1000px; margin: 0 auto; }
+        .header-institucional { text-align: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #a08848; }
+        .header-institucional img { max-height: 60px; margin-bottom: 8px; }
+        .header-institucional h1 { color: #201808; font-size: 22px; margin: 0 0 4px; }
+        .header-institucional p { color: #8a8070; font-size: 12px; margin: 2px 0; }
+        .card { border: 1px solid #ebe6db; border-radius: 8px; margin-bottom: 18px; }
+        .card-header { background-color: #a08848; color: white; padding: 12px 18px; border-radius: 8px 8px 0 0; }
+        .card-header h2 { margin: 0; font-size: 16px; font-weight: bold; }
+        .card-body { padding: 16px 18px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 7px 8px; text-align: left; border-bottom: 1px solid #ebe6db; }
+        th { background-color: #faf7f0; color: #a08848; }
+        .grafico { text-align: center; margin: 10px 0; }
+        .grafico img { max-width: 100%; height: auto; }
+        .variacion-pos { color: #709888; font-weight: bold; }
+        .variacion-neg { color: #b05050; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header-institucional">
+        {% if logo_base64 %}<img src="data:image/jpeg;base64,{{ logo_base64 }}" alt="Centro DHAE">{% else %}<h1>CENTRO DHAE</h1>{% endif %}
+        <p>Reportes comparativos — Generado el {{ fecha_generacion|date:"d/m/Y H:i" }}</p>
+        <p>Periodo: {{ desde|date:"d/m/Y" }} al {{ hasta|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Pruebas aplicadas por género</h2></div>
+        <div class="card-body"><div class="grafico"><img src="data:image/png;base64,{{ grafico_genero }}" alt="Género"></div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Percentil promedio por grupo de edad (Dominó)</h2></div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>Grupo de edad</th><th>Percentil prom.</th><th>Aplicaciones</th><th>Vs. promedio</th></tr></thead>
+                <tbody>
+                {% for fila in tabla_edad %}
+                    <tr>
+                        <td>{{ fila.grupo_edad }}</td><td>{{ fila.promedio_percentil }}</td><td>{{ fila.total }}</td>
+                        <td class="{% if fila.variacion >= 0 %}variacion-pos{% else %}variacion-neg{% endif %}">
+                            {% if fila.variacion >= 0 %}+{% endif %}{{ fila.variacion }}%
+                        </td>
+                    </tr>
+                {% empty %}<tr><td colspan="4">Sin datos.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Tasa de finalización por institución (top 10)</h2></div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>Institución</th><th>Inscripciones</th><th>Completadas</th><th>Tasa</th><th>Vs. promedio</th></tr></thead>
+                <tbody>
+                {% for fila in tabla_institucion %}
+                    <tr>
+                        <td>{{ fila.institucion }}</td><td>{{ fila.total }}</td><td>{{ fila.completadas }}</td><td>{{ fila.tasa_finalizacion }}%</td>
+                        <td class="{% if fila.variacion >= 0 %}variacion-pos{% else %}variacion-neg{% endif %}">
+                            {% if fila.variacion >= 0 %}+{% endif %}{{ fila.variacion }} pts
+                        </td>
+                    </tr>
+                {% empty %}<tr><td colspan="5">Sin datos.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Progreso promedio por instructor</h2></div>
+        <div class="card-body">
+            <table>
+                <thead><tr><th>Instructor</th><th>Estudiantes</th><th>Progreso prom.</th><th>Vs. promedio</th></tr></thead>
+                <tbody>
+                {% for fila in tabla_instructor %}
+                    <tr>
+                        <td>{{ fila.instructor }}</td><td>{{ fila.total_estudiantes }}</td><td>{{ fila.progreso_promedio }}%</td>
+                        <td class="{% if fila.variacion >= 0 %}variacion-pos{% else %}variacion-neg{% endif %}">
+                            {% if fila.variacion >= 0 %}+{% endif %}{{ fila.variacion }} pts
+                        </td>
+                    </tr>
+                {% empty %}<tr><td colspan="4">Sin datos.</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

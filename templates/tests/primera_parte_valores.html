@@ -163,6 +163,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const puntosInputs = document.querySelectorAll('.puntos-input');
+
+    const storageKey = 'psymetrics_valores_test_data';
+    const savedData = JSON.parse(localStorage.getItem(storageKey) || '{}');
     
     const handleInput = function(e) {
         // Permitir sólo dígitos 0-3 y un solo carácter
@@ -175,6 +178,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isNaN(num) && num > 3) {
             this.value = '3';
         }
+
+        const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        currentData[this.name] = this.value;
+        localStorage.setItem(storageKey, JSON.stringify(currentData));
+
         validateCombination.call(this);
     };
     
@@ -206,10 +214,21 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     puntosInputs.forEach(input => {
+
+        if (savedData[input.name] !== undefined) {
+            input.value = savedData[input.name];
+        }
+
         input.addEventListener('input', handleInput);
         input.addEventListener('blur', function() {
             if (this.value === '') {
                 this.value = '0';
+
+                // Actualizar también en LocalStorage cuando se autocompleta con 0
+                const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                currentData[this.name] = this.value;
+                localStorage.setItem(storageKey, JSON.stringify(currentData));
+
                 validateCombination.call(this);
             }
         });
@@ -241,6 +260,8 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             document.body.appendChild(alertDiv);
             setTimeout(() => alertDiv.remove(), 5000);
+        } else {
+            localStorage.removeItem(storageKey);
         }
     });
 });

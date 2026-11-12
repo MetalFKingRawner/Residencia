@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: 'FirmaEstilo';
+    src: url('data:font/truetype;base64,{{ fuente_b64 }}');
+  }
+
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #4a4a4a;
+    text-align: center;
+  }
+
+  .contenido {
+    padding: 18mm 28mm 8mm 28mm;
+    position: relative;
+  }
+
+  .titulo {
+    font-size: 34pt;
+    font-weight: bold;
+    letter-spacing: 6px;
+    color: #6b531e;
+    margin: 0 0 3mm 0;
+  }
+
+  .subtitulo {
+    font-size: 13pt;
+    color: #b89742;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin: 0 0 7mm 0;
+  }
+
+  .intro {
+    font-size: 11pt;
+    color: #666;
+    margin: 0 0 4mm 0;
+  }
+
+  .nombre {
+    font-family: 'FirmaEstilo', cursive;
+    font-size: 44pt;
+    color: #201808;
+    margin: 0 0 2mm 0;
+    line-height: 1.2;
+  }
+
+  .linea-nombre {
+    border-top: 1.5px solid #b89742;
+    width: 60%;
+    margin: 0 auto 6mm auto;
+  }
+
+  .reconocimiento {
+    font-size: 11pt;
+    color: #666;
+    margin: 0 0 2mm 0;
+  }
+
+  .nombre-curso {
+    font-size: 14pt;
+    color: #4a4a4a;
+    font-weight: bold;
+    margin: 0 0 8mm 0;
+  }
+
+  .firmas-wrap {
+    width: 80%;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .firma-col {
+    float: left;
+    width: 33.33%;
+    text-align: center;
+  }
+
+  .linea-firma {
+    border-bottom: 1px solid #b89742;
+    width: 80%;
+    margin: 0 auto 4px auto;
+    font-size: 11pt;
+    color: #333;
+    padding-bottom: 4px;
+  }
+
+  .rol-firma {
+    font-size: 9pt;
+    color: #999;
+  }
+
+  .fecha {
+    font-size: 9pt;
+    color: #999;
+    margin-top: 6mm;
+    clear: both;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Fondo decorativo: se renderiza primero, posición absoluta -->
+  <img src="data:image/png;base64,{{ sello_b64 }}"
+       style="position: absolute; top: 0; left: 0; width: 297mm; height: 210mm;">
+
+  <div class="contenido">
+
+    <div class="titulo">CERTIFICADO</div>
+    <div class="subtitulo">&#10070; DE PARTICIPACIÓN &#10070;</div>
+
+    <p class="intro">Este certificado se otorga a</p>
+
+    <div class="nombre">{{ nombre }}</div>
+    <div class="linea-nombre"></div>
+
+    <p class="reconocimiento">En reconocimiento por su valiosa participación y conclusión del curso</p>
+    <p class="nombre-curso">{{ curso }}</p>
+
+    <div class="firmas-wrap">
+      <div class="firma-col">
+        <div class="linea-firma">Alba Castro</div>
+        <div class="rol-firma">Dirección</div>
+      </div>
+      <div class="firma-col">
+        <!-- espacio central libre -->
+      </div>
+      <div class="firma-col">
+        <div class="linea-firma">{{ instructor_nombre }}</div>
+        <div class="rol-firma">Instructor</div>
+      </div>
+    </div>
+
+    <p class="fecha">{{ fecha }}</p>
+
+  </div>
+
+</body>
+</html>

@@ -1,78 +1,647 @@
-{% extends "base.html" %}
+{% extends "courses/base_cursos.html" %}
 {% load embed_video_tags %}
+
+{% block extra_css %}
+<style>
+  /* ── LAYOUT PRINCIPAL ── */
+  .ld-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    min-height: calc(100vh - 68px);
+    background: var(--cream);
+  }
+
+  /* ── ÁREA DE CONTENIDO ── */
+  .ld-main {
+    padding: 40px 48px 80px;
+    min-width: 0; /* evita desbordamiento en grid */
+  }
+
+  /* ── BREADCRUMB ── */
+  .ld-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .78rem;
+    color: color-mix(in srgb, var(--primary) 50%, var(--ink));
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .ld-breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .ld-breadcrumb a:hover { color: var(--primary); }
+  .ld-breadcrumb .sep {
+    color: var(--sand);
+    font-size: .7rem;
+  }
+  .ld-breadcrumb .current {
+    color: var(--dark);
+    font-weight: 500;
+  }
+
+  /* ── ENCABEZADO DE LECCIÓN ── */
+  .ld-header {
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--warm);
+  }
+  .ld-header h1 {
+    font-family: var(--ff-display);
+    font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+    font-weight: 400;
+    color: var(--dark);
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+  .ld-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: .8rem;
+    color: color-mix(in srgb, var(--primary) 60%, var(--ink));
+    flex-wrap: wrap;
+  }
+  .ld-header-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ld-header-meta i { color: var(--primary); }
+
+  /* ── RECURSOS ── */
+  .ld-resources { display: flex; flex-direction: column; gap: 32px; }
+
+  /* Recurso: TEXTO */
+  .ld-recurso-texto {
+    background: #fff;
+    border: 1px solid var(--warm);
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: 0 2px 12px rgba(160,136,72,.06);
+  }
+  .ld-recurso-texto .leccion-contenido {
+    font-size: .95rem;
+    line-height: 1.9;
+    color: var(--ink);
+  }
+  .ld-recurso-texto .leccion-contenido h1,
+  .ld-recurso-texto .leccion-contenido h2,
+  .ld-recurso-texto .leccion-contenido h3 {
+    font-family: var(--ff-display);
+    font-weight: 400;
+    color: var(--dark);
+    margin: 1.4em 0 .6em;
+  }
+  .ld-recurso-texto .leccion-contenido h2 { font-size: 1.5rem; }
+  .ld-recurso-texto .leccion-contenido h3 { font-size: 1.25rem; }
+  .ld-recurso-texto .leccion-contenido p { margin-bottom: 1em; }
+  .ld-recurso-texto .leccion-contenido ul,
+  .ld-recurso-texto .leccion-contenido ol {
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+  }
+  .ld-recurso-texto .leccion-contenido li { margin-bottom: .4em; }
+  .ld-recurso-texto .leccion-contenido blockquote {
+    border-left: 3px solid var(--primary);
+    margin: 1.5em 0;
+    padding: 12px 20px;
+    background: var(--warm);
+    border-radius: 0 10px 10px 0;
+    font-style: italic;
+    color: var(--dark);
+  }
+  .ld-recurso-texto .leccion-contenido img {
+    max-width: min(100%, 240px); /* nunca más ancho que 560px ni que su contenedor */
+    width: auto !important;      /* anula el width inline que pone CKEditor */
+    height: auto !important;     /* anula el height inline que pone CKEditor */
+    border-radius: 10px;
+    display: block;
+    margin: 20px auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  }
+  .ld-recurso-texto .leccion-contenido a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-decoration-color: var(--sand);
+    text-underline-offset: 3px;
+  }
+  .ld-recurso-texto .leccion-contenido strong { font-weight: 500; color: var(--dark); }
+
+  /* Recurso: VIDEO */
+  .ld-recurso-video {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(160,136,72,.14);
+    background: #000;
+    aspect-ratio: 16/9;
+    position: relative;
+  }
+  .ld-recurso-video iframe,
+  .ld-recurso-video object,
+  .ld-recurso-video embed {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    inset: 0;
+    border: none;
+  }
+  .ld-video-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .ld-video-label i { font-size: .9rem; }
+
+  /* Recurso: ARCHIVO / DESCARGA */
+  .ld-recurso-archivo {
+    background: linear-gradient(135deg, var(--warm) 0%, color-mix(in srgb, var(--warm) 60%, #fff) 100%);
+    border: 1px solid var(--sand);
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .ld-archivo-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--primary);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+  .ld-archivo-icon i {
+    font-size: 1.4rem;
+    color: #fff;
+  }
+  .ld-archivo-info { flex: 1; min-width: 0; }
+  .ld-archivo-info .ld-archivo-label {
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 4px;
+    display: block;
+  }
+  .ld-archivo-info p {
+    font-size: .9rem;
+    color: var(--dark);
+    font-weight: 400;
+    margin: 0;
+  }
+  .ld-btn-descarga {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-size: .84rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background .2s, transform .2s, box-shadow .2s;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+  .ld-btn-descarga:hover {
+    background: var(--dark);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--dark) 30%, transparent);
+  }
+
+  /* Recurso: AUDIO */
+  .ld-recurso-audio {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, #fff) 0%, #fff 100%);
+    border: 1px solid var(--accent2);
+    border-radius: 16px;
+    padding: 28px 32px;
+  }
+  .ld-audio-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .ld-audio-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--accent);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .ld-audio-icon i { color: #fff; font-size: 1.1rem; }
+  .ld-audio-label {
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .ld-audio-title {
+    font-size: .9rem;
+    color: var(--dark);
+    font-weight: 400;
+  }
+  .ld-audio-player {
+    width: 100%;
+    height: 44px;
+    border-radius: 999px;
+    accent-color: var(--accent);
+    outline: none;
+    filter: sepia(20%) hue-rotate(120deg);
+  }
+  .ld-audio-player::-webkit-media-controls-panel {
+    background: color-mix(in srgb, var(--accent2) 30%, #fff);
+    border-radius: 999px;
+  }
+
+  /* ── ESTADO VACÍO ── */
+  .ld-empty {
+    text-align: center;
+    padding: 64px 32px;
+    color: color-mix(in srgb, var(--primary) 40%, var(--ink));
+    background: #fff;
+    border-radius: 16px;
+    border: 1px dashed var(--sand);
+  }
+  .ld-empty i { font-size: 2rem; color: var(--sand); margin-bottom: 12px; display: block; }
+
+  /* ── ACCIÓN: COMPLETAR LECCIÓN ── */
+  .ld-action-bar {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--warm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .ld-btn-completar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--ff-body);
+    font-size: .9rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+    transition: background .2s, transform .2s, box-shadow .2s;
+  }
+  .ld-btn-completar:hover {
+    background: #4e7060;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .ld-completada-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 12%, #fff);
+    border: 1.5px solid var(--accent);
+    color: #4e7060;
+    font-size: .9rem;
+    font-weight: 500;
+  }
+  .ld-completada-badge i { font-size: 1rem; }
+  .ld-nav-prev-next {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ld-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: .82rem;
+    font-weight: 400;
+    text-decoration: none;
+    border: 1.5px solid var(--sand);
+    color: var(--dark);
+    background: transparent;
+    transition: border-color .2s, background .2s, color .2s;
+  }
+  .ld-nav-btn:hover { border-color: var(--primary); background: var(--warm); color: var(--primary); }
+
+  /* ── SIDEBAR ── */
+  .ld-sidebar {
+    border-left: 1px solid var(--warm);
+    background: #fff;
+    position: sticky;
+    top: 68px;
+    height: calc(100vh - 68px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .ld-sidebar-head {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--warm);
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 2;
+  }
+  .ld-sidebar-head h3 {
+    font-family: var(--ff-display);
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .ld-sidebar-head .ld-progress-wrap { margin-top: 14px; }
+  .ld-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: .74rem;
+    color: color-mix(in srgb, var(--primary) 60%, var(--ink));
+    margin-bottom: 6px;
+  }
+  .ld-progress-bar {
+    height: 5px;
+    background: var(--warm);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .ld-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    border-radius: 999px;
+    transition: width .5s ease;
+  }
+
+  .ld-lesson-list { padding: 8px 0 24px; list-style: none; margin: 0; }
+  .ld-lesson-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 24px;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: .84rem;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+    transition: background .15s, border-color .15s;
+    cursor: pointer;
+  }
+  .ld-lesson-item:hover { background: var(--cream); }
+  .ld-lesson-item.active {
+    background: color-mix(in srgb, var(--primary) 7%, #fff);
+    border-left-color: var(--primary);
+    color: var(--dark);
+    font-weight: 500;
+  }
+  .ld-lesson-item.completed .ld-lesson-icon { color: var(--accent); }
+  .ld-lesson-icon {
+    width: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: .85rem;
+    color: var(--sand);
+    text-align: center;
+  }
+  .ld-lesson-text { flex: 1; min-width: 0; }
+  .ld-lesson-num {
+    font-size: .68rem;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--primary) 50%, var(--ink));
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Scrollbar sidebar */
+  .ld-sidebar::-webkit-scrollbar { width: 4px; }
+  .ld-sidebar::-webkit-scrollbar-track { background: transparent; }
+  .ld-sidebar::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 2px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 992px) {
+    .ld-layout { grid-template-columns: 1fr; }
+    .ld-sidebar {
+      position: static;
+      height: auto;
+      border-left: none;
+      border-top: 1px solid var(--warm);
+      order: -1; /* sidebar arriba en móvil */
+    }
+    .ld-sidebar-head { position: static; }
+    .ld-lesson-list { max-height: 240px; overflow-y: auto; }
+    .ld-main { padding: 28px 20px 60px; }
+  }
+  @media (max-width: 576px) {
+    .ld-recurso-archivo { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .ld-action-bar { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'courses:curso_list' %}">Cursos</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'courses:curso_detail' slug=curso.slug %}">{{ curso.titulo }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ leccion.titulo }}</li>
-        </ol>
+<div class="ld-layout">
+
+  <!-- ── CONTENIDO PRINCIPAL ── -->
+  <main class="ld-main">
+
+    <!-- Breadcrumb -->
+    <nav class="ld-breadcrumb" aria-label="breadcrumb">
+      <a href="{% url 'courses:curso_list' %}">
+        <i class="fas fa-graduation-cap"></i> Cursos
+      </a>
+      <span class="sep"><i class="fas fa-chevron-right"></i></span>
+      <a href="{% url 'courses:curso_detail' slug=curso.slug %}">{{ curso.titulo }}</a>
+      <span class="sep"><i class="fas fa-chevron-right"></i></span>
+      <span class="current">{{ leccion.titulo }}</span>
     </nav>
 
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h1 class="h2 mb-3">{{ leccion.titulo }}</h1>
-                    
-                    {% for recurso in recursos %}
+    <!-- Encabezado de lección -->
+    <header class="ld-header">
+      <h1>{{ leccion.titulo }}</h1>
+      <div class="ld-header-meta">
+        <span><i class="fas fa-layer-group"></i> Lección {{ leccion.orden }}</span>
+        <span><i class="fas fa-user-tie"></i>
+          {% if curso.instructor %}{{ curso.instructor.full_name }}{% else %}Centro DHAE{% endif %}
+        </span>
+        {% if recursos %}
+          <span><i class="fas fa-puzzle-piece"></i> {{ recursos|length }} recurso{{ recursos|length|pluralize }}</span>
+        {% endif %}
+      </div>
+    </header>
 
-                        {% if recurso.tipo == 'texto' %}
-                            <div class="leccion-contenido mb-4">
-                                {{ recurso.contenido_texto|safe }}
-                            </div>
+    <!-- Recursos -->
+    <div class="ld-resources">
 
-                        {% elif recurso.tipo == 'video' %}
-                            <div class="mb-4">
-                                {% video recurso.video_url '100% x 400' %}
-                            </div>
+      {% for recurso in recursos %}
 
-                        {% elif recurso.tipo == 'archivo' %}
-                            <div class="mb-4">
-                                <a href="{{ recurso.archivo.url }}" class="btn btn-outline-secondary" target="_blank" download>
-                                    <i class="fas fa-file-alt me-2"></i>Descargar documento
-                                </a>
-                            </div>
-
-                        {% elif recurso.tipo == 'audio' %}
-                            <div class="mb-4">
-                                <audio controls class="w-100">
-                                    <source src="{{ recurso.archivo.url }}">
-                                    Tu navegador no soporta audio HTML5.
-                                </audio>
-                            </div>
-
-                        {% endif %}
-
-                    {% empty %}
-                        <p class="text-muted">Esta lección no tiene contenido aún.</p>
-                    {% endfor %}
-                    
-                    {% if user_inscrito and not leccion_completada %}
-                        <form method="post" 
-                            action="{% url 'courses:completar_leccion' slug=curso.slug orden=leccion.orden %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-success">✓ Marcar como completada</button>
-                        </form>
-                    {% elif leccion_completada %}
-                        <div class="alert alert-success mt-4">
-                            ✓ Lección completada
-                        </div>
-                    {% endif %}
-                </div>
+        {% if recurso.tipo == 'texto' %}
+          <!-- RECURSO: TEXTO -->
+          <div class="ld-recurso-texto">
+            <div class="leccion-contenido">
+              {{ recurso.contenido_texto|safe }}
             </div>
-        </div>
-    </div>
-</div>
+          </div>
 
-<style>
-.leccion-contenido img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    display: block;
-    margin: 16px auto;
-}
-</style>
+        {% elif recurso.tipo == 'video' %}
+          <!-- RECURSO: VIDEO -->
+          <div>
+            <div class="ld-video-label">
+              <i class="fas fa-play-circle"></i> Video
+            </div>
+            <div class="ld-recurso-video">
+              {% video recurso.video_url '100% x 100%' %}
+            </div>
+          </div>
+
+        {% elif recurso.tipo == 'archivo' %}
+          <!-- RECURSO: ARCHIVO DESCARGABLE -->
+          <div class="ld-recurso-archivo">
+            <div class="ld-archivo-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="ld-archivo-info">
+              <span class="ld-archivo-label">Documento adjunto</span>
+              <p>Material de apoyo disponible para descargar.</p>
+            </div>
+            <a href="{{ recurso.archivo.url }}" class="ld-btn-descarga" target="_blank" download>
+              <i class="fas fa-download"></i> Descargar
+            </a>
+          </div>
+
+        {% elif recurso.tipo == 'audio' %}
+          <!-- RECURSO: AUDIO -->
+          <div class="ld-recurso-audio">
+            <div class="ld-audio-header">
+              <div class="ld-audio-icon">
+                <i class="fas fa-headphones"></i>
+              </div>
+              <div>
+                <span class="ld-audio-label">Audio / Podcast</span>
+                <span class="ld-audio-title">{{ leccion.titulo }}</span>
+              </div>
+            </div>
+            <audio controls class="ld-audio-player">
+              <source src="{{ recurso.archivo.url }}">
+              Tu navegador no soporta audio HTML5.
+            </audio>
+          </div>
+
+        {% endif %}
+
+      {% empty %}
+        <div class="ld-empty">
+          <i class="fas fa-inbox"></i>
+          <p>Esta lección no tiene contenido disponible aún.</p>
+        </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- Barra de acciones (completar / navegación) -->
+    <div class="ld-action-bar">
+      <div>
+        {% if user_inscrito and not leccion_completada %}
+          <form method="post"
+              action="{% url 'courses:completar_leccion' slug=curso.slug orden=leccion.orden %}">
+            {% csrf_token %}
+            <button type="submit" class="ld-btn-completar">
+              <i class="fas fa-check-circle"></i> Marcar como completada
+            </button>
+          </form>
+        {% elif leccion_completada %}
+          <div class="ld-completada-badge">
+            <i class="fas fa-check-circle"></i> Lección completada
+          </div>
+        {% endif %}
+      </div>
+
+      <nav class="ld-nav-prev-next">
+        {% if leccion_anterior %}
+          <a href="{% url 'courses:leccion_detail' slug=curso.slug orden=leccion_anterior.orden %}" class="ld-nav-btn">
+            <i class="fas fa-arrow-left"></i> Anterior
+          </a>
+        {% endif %}
+        {% if leccion_siguiente %}
+          <a href="{% url 'courses:leccion_detail' slug=curso.slug orden=leccion_siguiente.orden %}" class="ld-nav-btn">
+            Siguiente <i class="fas fa-arrow-right"></i>
+          </a>
+        {% endif %}
+      </nav>
+    </div>
+
+  </main>
+
+  <!-- ── SIDEBAR: LISTA DE LECCIONES ── -->
+  <aside class="ld-sidebar">
+    <div class="ld-sidebar-head">
+      <h3>{{ curso.titulo }}</h3>
+      {% if progreso is not None %}
+        <div class="ld-progress-wrap">
+          <div class="ld-progress-label">
+            <span>Tu progreso</span>
+            <span>{{ progreso }}%</span>
+          </div>
+          <div class="ld-progress-bar">
+            <div class="ld-progress-fill" style="width: {{ progreso }}%"></div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <ul class="ld-lesson-list">
+      {% for lec in todas_lecciones %}
+        <li>
+          <a href="{% url 'courses:leccion_detail' slug=curso.slug orden=lec.orden %}"
+             class="ld-lesson-item
+               {% if lec.orden == leccion.orden %}active{% endif %}
+               {% if lec.orden in lecciones_completadas_ids %}completed{% endif %}">
+            <span class="ld-lesson-icon">
+              {% if lec.orden in lecciones_completadas_ids %}
+                <i class="fas fa-check-circle"></i>
+              {% elif lec.orden == leccion.orden %}
+                <i class="fas fa-play-circle"></i>
+              {% else %}
+                <i class="far fa-circle"></i>
+              {% endif %}
+            </span>
+            <span class="ld-lesson-text">
+              <span class="ld-lesson-num">Lección {{ lec.orden }}</span>
+              {{ lec.titulo }}
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+</div>
 {% endblock %}

@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
+{% extends base_template|default:"base.html" %}
 {% load static %}
 
-{% block title %}Iniciar Sesión - PsyMetrics{% endblock %}
+{% block title %}Iniciar Sesión - Centro DHAE{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -28,13 +28,28 @@
                     <button type="submit" class="btn-auth-primary">
                         Iniciar Sesión
                     </button>
-                    <a href="{% url 'signup' %}" class="btn-auth-secondary">
-                        Registrarse
-                    </a>
+                    
+                    {% if base_template == 'base.html' and CONFIG.pruebas_activas %}
+                        <a href="{% url 'signup' %}" class="btn-auth-secondary">
+                            Registrarse
+                        </a>
+                    {% elif base_template == 'base_cursos.html' and CONFIG.registro_abierto %}
+                        <a href="{% url 'signup' %}" class="btn-auth-secondary">
+                            Registrarse
+                        </a>
+                    {% endif %}
                 </div>
+
+                {% if base_template == 'base_cursos.html' and not CONFIG.registro_abierto %}
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> El registro público para cursos está cerrado. Si adquiriste una formación, inicia sesión con las credenciales enviadas a tu correo.
+                    </small>
+                </div>
+                {% endif %}
                 
                 <div class="text-center mt-4">
-                    <a href="{% url 'password_reset' %}" class="auth-link">
+                    <a href="{% url 'password_reset' %}?next={{ next }}" class="auth-link">
                         ¿Olvidaste tu contraseña?
                     </a>
                 </div>

@@ -1,0 +1,82 @@
+{% comment %}
+templates/panel/partials/_recurso_row.html
+Se usa en leccion_form.html tanto para filas reales como para el empty_form (clonación JS).
+Variables disponibles: r_form, forloop (puede ser None en el empty_form)
+{% endcomment %}
+<div class="recurso-row collapsed">
+
+    {# Campos ocultos de gestión del formset (id, leccion, etc.) #}
+    {{ r_form.id }}
+
+    {# Campo orden como hidden: el JS lo actualiza al reordenar con drag & drop #}
+    <div style="display:none">{{ r_form.orden }}</div>
+
+    <!-- Encabezado de la fila -->
+    <div class="recurso-row-header">
+        <span class="recurso-row-header-left">
+            {# Handle de arrastre — SortableJS lo usa como zona de agarre #}
+            <span class="recurso-drag-handle" title="Arrastrar para reordenar">
+                <i class="fas fa-grip-vertical"></i>
+            </span>
+            <i class="fas fa-cube recurso-tipo-icon"></i>
+            <span class="recurso-tipo-label">Recurso nuevo</span>
+        </span>
+        <span class="recurso-row-header-right">
+            <button type="button" class="recurso-btn-delete">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+            {# Checkbox DELETE oculto; el JS lo activa al eliminar #}
+            <span style="display:none">{{ r_form.DELETE }}</span>
+            <i class="fas fa-chevron-down recurso-toggle-icon"></i>
+        </span>
+    </div>
+
+    <!-- Cuerpo de la fila -->
+    <div class="recurso-row-body">
+
+        <!-- Solo tipo (el orden ya no se muestra) -->
+        <div class="recurso-meta-row recurso-meta-row--solo-tipo">
+            <div class="recurso-campo">
+                <label class="lf-label" for="{{ r_form.tipo.id_for_label }}">Tipo de recurso</label>
+                {{ r_form.tipo }}
+                {% if r_form.tipo.errors %}
+                    <span class="lf-error">{{ r_form.tipo.errors|join:", " }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Campo: contenido_texto (solo tipo=texto) -->
+        <div class="recurso-campo" data-tipos="texto">
+            <label class="lf-label" for="{{ r_form.contenido_texto.id_for_label }}">Contenido</label>
+            {{ r_form.contenido_texto }}
+            {% if r_form.contenido_texto.errors %}
+                <span class="lf-error">{{ r_form.contenido_texto.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Campo: video_url (solo tipo=video) -->
+        <div class="recurso-campo" data-tipos="video">
+            <label class="lf-label" for="{{ r_form.video_url.id_for_label }}">URL del video</label>
+            {{ r_form.video_url }}
+            <span class="lf-hint">Acepta URLs de YouTube, Vimeo, etc.</span>
+            {% if r_form.video_url.errors %}
+                <span class="lf-error">{{ r_form.video_url.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Campo: archivo (solo tipo=archivo o audio) -->
+        <div class="recurso-campo" data-tipos="archivo,audio">
+            <label class="lf-label" for="{{ r_form.archivo.id_for_label }}">Archivo</label>
+            {{ r_form.archivo }}
+            {% if r_form.archivo.errors %}
+                <span class="lf-error">{{ r_form.archivo.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        {# Errores no relacionados con campos específicos #}
+        {% if r_form.non_field_errors %}
+            <span class="lf-error">{{ r_form.non_field_errors|join:", " }}</span>
+        {% endif %}
+
+    </div>
+</div>

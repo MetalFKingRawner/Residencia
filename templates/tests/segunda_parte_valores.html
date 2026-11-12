@@ -105,6 +105,9 @@
 document.addEventListener('DOMContentLoaded', function() {
   const inputs = document.querySelectorAll('.puntos-input');
 
+  const storageKey = 'psymetrics_valores_parte2_data';
+  const savedData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
   function validateGroup(preguntaId) {
     const group = Array.from(document.querySelectorAll(`input[data-pregunta="${preguntaId}"]`));
     const values = group.map(i => parseInt(i.value) || 0);
@@ -126,13 +129,30 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   inputs.forEach(input => {
+
+    if (savedData[input.name] !== undefined) {
+        input.value = savedData[input.name];
+    }
+
     input.addEventListener('input', function() {
       this.value = this.value.replace(/[^0-4]/g, '');
       if (this.value.length > 1) this.value = this.value.slice(0,1);
+
+      const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      currentData[this.name] = this.value;
+      localStorage.setItem(storageKey, JSON.stringify(currentData));
+
       validateGroup(this.dataset.pregunta);
     });
     input.addEventListener('blur', function() {
-      if (this.value === '') this.value = '0';
+      if (this.value === '') {
+        this.value = '0';
+        
+        // Guardar también cuando se autocompleta con 0 al perder el foco
+        const currentData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        currentData[this.name] = this.value;
+        localStorage.setItem(storageKey, JSON.stringify(currentData));
+      }
       validateGroup(this.dataset.pregunta);
     });
     validateGroup(input.dataset.pregunta);
@@ -143,9 +163,27 @@ document.addEventListener('DOMContentLoaded', function() {
     [...new Set(Array.from(inputs).map(i => i.dataset.pregunta))].forEach(id => {
       if (!validateGroup(id)) ok = false;
     });
+    
     if (!ok) {
       e.preventDefault();
-      alert('Corrige las prioridades antes de continuar.');
+      // Alerta mejorada (estilo Bootstrap) en lugar del alert() nativo
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-danger position-fixed top-0 start-50 translate-middle-x mt-3';
+      alertDiv.style.zIndex = '2000';
+      alertDiv.innerHTML = `
+          <div class="d-flex align-items-center">
+              <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+              <div>
+                  <h5>Valores inválidos</h5>
+                  <p class="mb-0">Debes usar 4, 3, 2, 1 sin repetir, o todos 0. Revisa las preguntas marcadas en rojo.</p>
+              </div>
+          </div>
+      `;
+      document.body.appendChild(alertDiv);
+      setTimeout(() => alertDiv.remove(), 5000);
+    } else {
+      // --- 4. LIMPIAR LOCALSTORAGE SI EL TEST SE ENVÍA CORRECTAMENTE ---
+      localStorage.removeItem(storageKey);
     }
   });
 });
