@@ -12,8 +12,36 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.auth.views import LoginView
 from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from core.models import ConfiguracionPlataforma
+from django.urls import reverse
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+
+from courses.models import Inscripcion, LeccionCompletada
+
+@login_required
+@require_POST
+def change_password_ajax(request):
+    form = PasswordChangeForm(user=request.user, data=request.POST)
+    if form.is_valid():
+        user = form.save()
+        update_session_auth_hash(request, user)  # evita cerrar la sesión al cambiar el hash
+        return JsonResponse({'success': True, 'message': 'Contraseña actualizada correctamente.'})
+    return JsonResponse({'success': False, 'errors': form.errors.get_json_data()}, status=400)
 
 def signup(request):
+    # ── CANDADO DE SEGURIDAD ──
+    config, _ = ConfiguracionPlataforma.objects.get_or_create(id=1)
+    if not config.registro_abierto:
+        # Si el registro está cerrado, mostramos error y lo mandamos al inicio
+        messages.error(request, "Lo sentimos, los registros están cerrados temporalmente.")
+        return redirect('home')
+    # ──────────────────────────
+
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -25,19 +53,35 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 def password_reset_request(request):
+    # 1. Atrapamos el parámetro 'next' (ya sea que venga por la URL en GET o por el formulario en POST)
+    next_url = request.GET.get('next') or request.POST.get('next') or ''
+    
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():
+            # 2. Guardamos y enviamos el correo, inyectando el 'next' en el contexto del email
             form.save(
                 email_template_name='registration/password_reset_email.html',
                 subject_template_name='registration/password_reset_subject.txt',
                 from_email="no-reply@CentroDHAE.com",
-                request=request
+                request=request,
+                extra_email_context={'next': next_url}  # <-- ESTO ES CLAVE PARA EL CORREO
             )
-            return redirect('password_reset_done')
+            
+            # 3. Preparamos la URL de redirección y le "pegamos" el parámetro next
+            url_destino = reverse('password_reset_done')
+            if next_url:
+                url_destino += f"?next={next_url}"
+                
+            return redirect(url_destino)
     else:
         form = PasswordResetForm()
-    return render(request, 'registration/password_reset.html', {'form': form})
+        
+    # 4. Mandamos el 'next' al HTML para que no se pierda al recargar la página
+    return render(request, 'registration/password_reset.html', {
+        'form': form, 
+        'next': next_url
+    })
 
 @login_required
 def dashboard(request):
@@ -52,30 +96,78 @@ def user_dashboard(request):
     """Dashboard para usuarios normales"""
     resultados_valores = ResultadoValores.objects.filter(usuario=request.user)
     resultados_domino = ResultadoDomino.objects.filter(usuario=request.user)
-    
+
     total_valores = resultados_valores.count()
     total_domino = resultados_domino.count()
     total_tests = total_valores + total_domino
-    
+
     ultimas_valores = list(resultados_valores.order_by('-fecha_completado')[:3])
     ultimas_domino = list(resultados_domino.order_by('-fecha')[:3])
-    ultimas_pruebas = ultimas_valores + ultimas_domino
-    
+
+    # Anota cada objeto con datos ya resueltos para que el template no tenga que decidir nada
+    for r in ultimas_valores:
+        r.tipo = 'valores'
+        r.nombre_test = r.test.nombre if getattr(r, 'test', None) and r.test.nombre else 'Test de Valores'
+        r.fecha_mostrar = r.fecha_completado
+        r.resultado_mostrar = r.valor_dominante
+        r.detalle_url = reverse('tests:reporte_valores', args=[r.id])
+
+    for r in ultimas_domino:
+        r.tipo = 'domino'
+        r.nombre_test = 'Test de Dominó D-48'
+        r.fecha_mostrar = r.fecha
+        r.resultado_mostrar = f"{r.puntuacion} pts"
+        r.detalle_url = reverse('tests:resultados_domino', args=[r.id])
+
     ultimas_pruebas = sorted(
-        ultimas_pruebas,
-        key=lambda x: x.fecha if hasattr(x, 'fecha') else x.fecha_completado,
+        ultimas_valores + ultimas_domino,
+        key=lambda x: x.fecha_mostrar,
         reverse=True
     )[:5]
-    
+
     avg_valores = resultados_valores.aggregate(
-        teorico=Avg('teorico'),
-        economico=Avg('economico'),
-        estetico=Avg('estetico'),
-        social=Avg('social'),
-        politico=Avg('politico'),
-        religioso=Avg('religioso')
+        teorico=Avg('teorico'), economico=Avg('economico'), estetico=Avg('estetico'),
+        social=Avg('social'), politico=Avg('politico'), religioso=Avg('religioso')
     )
-    
+    # Evita None en el template/JS si el usuario no tiene resultados de Valores
+    if total_valores == 0:
+        avg_valores = {k: 0 for k in avg_valores}
+
+        # --- Cursos: progreso del estudiante ---
+    inscripciones = Inscripcion.objects.filter(
+        estudiante=request.user
+    ).select_related('curso').order_by('-inscrito_en')
+
+    cursos_progreso = []
+    for insc in inscripciones:
+        lecciones_curso = insc.curso.lecciones.all()
+        total_lecciones = lecciones_curso.count()
+
+        completadas_ids = set(
+            LeccionCompletada.objects.filter(inscripcion=insc)
+            .values_list('leccion_id', flat=True)
+        )
+        lecciones_completadas = len(completadas_ids)
+
+        siguiente_leccion = lecciones_curso.exclude(id__in=completadas_ids).order_by('orden').first()
+
+        if siguiente_leccion:
+            continuar_url = reverse('courses:leccion_detail', args=[insc.curso.slug, siguiente_leccion.orden])
+        else:
+            continuar_url = reverse('courses:curso_detail', args=[insc.curso.slug])
+
+        cursos_progreso.append({
+            'titulo': insc.curso.titulo,
+            'slug': insc.curso.slug,
+            'imagen': insc.curso.imagen,
+            'progreso': insc.progreso,
+            'completado': insc.completado,
+            'lecciones_completadas': lecciones_completadas,
+            'total_lecciones': total_lecciones,
+            'continuar_url': continuar_url,
+            'certificado_url': reverse('courses:descargar_certificado', args=[insc.curso.slug]) if insc.completado else None,
+        })
+
     context = {
         'user': request.user,
         'ultimas_pruebas': ultimas_pruebas,
@@ -83,6 +175,7 @@ def user_dashboard(request):
         'total_valores': total_valores,
         'total_domino': total_domino,
         'avg_valores': avg_valores,
+        'cursos_progreso': cursos_progreso,
     }
     return render(request, 'users/dashboard.html', context)
 
